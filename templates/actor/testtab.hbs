@@ -95,31 +95,31 @@
       </div>
     </div>
   </section>
-  {{#each system.cskills as |cskill key|}}
+  {{#each system.combat_skills as |combat_skill key|}}
     <div class="ability flexrow flex-group-center">
       <label
         class="resource-label rollable flexlarge align-left"
         data-action="roll"
-        data-roll="{{cskill.rating}}-1d100"
-        data-roll-type="cskill"
+        data-roll="{{combat_skill.rating}}-1d100"
+        data-roll-type="combat_skill"
         data-label="{{key}}"
       >{{key}} <!-- Use key to display the combat skill name --> </label>
       <input
         type="text"
-        name="system.cskills.{{key}}.value"
-        value="{{cskill.value}}"
-        class="cskill-value"
+        name="system.combat_skills.{{key}}.value"
+        value="{{combat_skill.value}}"
+        class="combat_skill-value"
         data-dtype="Number"
       />
       <span
         type="text"
-        class="cskill-mod rollable"
+        class="combat_skill-mod rollable"
         data-action="roll"
-        data-roll="{{cskill.rating}}-1d100"
-        data-roll-type="cskill"
+        data-roll="{{combat_skill.rating}}-1d100"
+        data-roll-type="combat_skill"
         data-label="{{key}}"
         data-dtype="Number"
-      >{{cskill.rating}} <!-- Display the combat skill rating --> </span>
+      >{{combat_skill.rating}} <!-- Display the combat skill rating --> </span>
     </div>
     <!-- Log the entire system object -->
     <!-- Log the skills object -->

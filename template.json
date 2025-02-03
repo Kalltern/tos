@@ -91,7 +91,7 @@
       },
 
       "skills": {
-        "Athletics": {
+        "athletics": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -99,7 +99,7 @@
           "id": 0,
           "type": 1
         },
-        "Muscles": {
+        "muscles": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -107,7 +107,7 @@
           "id": 0,
           "type": 2
         },
-        "Smithing": {
+        "smithing": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -115,7 +115,7 @@
           "id": 0,
           "type": 1
         },
-        "Acrobacy": {
+        "acrobacy": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -123,7 +123,7 @@
           "id": 1,
           "type": 1
         },
-        "Craft": {
+        "craft": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -131,7 +131,7 @@
           "id": 1,
           "type": 1
         },
-        "Dancing": {
+        "dancing": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -139,7 +139,7 @@
           "id": 1,
           "type": 4
         },
-        "Lockpicking": {
+        "lockpicking": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -147,7 +147,7 @@
           "id": 1,
           "type": 1
         },
-        "Nimbleness": {
+        "nimbleness": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -155,7 +155,7 @@
           "id": 1,
           "type": 2
         },
-        "Pickpocketing": {
+        "pickpocketing": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -163,7 +163,7 @@
           "id": 1,
           "type": 1
         },
-        "Riding": {
+        "riding": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -172,7 +172,7 @@
           "type": 3
         },
 
-        "Sailing": {
+        "sailing": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -181,7 +181,7 @@
           "type": 3
         },
 
-        "Stealth": {
+        "stealth": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -190,7 +190,7 @@
           "type": 1
         },
 
-        "Drinking": {
+        "drinking": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -198,7 +198,7 @@
           "id": 2,
           "type": 5
         },
-        "Alchemy": {
+        "alchemy": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -206,7 +206,7 @@
           "id": 3,
           "type": 1
         },
-        "Arcana": {
+        "arcana": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -214,7 +214,7 @@
           "id": 3,
           "type": 1
         },
-        "Art": {
+        "art": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -222,7 +222,7 @@
           "id": 3,
           "type": 1
         },
-        "Engineering": {
+        "engineering": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -230,7 +230,7 @@
           "id": 3,
           "type": 1
         },
-        "Firstaid": {
+        "first_aid": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -238,7 +238,7 @@
           "id": 3,
           "type": 1
         },
-        "Logic": {
+        "logic": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -246,7 +246,7 @@
           "id": 3,
           "type": 1
         },
-        "Research": {
+        "research": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -254,7 +254,7 @@
           "id": 3,
           "type": 1
         },
-        "Tactics": {
+        "tactics": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -262,7 +262,7 @@
           "id": 3,
           "type": 1
         },
-        "Augury": {
+        "augury": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -278,7 +278,7 @@
           "id": 4,
           "type": 1
         },
-        "Meditation": {
+        "meditation": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -286,7 +286,7 @@
           "id": 4,
           "type": 4
         },
-        "Rituals": {
+        "rituals": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -294,7 +294,7 @@
           "id": 4,
           "type": 1
         },
-        "Acting": {
+        "acting": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -302,7 +302,7 @@
           "id": 5,
           "type": 1
         },
-        "Animalhandling": {
+        "animal_handling": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -310,7 +310,7 @@
           "id": 5,
           "type": 1
         },
-        "Deception": {
+        "deception": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -318,7 +318,7 @@
           "id": 5,
           "type": 6
         },
-        "Intimidation": {
+        "intimidation": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -326,7 +326,7 @@
           "id": 5,
           "type": 6
         },
-        "Leadership": {
+        "leadership": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -334,7 +334,7 @@
           "id": 5,
           "type": 1
         },
-        "Music": {
+        "music": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -342,7 +342,7 @@
           "id": 5,
           "type": 1
         },
-        "Painting": {
+        "painting": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -350,7 +350,7 @@
           "id": 5,
           "type": 1
         },
-        "Perusasion": {
+        "perusasion": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -358,7 +358,7 @@
           "id": 5,
           "type": 6
         },
-        "Seduction": {
+        "seduction": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -367,7 +367,7 @@
           "type": 6
         },
 
-        "Singing": {
+        "singing": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -375,7 +375,7 @@
           "id": 5,
           "type": 1
         },
-        "Herbalism": {
+        "herbalism": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -383,7 +383,7 @@
           "id": 6,
           "type": 1
         },
-        "Insight": {
+        "insight": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -391,7 +391,7 @@
           "id": 6,
           "type": 6
         },
-        "Traps": {
+        "traps": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -399,7 +399,7 @@
           "id": 6,
           "type": 1
         },
-        "Survival": {
+        "survival": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -408,8 +408,48 @@
           "type": 7
         }
       },
-      "cskills": {
+      "combat_skills": {
         "combat": {
+          "value": 0,
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1
+        },
+        "ranged": {
+          "value": 0,
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1
+        },
+        "channeling": {
+          "value": 0,
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1
+        },
+        "ranger": {
+          "value": 0,
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1
+        },
+        "cordinas": {
+          "value": 0,
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1
+        },
+        "veneficus": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -423,12 +463,12 @@
           "value": 0
         }
       },
-      "weaponskills": {
+      "weapon_skills": {
         "sword": {
           "value": 0
         }
       },
-      "mdoctrines": {
+      "magic_doctrines": {
         "elymas": {
           "value": 0
         }

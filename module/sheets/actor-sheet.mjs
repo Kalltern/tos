@@ -409,8 +409,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (dataset.roll) {
       // Determine if this is a skill or combat skill roll
       const isSkillRoll =
-        dataset.rollType === "skill" || dataset.rollType === "cskill";
-      const skillKey = dataset.label; // This should hold either "skill name" or "cskill name"
+        dataset.rollType === "skill" || dataset.rollType === "combat_skill";
+      const skillKey = dataset.label; // This should hold either "skill name" or "combat_skill name"
 
       let label = dataset.label
         ? `[${dataset.rollType === "skill" ? "Skill" : "Combat Skill"}] ${
@@ -428,7 +428,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         const skillData =
           dataset.rollType === "skill"
             ? this.actor.system.skills[skillKey]
-            : this.actor.system.cskills[skillKey];
+            : this.actor.system.combat_skills[skillKey];
 
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
