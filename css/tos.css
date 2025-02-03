@@ -550,3 +550,6 @@
   max-height: 700px; /* Ensure no overflow of the skills tab */
   overflow-y: auto; /* Scrollbar for long content */
 }
+.hidden {
+  display: none;
+}
