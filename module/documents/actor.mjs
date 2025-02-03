@@ -110,31 +110,32 @@ export class ToSActor extends Actor {
 
     // Function to calculate thresholds for each skill type (e.g., skills, cskills)
     function calculateSkillThresholds(skillsObject) {
-      for (const [key, skillData] of Object.entries(skillsObject)) {
+      for (const [key, anySkill] of Object.entries(skillsObject)) {
         // Ensure skillData is defined and contains critical bonus properties
-        const critBonus = skillData.critbonus || 0;
-        const critFailPenalty = skillData.critfailpenalty || 0;
+        const critBonus = anySkill.critbonus || 0;
+        const critFailPenalty = anySkill.critfailpenalty || 0;
 
         // Calculate critical success threshold for each skill
-        skillData.criticalSuccessThreshold = Math.max(
+        anySkill.criticalSuccessThreshold = Math.max(
           1,
           baseCriticalSuccess + Math.max(0, luck) + critBonus
         );
 
         // Calculate critical failure threshold for each skill
-        skillData.criticalFailureThreshold = Math.min(
+        anySkill.criticalFailureThreshold = Math.min(
           100,
           baseCriticalFailure - Math.max(0, -luck) - critFailPenalty
         );
 
         // Debug output to verify each skill's calculated thresholds
         console.log(
-          `Skill ${key}: Critical Success Threshold ${skillData.criticalSuccessThreshold}, Critical Failure Threshold ${skillData.criticalFailureThreshold}`
+          `Skill ${key}: Critical Success Threshold ${anySkill.criticalSuccessThreshold}, Critical Failure Threshold ${anySkill.criticalFailureThreshold}`
         );
       }
     }
 
     // Calculate thresholds for regular skills and combat skills
+    console.log('Calling calculateSkillThresholds() for skills');
     calculateSkillThresholds(systemData.skills);
     calculateSkillThresholds(systemData.cskills);
 
@@ -152,6 +153,8 @@ export class ToSActor extends Actor {
     // Store thresholds in actor data if needed
     actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
     actorData.criticalFailureThreshold = this.criticalFailureThreshold;
+    console.log(`After update: ${key} - Success Threshold: ${anySkill.criticalSuccessThreshold}, Failure Threshold: ${anySkill.criticalFailureThreshold}`);
+
 
     // Debugging: Log all skills and combat skills
     console.log("Updated Skills:", systemData.skills);

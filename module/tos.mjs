@@ -186,6 +186,23 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         const roll = new Roll(rollFormula);
         await roll.evaluate();
 
+        // Check if we have critical success or failure info to add
+        let criticalMessage = "";
+        if (message.system.rollType === "skill" || message.system.rollType === "cskill") {
+          const skillKey = message.system.skillKey; // Assuming this is available in message.data
+          const skillData = message.system.rollType === "skill"
+            ? game.actors.get(message.speaker.actor).system.skills[skillKey]
+            : game.actors.get(message.speaker.actor).system.cskills[skillKey];
+
+          if (skillData) {
+            criticalMessage = evaluateCriticalSuccess(
+              roll.total, 
+              skillData.criticalSuccessThreshold, 
+              skillData.criticalFailureThreshold
+            );
+          }
+        }
+
         // Send the new roll to chat or update the message as needed
         roll.toMessage({
           speaker: ChatMessage.getSpeaker({ user: game.user }),
