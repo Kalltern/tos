@@ -212,7 +212,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
     }
   }
 });
-Hooks.once("ready", () => {
+Hooks.once("ready", () => { 
   // Listen for clicks on any element with the class "action-btn"
   $(document).on("click", ".action-btn", function(event) {
     event.preventDefault(); // Prevent default action

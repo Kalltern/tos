@@ -7,8 +7,9 @@
         "biography": ""
       }
     },
+    
     "character": {
-      "templates": ["base"],
+            "templates": ["base"],
       "stats": {
         "health": {
           "value": 10,
@@ -97,7 +98,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "muscles": {
           "value": 0,
@@ -105,7 +107,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 2
+          "type": 2,
+          "visible":true
         },
         "smithing": {
           "value": 0,
@@ -113,7 +116,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "acrobacy": {
           "value": 0,

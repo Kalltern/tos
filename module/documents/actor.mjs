@@ -128,14 +128,14 @@ export class ToSActor extends Actor {
         );
 
         // Debug output to verify each skill's calculated thresholds
-        console.log(
-          `Skill ${key}: Critical Success Threshold ${anySkill.criticalSuccessThreshold}, Critical Failure Threshold ${anySkill.criticalFailureThreshold}`
-        );
+  //      console.log(
+ //         `Skill ${key}: Critical Success Threshold ${anySkill.criticalSuccessThreshold}, Critical Failure Threshold ${anySkill.criticalFailureThreshold}`
+ //       );
       }
     }
 
     // Calculate thresholds for regular skills and combat skills
-    console.log('Calling calculateSkillThresholds() for skills');
+//    console.log('Calling calculateSkillThresholds() for skills');
     calculateSkillThresholds(systemData.skills);
     calculateSkillThresholds(systemData.combat_skills);
 
@@ -153,7 +153,7 @@ export class ToSActor extends Actor {
     // Store thresholds in actor data if needed
     actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
     actorData.criticalFailureThreshold = this.criticalFailureThreshold;
-    console.log(`After update: ${key} - Success Threshold: ${anySkill.criticalSuccessThreshold}, Failure Threshold: ${anySkill.criticalFailureThreshold}`);
+  //  console.log(`After update: ${key} - Success Threshold: ${anySkill.criticalSuccessThreshold}, Failure Threshold: ${anySkill.criticalFailureThreshold}`);
 
 
     // Debugging: Log all skills and combat skills

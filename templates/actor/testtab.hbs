@@ -44,22 +44,33 @@
         />
       </div>
     </div>
+<div class="skills">
+  {{#if system.skills.athletics}}
+    <div class="skill">
+      <label>
+        <input type="checkbox" name="system.skills.athletics.visible"
+               {{#if system.skills.athletics.visible}}checked{{/if}} />
+        Athletics
+      </label>
+    </div>
+  {{/if}}
+</div>
     <div class="resource flex-group-center">
-      <label for="system.skills.Athletics.critbonus" class="resource-label">
+      <label for="system.skills.athletics.critbonus" class="resource-label">
         athleticsbonus
       </label>
       <div class="resource-content flexrow flex-center flex-between">
         <input
           type="text"
-          name="system.skills.Athletics.critbonus"
-          value="{{system.skills.Athletics.critbonus}}"
+          name="system.skills.athletics.critbonus"
+          value="{{system.skills.athletics.critbonus}}"
           data-dtype="Number"
         />
       </div>
     </div>
     <div class="resource flex-group-center">
       <label
-        for="system.skills.Athletics.critfailpenalty"
+        for="system.skills.athletics.critfailpenalty"
         class="resource-label"
       >
         athleticspenalty
@@ -67,8 +78,8 @@
       <div class="resource-content flexrow flex-center flex-between">
         <input
           type="text"
-          name="system.skills.Athletics.critfailpenalty"
-          value="{{system.skills.Athletics.critfailpenalty}}"
+          name="system.skills.athletics.critfailpenalty"
+          value="{{system.skills.athletics.critfailpenalty}}"
           data-dtype="Number"
         />
       </div>
