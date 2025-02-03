@@ -812,4 +812,19 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       }
     }
   }
+ 
+    /** @override */
+    activateListeners(html) {
+      super.activateListeners(html);
+  
+      // Listen for clicks on the "Click Me!" button
+      html.find(".action-btn").on("click", this._onButtonClick.bind(this));
+    }
+  
+    /** Handle button click */
+    _onButtonClick(event) {
+      event.preventDefault(); // Prevent default action if needed
+      console.log("Button was clicked!");
+    }
+ 
 }
