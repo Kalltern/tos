@@ -213,12 +213,29 @@ Hooks.on("renderChatMessage", (message, html, data) => {
   }
 });
 Hooks.once("ready", () => {
-  // Listen for clicks on the "Toggle Skill Visibility" button
-  $(document).on("click", ".action-btn", function(event) {
-    event.preventDefault(); // Prevent default action
+  $(document).on("click", ".action-btn", function (event) {
+    event.preventDefault();
     console.log("Button clicked!");
 
-    // Toggle the visibility of skill entries by toggling the "hidden" class
-    $(".skill-entry").toggleClass("hidden");
+    // Toggle visibility of skills and checkboxes
+    $(".skill-entry").toggleClass("hidden-skill");  // Toggle skill visibility
+    $(".toggle-label").toggleClass("hidden");  // Toggle checkbox visibility
+  });
+
+  // Listen for checkbox changes to update skill visibility
+  $(document).on("change", ".toggle-skill-visibility", function () {
+    let skillKey = $(this).attr("data-skill");
+    let isChecked = $(this).prop("checked");
+
+    console.log(`Toggling visibility for skill: ${skillKey}, Checked: ${isChecked}`);
+
+    let skillEntry = $(`.skill-label[data-label="${skillKey}"]`).closest(".skill-entry");
+
+    // Reverse the logic: if checked, hide the skill, else show the skill
+    if (isChecked) {
+      skillEntry.addClass("hidden-skill");
+    } else {
+      skillEntry.removeClass("hidden-skill");
+    }
   });
 });

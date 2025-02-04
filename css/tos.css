@@ -553,3 +553,11 @@
 .hidden {
   display: none;
 }
+
+.hidden-skill {
+  display: none !important;
+}
+
+.toggle-skill-visibility {
+  display: inline-block !important; /* Forces checkboxes to always be shown */
+}

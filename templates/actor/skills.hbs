@@ -14,10 +14,17 @@
 <div class="skills-checkbox-container">
   {{#each system.skills as |skill key|}}
     {{#if (eq skill.id 0)}}
-      {{#if skill.visible}}
-        <div class="skill-entry flexrow skill-visible">
+      <div class="skill-toggle-wrapper">
+        
+        <label class="toggle-label hidden">
+          <input type="checkbox" class="toggle-skill-visibility" data-skill="{{key}}" {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+
+       
+        <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
           <label
-            class="skill-label rollable flexlarge align-left"
+            class="skill-label rollable flexlarge align-left skill-name"  
             data-action="roll"
             data-roll="{{skill.rating}}-1d100"
             data-roll-type="skill"
@@ -25,6 +32,7 @@
           >
             {{key}}
           </label>
+
           <input
             type="text"
             name="system.skills.{{key}}.value"
@@ -32,16 +40,16 @@
             class="skill-value"
             data-dtype="Number"
           />
+
           <span
-            class="skill-mod rollable skill-rating"
-            data-action="roll"
+            class="skill-mod rollable skill-rating"  
             data-roll="{{skill.rating}}-1d100"
             data-roll-type="skill"
             data-label="{{key}}"
             data-dtype="Number"
           >{{skill.rating}}</span>
         </div>
-      {{/if}}
+      </div>
     {{/if}}
   {{/each}}
 </div>
