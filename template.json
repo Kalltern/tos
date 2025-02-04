@@ -9,6 +9,7 @@
     },
     
     "character": {
+      "skillvisibility":true,
             "templates": ["base"],
       "stats": {
         "health": {
@@ -125,7 +126,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "craft": {
           "value": 0,
@@ -133,7 +135,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "dancing": {
           "value": 0,
@@ -141,7 +144,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 4
+          "type": 4,
+          "visible":true
         },
         "lockpicking": {
           "value": 0,
@@ -149,7 +153,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "nimbleness": {
           "value": 0,
@@ -157,7 +162,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 2
+          "type": 2,
+          "visible":true
         },
         "pickpocketing": {
           "value": 0,
@@ -165,7 +171,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "riding": {
           "value": 0,
@@ -173,7 +180,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 3
+          "type": 3,
+          "visible":true
         },
 
         "sailing": {
@@ -182,7 +190,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 3
+          "type": 3,
+          "visible":true
         },
 
         "stealth": {
@@ -191,7 +200,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
 
         "drinking": {
@@ -200,7 +210,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 2,
-          "type": 5
+          "type": 5,
+          "visible":true
         },
         "alchemy": {
           "value": 0,
@@ -208,7 +219,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "arcana": {
           "value": 0,
@@ -216,7 +228,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "art": {
           "value": 0,
@@ -224,7 +237,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "engineering": {
           "value": 0,
@@ -232,15 +246,17 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
-        "first_aid": {
+        "firstAid": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "logic": {
           "value": 0,
@@ -248,7 +264,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "research": {
           "value": 0,
@@ -256,7 +273,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "tactics": {
           "value": 0,
@@ -264,7 +282,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 3,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "augury": {
           "value": 0,
@@ -272,15 +291,17 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 4,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
-        "Dreamwalker": {
+        "dreamwalker": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 4,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "meditation": {
           "value": 0,
@@ -288,7 +309,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 4,
-          "type": 4
+          "type": 4,
+          "visible":true
         },
         "rituals": {
           "value": 0,
@@ -296,7 +318,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 4,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "acting": {
           "value": 0,
@@ -304,15 +327,17 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
-        "animal_handling": {
+        "animalHandling": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "deception": {
           "value": 0,
@@ -320,7 +345,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 6
+          "type": 6,
+          "visible":true
         },
         "intimidation": {
           "value": 0,
@@ -328,7 +354,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 6
+          "type": 6,
+          "visible":true
         },
         "leadership": {
           "value": 0,
@@ -336,7 +363,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "music": {
           "value": 0,
@@ -344,7 +372,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "painting": {
           "value": 0,
@@ -352,7 +381,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "perusasion": {
           "value": 0,
@@ -360,7 +390,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 6
+          "type": 6,
+          "visible":true
         },
         "seduction": {
           "value": 0,
@@ -368,7 +399,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 6
+          "type": 6,
+          "visible":true
         },
 
         "singing": {
@@ -377,7 +409,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 5,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "herbalism": {
           "value": 0,
@@ -385,7 +418,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 6,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "insight": {
           "value": 0,
@@ -393,7 +427,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 6,
-          "type": 6
+          "type": 6,
+          "visible":true
         },
         "traps": {
           "value": 0,
@@ -401,7 +436,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 6,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "survival": {
           "value": 0,
@@ -409,17 +445,53 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 6,
-          "type": 7
+          "type": 7,
+          "visible":true
         }
       },
-      "combat_skills": {
-        "combat": {
+      "combatSkills": {
+        "melee": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1
+          "type": 1,
+          "finesse":false,
+          "veneficus":false,
+          "cordinas":false,
+          "visible":true
+        },
+        "throwing": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1,
+          "finesse":false,
+          "visible":true
+        },
+        "meleeDefense": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1,
+          "steelGrip":false,
+          "predatorySenses":false,
+          "visible":true
+
+        },
+        "rangedDefense": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1,
+          "steelGrip":false,
+          "predatorySenses":false,
+          "visible":true
+
         },
         "ranged": {
           "value": 0,
@@ -427,7 +499,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1
+          "type": 1,
+          "visible":true
         },
         "channeling": {
           "value": 0,
@@ -435,7 +508,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1
+          "type": 1,
+          "visible":false
         },
         "ranger": {
           "value": 0,
@@ -443,43 +517,93 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1
-        },
-        "cordinas": {
-          "value": 0,
-          "rating": 0,
-          "critbonus": 0,
-          "critfailpenalty": 0,
-          "id": 0,
-          "type": 1
-        },
-        "veneficus": {
-          "value": 0,
-          "rating": 0,
-          "critbonus": 0,
-          "critfailpenalty": 0,
-          "id": 0,
-          "type": 1
+          "type": 1,
+          "visible":false
         }
+
       },
       "doctrines": {
-        "swordsman": {
-          "value": 0
-        }
+        "swordsman": { "value": 0,
+        "visible":false },       
+        "shieldbearer": { "value": 0,
+        "visible":false },
+        "reaver": { "value": 0,
+        "visible":false },
+        "pikeman": { "value": 0,
+        "visible":false },
+        "dimakerus": { "value": 0,
+        "visible":false },
+        "duelist": { "value": 0,
+        "visible":false },
+        "monk": { "value": 0,
+        "visible":false },
+        "rogue": { "value": 0,
+        "visible":false },
+        "rider": { "value": 0,
+        "visible":false },
+        "archer": { "value": 0,
+        "visible":false },
+        "arbalest": { "value": 0,
+        "visible":false },
+        "peltast": { "value": 0,
+        "visible":false },
+        "juggler": { "value": 0,
+        "visible":false },
+        "musketeer": { "value": 0,
+        "visible":false },
+        "cordinas": { "value": 0,
+        "visible":false },
+        "elymas": { "value": 0,
+        "visible":false },
+        "incantator": { "value": 0,
+        "visible":false },
+        "veneficus": { "value": 0,
+        "visible":false },
+        "elementalist": { "value": 0,
+        "visible":false }
       },
-      "weapon_skills": {
-        "sword": {
-          "value": 0
-        }
-      },
-      "magic_doctrines": {
-        "elymas": {
-          "value": 0
-        }
+      "weaponSkills": {
+        "swords": { "value": 0,
+        "visible":false },
+        "axes": { "value": 0,
+        "visible":false },
+        "blunt": { "value": 0,
+        "visible":false },
+        "polearms": { "value": 0,
+        "visible":false }
       },
       "schools": {
         "fire": {
-          "value": 0
+          "value": 0,
+          "visible":false
+        },
+        "water": {
+          "value": 0,
+          "visible":false
+        },
+        "earth": {
+          "value": 0,
+          "visible":false
+        },
+        "air": {
+          "value": 0,
+          "visible":false
+        },
+        "spirit": {
+          "value": 0,
+          "visible":false
+        },
+        "body": {
+          "value": 0,
+          "visible":false
+        },
+        "darkness": {
+          "value": 0,
+          "visible":false
+        },
+        "blood": {
+          "value": 0,
+          "visible":false
         }
       }
     },

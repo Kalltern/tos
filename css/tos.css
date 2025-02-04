@@ -554,8 +554,8 @@
   display: none;
 }
 
-.hidden-skill {
-  display: none !important;
+.skills-container .hidden-skill {
+  display: none;
 }
 
 .toggle-skill-visibility {

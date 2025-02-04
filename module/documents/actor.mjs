@@ -93,13 +93,13 @@ export class ToSActor extends Actor {
       }
     }
     // Iterate through combat skills
-    for (let [key, combat_skill] of Object.entries(systemData.combat_skills)) {
+    for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
       // Ensure skill type is valid and matches your criteria
-      if (combat_skill.type === 1) {
+      if (combatSkill.type === 1) {
         // Use skill.id to find the corresponding attribute
 
-        combat_skill.rating =
-          combatset1[combat_skill.value] + attributeScore[combat_skill.id] * 3;
+        combatSkill.rating =
+          combatset1[combatSkill.value] + attributeScore[combatSkill.id] * 3;
       }
     }
 
@@ -108,7 +108,7 @@ export class ToSActor extends Actor {
     const baseCriticalSuccess = 5; // Base critical success threshold
     const baseCriticalFailure = 96; // Base critical failure threshold
 
-    // Function to calculate thresholds for each skill type (e.g., skills, combat_skills)
+    // Function to calculate thresholds for each skill type (e.g., skills, combatSkills)
     function calculateSkillThresholds(skillsObject) {
       for (const [key, anySkill] of Object.entries(skillsObject)) {
         // Ensure skillData is defined and contains critical bonus properties
@@ -137,7 +137,7 @@ export class ToSActor extends Actor {
     // Calculate thresholds for regular skills and combat skills
 //    console.log('Calling calculateSkillThresholds() for skills');
     calculateSkillThresholds(systemData.skills);
-    calculateSkillThresholds(systemData.combat_skills);
+    calculateSkillThresholds(systemData.combatSkills);
 
     // Global thresholds based on luck.value
     this.criticalSuccessThreshold = Math.max(
@@ -158,7 +158,7 @@ export class ToSActor extends Actor {
 
     // Debugging: Log all skills and combat skills
     console.log("Updated Skills:", systemData.skills);
-    console.log("Updated Combat Skills:", systemData.combat_skills);
+    console.log("Updated Combat Skills:", systemData.combatSkills);
   }
 
   /**
