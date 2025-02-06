@@ -828,22 +828,5 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
  
 
-/** @override */
-activateListeners(html) {
-  super.activateListeners(html);
 
-  // Listen for changes to the Athletics checkbox
-  html.find('input[name="system.skills.athletics.visible"]').on('change', this._onAthleticsVisibilityChange.bind(this));
-}
-
-/**
- * Handle the visibility change for Athletics skill.
- * @private
- */
-_onAthleticsVisibilityChange(event) {
-  const visible = event.target.checked; // Get the current visibility (checked or unchecked)
-
-  // Update the actor's system data for Athletics visibility
-  this.actor.update({ "system.skills.athletics.visible": visible });
-}
 }
