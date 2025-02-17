@@ -178,6 +178,14 @@
 .grid-span-12 {
   grid-column-end: span 12;
 }
+.grid-skills {
+  display: grid ;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Collapsing empty spaces */
+  margin: 10px 0 ;
+  padding: 0 ;  
+  width: 100% ;
+  max-width: 1200px ; /* Adjust if necessary */
+}
 
 .flex-group-center,
 .flex-group-left,
@@ -269,12 +277,12 @@
   font-weight: bold;
 }
 .skill-label.rollable {
-  flex: 0 0 auto; /* Prevent it from expanding */
-  width: 8rem; /* Adjust the width as needed */
-  max-width: 140px; /* Set a maximum width */
-  padding: 0.4rem; /* Optional: Adjust padding */
-  text-align: left; /* Ensure text is left-aligned */
-}
+  flex: 1 0 auto;  /* Allow label to grow without shrinking */
+  max-width: 140px;  /* Optional: Keep the max-width */
+  width: 100%;
+  padding: 0.4rem;  /* Optional: Adjust padding */
+  text-align: left;  /* Ensure text is left-aligned */
+  }
 
 .tos .attributes {
   display: flex; /* Align attributes in a row */
@@ -524,13 +532,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-}
+  }
 
 .skill-entry {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  align-items: left;
+  margin-bottom: 0.5rem;
+  
 }
 .skill-value {
   width: 4rem; /* Adjust the width as needed */
@@ -550,20 +558,13 @@
   max-height: 700px; /* Ensure no overflow of the skills tab */
   overflow-y: auto; /* Scrollbar for long content */
 }
-.hidden {
-  display: none;
-}
-
+.skill-entry.hidden-skill,
+.hidden,
 .skills-container .hidden-skill {
-  display: none;
-}
-.hidden-skill {
-  display: none;
+  display: none !important;
+  margin-bottom: 0 !important;
 }
 
-.skill-entry.hidden-skill {
-  display: none !important;
-}
 .toggle-skill-visibility {
   display: inline-block !important; /* Forces checkboxes to always be shown */
 }
@@ -571,6 +572,11 @@
   display: block !important;
   
 }
-input[type="checkbox"] {
-  display: inline-block !important;  /* Force visibility */
+.tab.config {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  max-height: 700px; /* Ensure no overflow of the skills tab */
+  overflow-y: auto; /* Scrollbar for long content */
 }
+

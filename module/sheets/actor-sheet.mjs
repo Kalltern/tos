@@ -190,6 +190,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = "testtab";
           tab.label += "TestTab";
           break;
+        case "config":
+          tab.id = "config";
+          tab.label += "Config";
+          break;
         case "skills":
           tab.id = "skills";
           tab.label += "Skills";
@@ -210,16 +214,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = "effects";
           tab.label += "Effects";
           break;
-          case "config":
-            tab.id = "config";
-            tab.label += "Config";
-            break;
+
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;
       return tabs;
     }, {});
   }
+
 
   /**
    * Organize and classify Items for Actor sheets.
@@ -336,6 +338,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const doc = this._getEmbeddedDocument(target);
     doc.sheet.render(true);
   }
+
+  
 
   /**
    * Handles item deletion

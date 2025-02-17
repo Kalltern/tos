@@ -1,0 +1,60 @@
+<section
+  class="tab config {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="config"
+  >
+  <section class="config-container grid grid-3col"> 
+    
+{{#each system.combatSkills as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.combatSkills.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+  {{/each}}
+{{#each system.weaponSkills as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.weaponSkills.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+  {{/each}}
+{{#each system.doctrines as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.doctrines.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+   {{/each}}
+{{#each system.schools as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.schools.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+  {{/each}}     
+{{#each system.skills as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.skills.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+   {{/each}}
+</section>
+ 
+</section>

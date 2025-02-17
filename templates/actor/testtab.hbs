@@ -4,6 +4,9 @@
   data-group="primary"
   data-tab="testtab"
 >
+<section class="config-container"> 
+<button class="action-btn" type="button">Click Me!</button>
+</section>
   <section class="grid grid-3col">
 
     {{! The grid classes are defined in scss/global/_grid.scss. To use,
@@ -44,17 +47,7 @@
         />
       </div>
     </div>
-<div class="skills">
-  {{#if system.skills.athletics}}
-    <div class="skill">
-      <label>
-        <input type="checkbox" name="system.skills.athletics.visible"
-               {{#if system.skills.athletics.visible}}checked{{/if}} />
-        Athletics
-      </label>
-    </div>
-  {{/if}}
-</div>
+
     <div class="resource flex-group-center">
       <label for="system.skills.athletics.critbonus" class="resource-label">
         athleticsbonus
