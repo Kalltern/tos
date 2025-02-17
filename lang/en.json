@@ -12,7 +12,8 @@
         "Features": "Features",
         "Inventory": "Inventory",
         "Spells": "Spells",
-        "Effects": "Effects"
+        "Effects": "Effects",
+        "Config": "Config"
       },
       "base": {
         "FIELDS": {

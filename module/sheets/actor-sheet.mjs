@@ -66,6 +66,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     effects: {
       template: "systems/tos/templates/actor/effects.hbs",
     },
+    config: {
+      template: "systems/tos/templates/actor/config.hbs",
+    },
   };
 
   /** @override */
@@ -78,7 +81,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case "character":
-        options.parts.push("features", "inventory", "spells", "effects");
+        options.parts.push("features", "inventory", "spells", "effects", "config");
         break;
       case "npc":
         options.parts.push("inventory", "effects");
@@ -120,6 +123,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       case "skills":
       case "spells":
       case "inventory":
+      case "config":
         context.tab = context.tabs[partId];
         break;
       case "biography":
@@ -147,6 +151,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           this.actor.allApplicableEffects()
         );
         break;
+        
     }
     return context;
   }
@@ -205,6 +210,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = "effects";
           tab.label += "Effects";
           break;
+          case "config":
+            tab.id = "config";
+            tab.label += "Config";
+            break;
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;
@@ -813,6 +822,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
  
+  //functioning button example
     /** @override */
     activateListeners(html) {
       super.activateListeners(html);

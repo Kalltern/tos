@@ -557,7 +557,20 @@
 .skills-container .hidden-skill {
   display: none;
 }
+.hidden-skill {
+  display: none;
+}
 
+.skill-entry.hidden-skill {
+  display: none !important;
+}
 .toggle-skill-visibility {
   display: inline-block !important; /* Forces checkboxes to always be shown */
+}
+.config-checkbox {
+  display: block !important;
+  
+}
+input[type="checkbox"] {
+  display: inline-block !important;  /* Force visibility */
 }

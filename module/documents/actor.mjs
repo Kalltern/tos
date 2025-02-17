@@ -77,19 +77,19 @@ export class ToSActor extends Actor {
       if (skill.type === 1) {
         // Use skill.id to find the corresponding attribute
 
-        skill.rating = skillset1[skill.value] + attributeScore[skill.id] * 3;
+        skill.rating = skillset1[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 2) {
-        skill.rating = skillset2[skill.value] + attributeScore[skill.id] * 3;
+        skill.rating = skillset2[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 3) {
-        skill.rating = skillset3[skill.value] + attributeScore[skill.id] * 3;
+        skill.rating = skillset3[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 4) {
-        skill.rating = skillset4[skill.value] + attributeScore[skill.id] * 3;
+        skill.rating = skillset4[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 5) {
-        skill.rating = skillset5[skill.value] + attributeScore[skill.id] * 3;
+        skill.rating = skillset5[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 6) {
-        skill.rating = skillset6[skill.value] + attributeScore[skill.id] * 6;
+        skill.rating = skillset6[skill.value] + attributeScore[skill.id] * 6 + skill.bonus;
       } else if (skill.type === 7) {
-        skill.rating = skillset7[skill.value] + attributeScore[skill.id] * 3;
+        skill.rating = skillset7[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       }
     }
     // Iterate through combat skills
