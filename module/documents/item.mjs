@@ -18,13 +18,16 @@ export class ToSItem extends Item {
     
     // Check if the actor owns an item with the name "Finesse"
     if (this.actor) {
+      let str = this.actor.system.attributes.str.value;
+      let dex = this.actor.system.attributes.dex.value;
+      
       const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
 
       // Now loop through each weapon in the actor's inventory
       this.actor.items.forEach(item => {
         if (item.type === "weapon" && item === this) {
           // Check if the weapon has the 'finesse' property set to true
-          if (item.system.weapon?.finesse === true && hasFinesse) {
+          if (item.system.weapon?.finesse === true && hasFinesse && str <= dex) {
             attr = "dex";  // Use Dexterity if both conditions are met
           }
         }

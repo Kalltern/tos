@@ -45,8 +45,99 @@
           data-dtype="String"
         />
       </div>
-      <label class='resource-label'>Finesse</label>
-<input type='checkbox' name='system.weapon.finesse' {{checked system.weapon.finesse}} />
+      <label class='resource-label'>{{localize
+            "TOS.Item.Weapon.FIELDS.finesse.label"
+          }}</label>
+      <input type='checkbox' name='system.weapon.finesse' {{checked system.weapon.finesse}} />
+      <label class='resource-label'>{{localize
+            "TOS.Item.Weapon.FIELDS.sharp.label"
+          }}</label>
+      <input type='checkbox' name='system.weapon.sharp' {{checked system.weapon.sharp}} />
+
+     <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.stun.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.stun"
+          value="{{system.roll.stun}}"
+          data-dtype="String"
+        />
+      </div>
+
+     <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.bleed.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.bleed"
+          value="{{system.roll.bleed}}"
+          data-dtype="String"
+        />
+      </div>
+
+     <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.attack.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.attack"
+          value="{{system.roll.attack}}"
+          data-dtype="String"
+        />
+      </div>
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.defense"
+          value="{{system.roll.defense}}"
+          data-dtype="String"
+        />
+      </div>
+
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critRange.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.critRange"
+          value="{{system.roll.critRange}}"
+          data-dtype="String"
+        />
+      </div>
+
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critChance.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.critChance"
+          value="{{system.roll.critChance}}"
+          data-dtype="String"
+        />
+      </div>
+
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critFail.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.critFail"
+          value="{{system.roll.critFail}}"
+          data-dtype="String"
+        />
+      </div>
+
+
     </div>
 
   </div>

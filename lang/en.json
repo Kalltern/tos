@@ -67,9 +67,17 @@
         "FIELDS": {
           "rollFormula": { "label": "Roll Formula" },
           "diceNum": { "label": "Number of dices" },
-          "damageDice": { "label": "damageDice" },
           "dieSize": { "label": "Die Size" },
           "rollMod": { "label": "Roll Modifier" },
+          "finesse": { "label": "Finesse" },
+          "sharp": { "label": "Sharp" },
+          "stun": { "label": "Stun" },
+          "bleed": { "label": "Bleed" },
+          "attack": { "label": "Attack" },
+          "defense": { "label": "Defense" },
+          "critRange": { "label": "Crit range" },
+          "critChance": { "label": "Crit chance" },
+          "critFail": { "label": "Crit fail" },
           "weight": { "label": "Weight" }
         }
       },
