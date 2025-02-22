@@ -14,15 +14,13 @@
     <div class="grid grid-4col">
       <div class="item-details">
         <label for="damage-dice">{{localize
-            "TOS.Item.Weapon.FIELDS.damageDice.label"
+            "TOS.Item.Weapon.FIELDS.diceNum.label"
           }}:</label>
         <input
           type="text"
-          id="damage-dice"
-          name="system.damageDice"
-          value="{{item.system.damageDice}}"
-          placeholder="e.g. 2d6"
-          data-dtype="String"
+          name="system.roll.diceNum"
+          value="{{system.roll.diceNum}}"
+          data-dtype="Number"
         />
       </div>
       <div class="grid-span-1">
@@ -47,6 +45,8 @@
           data-dtype="String"
         />
       </div>
+      <label class='resource-label'>Finesse</label>
+<input type='checkbox' name='system.weapon.finesse' {{checked system.weapon.finesse}} />
     </div>
 
   </div>

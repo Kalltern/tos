@@ -667,7 +667,7 @@
     }
   },
   "Item": {
-    "types": ["gear", "feature", "spell", "race", "weapon"],
+    "types": ["gear", "feature", "spell", "race", "weapon","item","consumable"],
     "htmlFields": ["description"],
     "templates": {
       "base": {
@@ -680,8 +680,16 @@
       "class": ["axe", "blunt", "sword", "polearm", "bow", "crossbow"],
       "type": ["light", "medium", "heavy"],
       "weight": 0,
-      "formula": "@damageDice"
-    },
+      "stun": 0,
+      "bleed": 0,
+      "attack": 0,
+      "defense": 0,
+      "critRange": 0,
+      "critChance": 0,
+      "critFail": 0,
+      "finesse": false,
+      "sharp": false
+      },
     "feature": {
       "templates": ["base"]
     },

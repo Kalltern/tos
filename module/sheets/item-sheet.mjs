@@ -48,6 +48,18 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     attributesFeature: {
       template: "systems/tos/templates/item/attribute-parts/feature.hbs",
     },
+    attributesGear: {
+      template: "systems/tos/templates/item/attribute-parts/gear.hbs",
+    },
+    attributesItem: {
+      template: "systems/tos/templates/item/attribute-parts/item.hbs",
+    },
+    attributesRace: {
+      template: "systems/tos/templates/item/attribute-parts/race.hbs",
+    },
+    attributesConsumable: {
+      template: "systems/tos/templates/item/attribute-parts/consumable.hbs",
+    },
     attributesWeapon: {
       template: "systems/tos/templates/item/attribute-parts/weapon.hbs",
     },
@@ -71,12 +83,19 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       case "feature":
         options.parts.push("attributesFeature", "effects");
         break;
+      case "gear":
+        options.parts.push("attributesGear");
+        break;  
+      case "race":
+        options.parts.push("effects");
+        break;  
       case "weapon":
         options.parts.push("attributesWeapon");
         break;
       case "spell":
         options.parts.push("attributesSpell");
         break;
+      
     }
   }
 
@@ -107,6 +126,9 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
   async _preparePartContext(partId, context) {
     switch (partId) {
       case "attributesFeature":
+      case "attributesItem":
+      case "attributesRace":
+      case "attributesConsumable":
       case "attributesWeapon":
       case "attributesSpell":
         // Necessary for preserving active tab on re-render
@@ -168,6 +190,9 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
           tab.label += "Description";
           break;
         case "attributesFeature":
+        case "attributesItem":
+        case "attributesRace":
+        case "attributesConsumable":
         case "attributesWeapon":
         case "attributesSpell":
           tab.id = "attributes";

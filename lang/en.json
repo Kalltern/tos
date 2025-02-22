@@ -66,6 +66,7 @@
       "Weapon": {
         "FIELDS": {
           "rollFormula": { "label": "Roll Formula" },
+          "diceNum": { "label": "Number of dices" },
           "damageDice": { "label": "damageDice" },
           "dieSize": { "label": "Die Size" },
           "rollMod": { "label": "Roll Modifier" },

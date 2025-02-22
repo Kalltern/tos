@@ -10,6 +10,28 @@ export class ToSItem extends Item {
     // As with the actor class, items are documents that can have their data
     // preparation methods overridden (such as prepareBaseData()).
     super.prepareData();
+      // Ensure formula updates dynamically
+  if (this.system.roll) {
+    const { diceNum, diceSize, diceBonus } = this.system.roll;
+    // Default to Strength
+    let attr = "str";
+    
+    // Check if the actor owns an item with the name "Finesse"
+    if (this.actor) {
+      const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
+
+      // Now loop through each weapon in the actor's inventory
+      this.actor.items.forEach(item => {
+        if (item.type === "weapon" && item === this) {
+          // Check if the weapon has the 'finesse' property set to true
+          if (item.system.weapon?.finesse === true && hasFinesse) {
+            attr = "dex";  // Use Dexterity if both conditions are met
+          }
+        }
+      });
+    }
+    this.system.formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+  }
   }
 
   /**
@@ -22,12 +44,17 @@ export class ToSItem extends Item {
 
     // Quit early if there's no parent actor
     if (!this.actor) return rollData;
-    // Only add `damageDice` if the item type is "weapon"
-    if (this.type === "weapon") {
-      rollData.damageDice = this.system.damageDice || "d6"; // Default to "d6" if undefined
-    }
     // If present, add the actor's roll data
     rollData.actor = this.actor.getRollData();
+
+    // Check if the item is owned by an actor
+    if (this.actor) {
+    rollData.actor = this.actor.getRollData();
+
+    // Include specific actor attributes in rollData
+    rollData.str = this.actor.system.attributes.str.value;
+    rollData.dex = this.actor.system.attributes.dex.value;
+  }
 
     return rollData;
   }
@@ -58,14 +85,6 @@ export class ToSItem extends Item {
     else {
       // Retrieve roll data.
       const rollData = this.getRollData();
-
-      // Check if the item is a weapon
-      if (this.type === "weapon") {
-        // Construct the formula to include damageDice and the strength value
-        const damageDice = rollData.damageDice || "d6"; // Default to "d6" if undefined
-        const strengthValue = rollData.actor?.abilities?.str.value || 0; // Get strength value from actor
-        rollData.formula = `${damageDice} + ${strengthValue}`; // Combine into the new formula
-      }
       // Invoke the roll and submit it to chat.
       const roll = new Roll(rollData.formula, rollData);
       // If you need to store the value first, uncomment the next line.
