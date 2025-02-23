@@ -7,7 +7,7 @@
 <section class="combat-skills grid-skills"> 
 
       {{#each system.combatSkills as |skill key|}}
-       {{#if (eq skill.id 0)}}
+       {{#if (eq skill.isSkill 1)}}
       
          <label class="toggle-label hidden">
           <input 
@@ -29,7 +29,7 @@
           </label>
           <input
             type="text"
-            name="system.skills.{{key}}.value"
+            name="system.combatSkills.{{key}}.value"
             value="{{skill.value}}"
             class="skill-value"
             data-dtype="Number"
@@ -131,7 +131,7 @@
            </div>
   {{/each}}
    {{#each system.combatSkills as |skill key|}}
-    {{#if (eq skill.id 1)}}
+    {{#if (eq skill.isSkill 0)}}
          <label class="toggle-label hidden">
           <input 
             type="checkbox" 

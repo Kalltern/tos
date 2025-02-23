@@ -10,6 +10,7 @@
     
     "character": {
       "skillvisibility":true,
+       "finesse": 0,
             "templates": ["base"],
       "stats": {
         "health": {
@@ -497,7 +498,8 @@
           "type": 1,
           "finesse":false,
           "visible":true,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 0
         },
         "meleeDefense": {
           "rating": 0,
@@ -508,7 +510,8 @@
           "steelGrip":false,
           "predatorySenses":false,
           "visible":true,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 0
 
         },
         "rangedDefense": {
@@ -520,7 +523,8 @@
           "steelGrip":false,
           "predatorySenses":false,
           "visible":true,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 0
 
         },
         "dodge": {
@@ -529,7 +533,8 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 1,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 0
 
         },        
         "combat": {
@@ -543,7 +548,8 @@
           "veneficus":false,
           "cordinas":false,
           "visible":true,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 1
         },
         "archery": {
           "value": 0,
@@ -553,7 +559,8 @@
           "id": 0,
           "type": 1,
           "visible":true,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 0
         },
         "channeling": {
           "value": 0,
@@ -563,7 +570,8 @@
           "id": 0,
           "type": 1,
           "visible":false,
-          "bonus": 0
+          "bonus": 0,
+          "isSkill": 1
         },
         "ranger": {
           "value": 0,
@@ -572,7 +580,8 @@
           "critfailpenalty": 0,
           "id": 0,
           "type": 1,
-          "visible":false
+          "visible":false,
+          "isSkill": 1
         }
 
       },
@@ -679,9 +688,11 @@
       "templates": ["base"],
       "class": ["axe", "blunt", "sword", "polearm", "bow", "crossbow"],
       "type": ["light", "medium", "heavy"],
+      "effects":{
+        "stun": 0,
+        "bleed": 0
+      },
       "weight": 0,
-      "stun": 0,
-      "bleed": 0,
       "attack": 0,
       "defense": 0,
       "critRange": 0,

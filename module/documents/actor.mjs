@@ -67,6 +67,7 @@ export class ToSActor extends Actor {
     const skillset6 = [0, 5, 10, 15, 20, 25]; //social
     const skillset7 = [0, 20, 30, 40, 50, 60]; //survival
     const combatset1 = [0, 20, 25, 30, 35, 45, 50, 60, 65, 75, 80];
+    const ranger = systemData.combatSkills.ranger.value;
     const attributeScore = Object.values(systemData.attributes).map(
       (attribute) => attribute.value
     );
@@ -96,10 +97,20 @@ export class ToSActor extends Actor {
     for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
       // Ensure skill type is valid and matches your criteria
       if (combatSkill.type === 1) {
-        // Use skill.id to find the corresponding attribute
-
-        combatSkill.rating =
-          combatset1[combatSkill.value] + attributeScore[combatSkill.id] * 3;
+        // Looking for finesse=true to use dexterity, otherwise use strength  
+        const hasFinesse = systemData.finesse;
+        
+        if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
+          if (ranger > 0) {
+            combatSkill.rating = combatset1[ranger] + attributeScore[1] * 3;
+          } else {
+            combatSkill.rating = combatset1[combatSkill.value] + attributeScore[1] * 3;
+          }
+        } else if (ranger > 0) {  // This else if is correctly placed now
+          combatSkill.rating = combatset1[ranger] + attributeScore[1] * 3;
+        } else {
+          combatSkill.rating = combatset1[combatSkill.value] + attributeScore[combatSkill.id] * 3;
+        }
       }
     }
 

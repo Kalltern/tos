@@ -7,35 +7,48 @@ export class ToSItem extends Item {
    * Augment the basic Item data model with additional dynamic data.
    */
   prepareData() {
-    // As with the actor class, items are documents that can have their data
-    // preparation methods overridden (such as prepareBaseData()).
     super.prepareData();
-      // Ensure formula updates dynamically
-  if (this.system.roll) {
-    const { diceNum, diceSize, diceBonus } = this.system.roll;
-    // Default to Strength
-    let attr = "str";
-    
-    // Check if the actor owns an item with the name "Finesse"
-    if (this.actor) {
-      let str = this.actor.system.attributes.str.value;
-      let dex = this.actor.system.attributes.dex.value;
-      
-      const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
-
-      // Now loop through each weapon in the actor's inventory
-      this.actor.items.forEach(item => {
-        if (item.type === "weapon" && item === this) {
-          // Check if the weapon has the 'finesse' property set to true
-          if (item.system.weapon?.finesse === true && hasFinesse && str <= dex) {
-            attr = "dex";  // Use Dexterity if both conditions are met
-          }
+  
+    if (this.system.roll) {
+      const { diceNum, diceSize, diceBonus } = this.system.roll;
+  
+      // Default to Strength
+      let attr = "str";
+  
+      if (this.actor) {
+        let str = this.actor.system.attributes.str.value;
+        let dex = this.actor.system.attributes.dex.value;
+  
+        // Retrieve STUN & BLEED from the weapon
+        const stun = this.system.roll?.effects.stun || 0;   // Default to 0 if undefined
+        const bleed = this.system.roll?.effects.bleed || 0; // Default to 0 if undefined
+  
+        // Check if the actor owns an item named "Finesse"
+        const hasFinesse = this.actor.items.some(item => item.system.feature?.toLowerCase() === "finesse");
+  
+        // Check if *this* weapon has finesse
+        if (this.system.weapon?.finesse === true && hasFinesse && str <= dex) {
+          attr = "dex";  // Use Dexterity if all conditions are met
         }
-      });
+  
+        // Define the formula (without stun/bleed effects)
+        let formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+  
+        // Store the main formula for the main roll
+        this.system.formula = formula;
+  
+        // Store stun and bleed rolls separately for later use
+        this.system.effectRolls = {
+          stun: stun > 0 ? `${stun} - 1d100` : null,
+          bleed: bleed > 0 ? `${bleed} - 1d100` : null
+        };
+      }
     }
-    this.system.formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+    
   }
-  }
+  
+  
+  
 
   /**
    * Prepare a data object which defines the data schema used by dice roll commands against this Item
