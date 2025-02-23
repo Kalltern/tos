@@ -494,8 +494,8 @@
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 1,
-          "type": 1,
+          "id": 6,
+          "type": 2,
           "finesse":false,
           "visible":true,
           "bonus": 0,
@@ -506,7 +506,7 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 1,
-          "type": 1,
+          "type": 0,
           "steelGrip":false,
           "predatorySenses":false,
           "visible":true,
@@ -518,10 +518,8 @@
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 1,
-          "type": 1,
-          "steelGrip":false,
-          "predatorySenses":false,
+          "id": 6,
+          "type": 0,
           "visible":true,
           "bonus": 0,
           "isSkill": 0
@@ -534,6 +532,7 @@
           "id": 1,
           "type": 1,
           "bonus": 0,
+          "visible":true,
           "isSkill": 0
 
         },        
@@ -543,7 +542,7 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1,
+          "type": 0,
           "finesse":false,
           "veneficus":false,
           "cordinas":false,
@@ -557,7 +556,7 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1,
+          "type": 3,
           "visible":true,
           "bonus": 0,
           "isSkill": 0
@@ -579,7 +578,7 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
-          "type": 1,
+          "type": 5,
           "visible":false,
           "isSkill": 1
         }
