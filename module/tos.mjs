@@ -245,30 +245,7 @@ Hooks.once("ready", () => {
   
 
   });
-  Hooks.on("updateActor", async (actor, data) => {
-    if (data.system && data.system.combatSkills) {
-      console.log("Updating actor with combatSkills data...");
-  
-      // Update the specific combatSkills data
-      await actor.update({
-        "system.combatSkills": data.system.combatSkills
-      });
-  
-      // After the update, force a reflow for the config tab
-      const sheet = actor.sheet;
-      if (sheet) {
-        // Find the config tab element
-        const configTab = sheet.element.querySelector('[data-tab="config"]');
-        if (configTab) {
-          // Simulate a click to force the tab to refresh
-          configTab.click();  // This forces a reflow or re-render when clicked
-          console.log("Config tab clicked to force refresh");
-        } else {
-          console.error("Config tab not found");
-        }
-      }
-    }
-  });
+ 
   
   
   

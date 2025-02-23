@@ -24,7 +24,7 @@ export class ToSItem extends Item {
         const bleed = this.system.roll?.effects.bleed || 0; // Default to 0 if undefined
   
         // Check if the actor owns an item named "Finesse"
-        const hasFinesse = this.actor.items.some(item => item.system.feature?.toLowerCase() === "finesse");
+        const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
   
         // Check if *this* weapon has finesse
         if (this.system.weapon?.finesse === true && hasFinesse && str <= dex) {
