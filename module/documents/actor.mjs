@@ -124,9 +124,6 @@ export class ToSActor extends Actor {
         } else {
           combatSkill.rating = combatset1[melee] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         }
-
-
-
         if (combatSkill === rangeddef) {
           if(archery.value > combat.value ) {rangeddef.rating = rangedDefenseSet[archery.value] }
           else{rangeddef.rating = rangedDefenseSet[combat.value]}
@@ -151,9 +148,17 @@ export class ToSActor extends Actor {
      
       }
       if (combatSkill.type === 2) {
+        combatSkill.rating = throwing[combat.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
-        combatSkill.finesseRating = throwing[combat.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
-        } else {}
+        combatSkill.finesseRating = throwing[combat.value] + attributeScore[1] * 3 + combatSkill.bonus;
+        }
+      }
+      if (combatSkill.type === 3) {
+        if(combatSkill.lindar){
+          combatSkill.rating = channeling2[combatSkill.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        } else {
+        combatSkill.rating = channeling1[combatSkill.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+      }
       }
 
     }

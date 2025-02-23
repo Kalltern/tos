@@ -422,11 +422,11 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (dataset.roll) {
       // Determine if this is a skill or combat skill roll
       const isSkillRoll =
-        dataset.rollType === "skill" || dataset.rollType === "combat_skill";
-      const skillKey = dataset.label; // This should hold either "skill name" or "combat_skill name"
+        dataset.rollType === "skill" || dataset.rollType === "combat-skill";
+      const skillKey = dataset.label; // This should hold either "skill name" or "combat skill name"
 
       let label = dataset.label
-        ? `[${dataset.rollType === "skill" ? "Skill" : "Combat Skill"}] ${
+        ? `[${dataset.rollType === "skill" ? "Skill" : "combat-skill"}] ${
             dataset.label
           }`
         : "";
@@ -438,11 +438,15 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       // Only evaluate critical status if it's a skill or combat skill roll
       if (isSkillRoll) {
         // Retrieve the skill data based on the roll type
+
+        console.log("Roll Type:", dataset.rollType);
+        console.log("Skill Key:", skillKey);
         const skillData =
           dataset.rollType === "skill"
             ? this.actor.system.skills[skillKey]
-            : this.actor.system.combat_skills[skillKey];
+            : this.actor.system.combatSkills[skillKey];
 
+        console.log("Skill Data:", skillData);
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
             d100Result,
