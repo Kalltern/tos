@@ -11,6 +11,8 @@
     "character": {
       "skillvisibility":true,
        "finesse": 0,
+       "steelGrip":false,
+       "predatorySenses":false,
             "templates": ["base"],
       "stats": {
         "health": {
@@ -507,8 +509,6 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 0,
-          "steelGrip":false,
-          "predatorySenses":false,
           "visible":true,
           "bonus": 0,
           "isSkill": 0
@@ -555,20 +555,21 @@
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 0,
-          "type": 3,
+          "id": 1,
+          "type": 0,
           "visible":true,
           "bonus": 0,
-          "isSkill": 0
+          "isSkill": 1
         },
         "channeling": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 0,
+          "id": 5,
           "type": 1,
           "visible":false,
+          "lindar":false,
           "bonus": 0,
           "isSkill": 1
         },
