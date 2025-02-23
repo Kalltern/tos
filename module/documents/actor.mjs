@@ -69,10 +69,11 @@ export class ToSActor extends Actor {
     const combatset1 = [0, 20, 25, 30, 35, 45, 50, 60, 65, 75, 80];
     const channeling1 = [0, 20, 25, 30, 35, 45, 50, 55, 65, 70, 80];
     const channeling2 = [0, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70];
-    const dodge = [0, 20, 25, 30, 35, 45, 50, 55, 60, 65, 75, 85];
+    const dodge = [0, 20, 25, 35, 40, 50, 55, 60, 65, 75, 85];
     const rangedDefense = [0, 10, 20, 25, 30, 35, 40, 45, 50, 55, 60];
     const rangerGroup = [0, 20, 24, 28, 32, 42, 46, 51, 55, 65, 75];
     const ranger = systemData.combatSkills.ranger.value;
+    const melee = systemData.combatSkills.combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
     const attributeScore = Object.values(systemData.attributes).map(
       (attribute) => attribute.value
     );
@@ -80,7 +81,7 @@ export class ToSActor extends Actor {
     // Iterate through skills
     for (let [key, skill] of Object.entries(systemData.skills)) {
       // Ensure skill type is valid and matches your criteria
-      if (skill.type === 0) {
+      if (skill.type === 1) {
         // Use skill.id to find the corresponding attribute
 
         skill.rating = skillset1[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
@@ -104,18 +105,23 @@ export class ToSActor extends Actor {
       if (combatSkill.type === 0) {
         // Looking for finesse=true to use dexterity, otherwise use strength  
         const hasFinesse = systemData.finesse;
-        
+                
         if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
           if (ranger > 0) {
-            combatSkill.rating = rangerGroup[ranger] + attributeScore[1] * 3;
+            combatSkill.rating = rangerGroup[ranger] + attributeScore[1] * 3 + combatSkill.bonus;
           } else {
-            combatSkill.rating = combatset1[combatSkill.value] + attributeScore[1] * 3;
+            combatSkill.rating = combatset1[melee] + attributeScore[1] * 3 + combatSkill.bonus;
           }
         } else if (ranger > 0) { 
-          combatSkill.rating = rangerGroup[ranger] + attributeScore[combatSkill.id] * 3;
+          combatSkill.rating = rangerGroup[ranger] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         } else {
-          combatSkill.rating = combatset1[combatSkill.value] + attributeScore[combatSkill.id] * 3;
+          combatSkill.rating = combatset1[melee] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         }
+      }
+      if (combatSkill.type === 1) {
+        //setting ratings for dodge
+        combatSkill.rating = dodge[systemData.skills.acrobacy.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+     
       }
     }
 
