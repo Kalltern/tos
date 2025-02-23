@@ -10,7 +10,7 @@
     
     "character": {
       "skillvisibility":true,
-       "finesse": 0,
+       "finesse": false,
        "steelGrip":false,
        "predatorySenses":false,
             "templates": ["base"],
@@ -498,8 +498,8 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 2,
-          "finesse":false,
           "visible":true,
+          "finesseRating": 0,
           "bonus": 0,
           "isSkill": 0
         },
@@ -539,13 +539,11 @@
         "combat": {
           "value": 0,
           "rating": 0,
+          "finesseRating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 0,
           "type": 0,
-          "finesse":false,
-          "veneficus":false,
-          "cordinas":false,
           "visible":true,
           "bonus": 0,
           "isSkill": 1

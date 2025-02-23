@@ -6,45 +6,62 @@
 <h3>Combat</h3>
 <section class="combat-skills grid-skills"> 
 
-      {{#each system.combatSkills as |skill key|}}
-       {{#if (eq skill.isSkill 1)}}
+{{#each system.combatSkills as |skill key|}}
+  {{#if (eq skill.isSkill 1)}}
+  
+    <label class="toggle-label hidden">
+      <input 
+        type="checkbox" 
+        class="toggle-skill-visibility" 
+        data-skill="{{key}}" 
+        {{#if skill.visible}}checked{{/if}}>
+        {{key}}
+    </label>       
+
+    <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+      <label
+        class="skill-label rollable flexlarge align-left skill-name"  
+        data-action="roll"
+        data-roll="{{#if (eq key 'combat')}}{{#if skill.finesseRating}}{{#if (gt skill.finesseRating skill.rating)}}{{skill.finesseRating}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}-1d100"
+        data-roll-type="skill"
+        data-label="{{key}}"
+      >
+        {{key}}
+      </label>
+
+      <input
+        type="text"
+        name="system.combatSkills.{{key}}.value"
+        value="{{skill.value}}"
+        class="skill-value"
+        data-dtype="Number"
+      />
       
-         <label class="toggle-label hidden">
-          <input 
-            type="checkbox" 
-            class="toggle-skill-visibility" 
-            data-skill="{{key}}" 
-            {{#if skill.visible}}checked{{/if}}>
-             {{key}}
-        </label>       
-        <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
-          <label
-            class="skill-label rollable flexlarge align-left skill-name"  
-            data-action="roll"
-            data-roll="{{skill.rating}}-1d100"
-            data-roll-type="skill"
-            data-label="{{key}}"
-          >
-            {{key}}
-          </label>
-          <input
-            type="text"
-            name="system.combatSkills.{{key}}.value"
-            value="{{skill.value}}"
-            class="skill-value"
-            data-dtype="Number"
-          />
-          <span
-            class="skill-mod rollable skill-rating"  
-            data-roll="{{skill.rating}}-1d100"
-            data-roll-type="skill"
-            data-label="{{key}}"
-            data-dtype="Number"
-          >{{skill.rating}}</span>
-        </div>
-      
+      <span
+        class="skill-mod rollable skill-rating"  
+        data-roll="{{#if (eq key 'combat')}}{{#if skill.finesseRating}}{{#if (gt skill.finesseRating skill.rating)}}{{skill.finesseRating}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}-1d100"
+        data-roll-type="skill"
+        data-label="{{key}}"
+        data-dtype="Number"
+      >
+        {{#if (eq key 'combat')}}
+          {{#if skill.finesseRating}}
+            {{#if (gt skill.finesseRating skill.rating)}} 
+              {{skill.finesseRating}}
+            {{else}}
+              {{skill.rating}}
+            {{/if}}
+          {{else}}
+            {{skill.rating}}
+          {{/if}}
+        {{else}}
+          {{skill.rating}}
+        {{/if}}
+      </span>
+    </div>
+
   {{/if}}
-  {{/each}}
+{{/each}}
 
         {{#each system.weaponSkills as |skill key|}}
          <label class="toggle-label hidden">
@@ -82,8 +99,8 @@
             data-skill="{{key}}" 
             {{#if skill.visible}}checked{{/if}}>
              {{key}}
-        </label>       
-        <div class="skill-entry {{#unless skill.visible}}hidden-skill{{/unless}}">
+        </label>  
+                 <div class="skill-entry {{#unless skill.visible}}hidden-skill{{/unless}}">
           <label
             class="skill-label rollable flexlarge align-left skill-name"  
             data-action="roll"
