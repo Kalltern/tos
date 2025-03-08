@@ -26,7 +26,7 @@
       "thumbnail": "systems/tos/assets/anvil-impact.png"
     }
   ],
-  "version": "0.0.3.3f",
+  "version": "0.0.3.5",
   "compatibility": {
     "minimum": "12.328",
     "verified": "12.330"

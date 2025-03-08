@@ -18,19 +18,24 @@ export class ToSItem extends Item {
       if (this.actor) {
         let str = this.actor.system.attributes.str.value;
         let dex = this.actor.system.attributes.dex.value;
-  
+          
         // Retrieve STUN & BLEED from the weapon
-        const stun = this.system.roll?.effects.stun || 0;   // Default to 0 if undefined
-        const bleed = this.system.roll?.effects.bleed || 0; // Default to 0 if undefined
+        const stun = this.system.effects.stun || 0;   // Default to 0 if undefined
+        const bleed = this.system.effects.bleed || 0; // Default to 0 if undefined
   
         // Check if the actor owns an item named "Finesse"
         const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
   
+        
         // Check if *this* weapon has finesse
-        if (this.system.weapon?.finesse === true && hasFinesse && str <= dex) {
+        if (this.system.finesse === true && hasFinesse && str <= dex) {
           attr = "dex";  // Use Dexterity if all conditions are met
         }
   
+        // Check if *this* weapon is bow or crossbow
+        if (this.system.class === "crossbow" ||this.system.class === "bow") {
+         attr = "per";  // Use Perception if ranged weapon
+                }
         // Define the formula (without stun/bleed effects)
         let formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
   

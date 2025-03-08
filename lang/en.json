@@ -71,6 +71,7 @@
           "rollMod": { "label": "Roll Modifier" },
           "finesse": { "label": "Finesse" },
           "sharp": { "label": "Sharp" },
+          "thrown": { "label": "Thrown" },
           "stun": { "label": "Stun" },
           "bleed": { "label": "Bleed" },
           "attack": { "label": "Attack" },
@@ -78,7 +79,18 @@
           "critRange": { "label": "Crit range" },
           "critChance": { "label": "Crit chance" },
           "critFail": { "label": "Crit fail" },
-          "weight": { "label": "Weight" }
+          "weight": { "label": "Weight" },
+          "penetration": { "label": "Penetration" },
+          "breakthrough": { "label": "Breakthrough" },
+          "extra1": { "label": "Extra Effect" },
+          "extra2": { "label": "Extra Effect" },
+          "extra3": { "label": "Extra Effect" }
+        }
+      },
+      "Gear": {
+        "FIELDS": {
+          "armor": { "label": "Armor value" },
+          "diceNum": { "label": "Number of dices" }
         }
       },
       "Spell": {

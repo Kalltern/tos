@@ -23,6 +23,14 @@
           data-dtype="Number"
         />
       </div>
+     <label for="weapon-class">Weapon Class:</label>
+<select name="system.class" id="weapon-class">
+  <option value="">-- Select a Class --</option> <!-- Empty option for initial state -->
+  {{#each system.classOptions as |classOption|}}
+    <option value="{{classOption}}" {{#if (eq ../system.class classOption)}}selected{{/if}}>
+      {{classOption}}
+    </option>
+  {{/each}}
     {{/if}}
   </div>
 </header>

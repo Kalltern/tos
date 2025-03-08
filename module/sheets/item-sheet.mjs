@@ -84,7 +84,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         options.parts.push("attributesFeature", "effects");
         break;
       case "gear":
-        options.parts.push("attributesGear");
+        options.parts.push("attributesGear", "effects");
         break;  
       case "race":
         options.parts.push("effects");
@@ -127,6 +127,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     switch (partId) {
       case "attributesFeature":
       case "attributesItem":
+      case "attributesGear":
       case "attributesRace":
       case "attributesConsumable":
       case "attributesWeapon":
@@ -193,6 +194,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         case "attributesItem":
         case "attributesRace":
         case "attributesConsumable":
+        case "attributesGear":
         case "attributesWeapon":
         case "attributesSpell":
           tab.id = "attributes";

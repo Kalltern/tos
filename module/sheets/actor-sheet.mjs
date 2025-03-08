@@ -235,6 +235,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // this sheet does with spells
     const features = [];
     const weapon = [];
+    const gear = [];
     const spells = {
       0: [],
       1: [],
@@ -258,6 +259,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       else if (i.type === "feature") {
         features.push(i);
       }
+     // Append to gear.
+        else if (i.type === "gear") {
+            gear.push(i);
+            }
       // Append to spells.
       else if (i.type === "spell") {
         if (i.system.spellLevel != undefined) {
@@ -272,6 +277,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     // Sort then assign
     context.weapon = weapon.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.spells = spells;
   }

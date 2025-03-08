@@ -129,6 +129,10 @@ export class ToSActor extends Actor {
           else{rangeddef.rating = rangedDefenseSet[combat.value]}
         }  
 
+        if (combatSkill === archery) {
+          combatSkill.rating = combatset1[archery.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        }  
+
       // Assuming steelGrip and predatorySenses are properties directly on the actor
       if (combatSkill === systemData.combatSkills.meleeDefense) {
       // Check if the actor has steelGrip enabled

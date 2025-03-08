@@ -580,3 +580,34 @@
   overflow-y: auto; /* Scrollbar for long content */
 }
 
+.button-container {
+  display: flex;
+  gap: 4px; /* Adds spacing between buttons */
+  justify-content: flex-start; /* Aligns buttons to the right */
+  flex-wrap: wrap; /* Allows buttons to wrap if needed */
+}
+
+.d100-reroll-button {
+  flex: 1 1 auto; /* Allows buttons to shrink and expand evenly */
+  min-width: 50px; /* Ensures buttons don't get too small */
+  max-width: 100px; /* Prevents them from getting too large */
+  padding: 4px 8px;
+  text-align: center;
+}
+.damage-roll-button {
+  flex: 1 1 auto; /* Allows buttons to shrink and expand evenly */
+  min-width: 50px; /* Ensures buttons don't get too small */
+  max-width: 100px; /* Prevents them from getting too large */
+  padding: 4px 8px;
+  text-align: center;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;  /* Adjust gap between items as needed */
+}
+
+.checkbox-row label {
+  margin-right: 5px; /* Space between label and checkbox */
+}

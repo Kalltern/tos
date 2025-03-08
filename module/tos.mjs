@@ -174,12 +174,18 @@ Hooks.on("renderChatMessage", (message, html, data) => {
     // Add logic to check if the message is a roll message
     if (message.content.includes("rolled") || message.rolls.length > 0) {
       // Create a reroll button element
-      const rerollButton = $(
-        '<button class="d100-reroll-button">Re-Roll</button>'
-      );
+      const rerollButton = $('<button class="d100-reroll-button">Re-Roll</button>');
 
-      // Append the reroll button to the chat message
-      html.find(".message-content").append(rerollButton);
+      // Check if a button container already exists, if not, create one
+      let buttonContainer = html.find(".button-container");
+
+      if (buttonContainer.length === 0) {
+        buttonContainer = $('<div class="button-container"></div>');
+        html.find(".message-content").append(buttonContainer);
+      }
+
+      // Append the reroll button to the container
+      buttonContainer.append(rerollButton);
 
       // Add click event listener for the reroll button
       rerollButton.on("click", async (event) => {
@@ -217,6 +223,8 @@ Hooks.on("renderChatMessage", (message, html, data) => {
     }
   }
 });
+
+
 Hooks.once("ready", () => {
   $(document).on("click", ".action-btn", function (event) {
     event.preventDefault();
