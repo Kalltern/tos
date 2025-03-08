@@ -246,10 +246,11 @@
   margin-bottom: 10px;
 }
 .tos .sheet-header .profile-img {
-  flex: 0 0 100px;
-  height: 100px;
+  flex: 0 0 165px;
+  height: 216px;
   margin-right: 10px;
 }
+
 .tos .sheet-header .header-fields {
   flex: 1;
 }
