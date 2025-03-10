@@ -7,6 +7,7 @@ import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { TOS } from "./helpers/config.mjs";
 
+
 /* -------------------------------------------- */
 /*  Init Hook                                   */
 /* -------------------------------------------- */
@@ -14,6 +15,7 @@ import { TOS } from "./helpers/config.mjs";
 // Add key classes to the global scope so they can be more easily used
 // by downstream developers
 globalThis.tos = {
+  
   documents: {
     ToSActor,
     ToSItem,
@@ -92,6 +94,8 @@ Handlebars.registerHelper("range", function (start, end) {
 Handlebars.registerHelper("hasValue", function(value) {
   return value !== null && value !== undefined && value !== "";
 });
+
+
 
 
 /* -------------------------------------------- */
@@ -254,8 +258,6 @@ Hooks.once("ready", () => {
 
   });
  
-  
-  
   
   
   

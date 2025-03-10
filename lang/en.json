@@ -26,9 +26,42 @@
             "value": { "label": "Health" },
             "max": { "label": "Maximum Health" }
           },
+          "graveWounds": {
+            "value": { "label": "Wounds" },
+            "max": { "label": "Maximum Wounds" },
+            "treated": { "label": "Treated Wounds" }
+          },
+          "stamina": {
+            "value": { "label": "Stamina" },
+            "max": { "label": "Maximum Stamina" }
+          },
+          "toxicity": {
+            "value": { "label": "Toxicity" },
+            "max": { "label": "Maximum Toxicity" }
+          },
           "mana": {
             "value": { "label": "Mana" },
             "max": { "label": "Maximum Mana" }
+          },
+          "mind": {
+            "value": { "label": "Mind" },
+            "max": { "label": "Maximum Mind" }
+          },
+          "sanity": {
+            "value": { "label": "Sanity" },
+            "max": { "label": "Maximum Sanity" }
+          },
+          "corruption": {
+            "value": { "label": "Corruption" },
+            "max": { "label": "Maximum Corruption" }
+          },
+          "fatigue": {
+            "value": { "label": "Fatigue" },
+            "max": { "label": "Maximum Fatigue" }
+          },
+          "holyEnergy": {
+            "value": { "label": "Holy Energy" },
+            "max": { "label": "Maximum Holy Energy" }
           }
         },
         "Attribute": {
@@ -90,7 +123,17 @@
       "Gear": {
         "FIELDS": {
           "armor": { "label": "Armor value" },
-          "diceNum": { "label": "Number of dices" }
+          "headArmor": { "label": "Head armor value" },
+          "acidArmor": { "label": "Acid armor value" },
+          "fireArmor": { "label": "Fire armor value" },
+          "frostArmor": { "label": "Frost armor value" },
+          "lightningArmor": { "label": "Lightning armor value" },
+          "equipped": { "label": "Equipped" },
+          "layer": { "label": "Armor layer" },
+          "helmet": { "label": "Is head gear" },
+          "dodgePenalty": { "label": "Dodge penalty" },
+          "dodgePenalty": { "label": "Dodge penalty" },
+          "dodgePenalty": { "label": "Dodge penalty" }
         }
       },
       "Spell": {

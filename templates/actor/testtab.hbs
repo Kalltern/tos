@@ -4,15 +4,21 @@
   data-group="primary"
   data-tab="testtab"
 >
+<div>
+  <input type="checkbox" data-action="myAction" />
+  <input type="checkbox" class="toggle-day"
+         data-action="toggleDay"
+         {{#if actor.system.day}}checked{{/if}} />
+</div>
 <section class="config-container"> 
-<button class="action-btn" type="button">Click Me!</button>
 </section>
   <section class="grid grid-3col">
 
     {{! The grid classes are defined in scss/global/_grid.scss. To use,
           use both the "grid" and "grid-Ncol" class where "N" can be any number
-          from 1 to 12 and will create that number of columns.  }}
+          from 1 to 12 and will create that number of columns.  }} 
 
+    <hr>
     <div class="resource flex-group-center">
       <label for="system.stats.health.value" class="resource-label">
         {{localize "TOS.Actor.Character.stats.health.value.label"}}
@@ -29,20 +35,6 @@
           type="text"
           name="system.stats.health.max"
           value="{{system.stats.health.max}}"
-          data-dtype="Number"
-        />
-      </div>
-    </div>
-
-    <div class="resource flex-group-center">
-      <label for="system.stats.luck.value" class="resource-label">
-        Luck
-      </label>
-      <div class="resource-content flexrow flex-center flex-between">
-        <input
-          type="text"
-          name="system.stats.luck.value"
-          value="{{system.stats.luck.value}}"
           data-dtype="Number"
         />
       </div>

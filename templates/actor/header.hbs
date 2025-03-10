@@ -80,15 +80,58 @@
       {{/each}}
     </div>
 <hr>
+<div class="stats">
+  <div class="stat-row">
+    {{#each system.stats as |stat key|}}
+      {{#if (not (or (eq key "corruption") (eq key "holyEnergy") (eq key "mana")))}}
+        <div class="attribute">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.' key '.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              value="{{stat.value}}" 
+              data-value="{{stat.value}}"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{stat.max}}" 
+              data-value="{{stat.max}}" 
+              readonly
+            />
+          </div>
+        </div>
+      {{/if}}
+    {{/each}}
+  </div>
+</div>
+<hr>
+
     <div>
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.armor.label"
           }}</label>
         <input
           type="text"
-          name="system.armor"
-          value="{{system.armor.value}}"
+          name="system.armorTotal"
+          value="{{system.armorTotal}}"
           data-dtype="Number"
+          readonly
+        />
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.headArmor.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.headArmorTotal"
+          value="{{system.headArmorTotal}}"
+          data-dtype="Number"
+          readonly
         />
   </div>
   </div>

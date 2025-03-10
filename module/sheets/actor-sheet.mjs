@@ -11,15 +11,17 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 ) {
   constructor(options = {}) {
     super(options);
+    console.log("Actor sheet loaded");
     this.#dragDrop = this.#createDragDropHandlers();
   }
 
+  
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ["tos", "actor"],
     position: {
       width: 800,
-      height: 1000,
+      height: 1200,
     },
     actions: {
       onEditImage: this._onEditImage,
@@ -28,6 +30,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       deleteDoc: this._deleteDoc,
       toggleEffect: this._toggleEffect,
       roll: this._onRoll,
+      toggleDay: this._toggleDay,
+      toggleEquipped: this._toggleEquipped,
+      myAction: this._myAction,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -35,6 +40,56 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       submitOnChange: true,
     },
   };
+
+  static _myAction(event) {
+    const isChecked = event.target.checked; // Get the state of the checkbox
+    console.log(`My custom action triggered, checkbox is ${isChecked ? 'checked' : 'unchecked'}`);
+    
+  }
+    
+  static _toggleDay(event) {
+    const isChecked = event.target.checked;
+       // Update the actor's day status based on the checkbox state
+    this.actor.update({ 'system.day': isChecked });
+  
+    console.log(`Day is now ${isChecked ? 'active' : 'inactive'}`);
+  }
+
+  static _toggleEquipped(event) {
+    const target = event.target;
+    const isChecked = target.checked;
+    const itemId = target.dataset.itemId;  // Get the item ID from the data attribute
+    const actor = this.actor; 
+  
+    console.log("Item ID:", itemId);  // Log the item ID
+  
+    // Fetch the item using the ID
+    const item = actor.items.get(itemId);  // Use the ID to fetch the actual item object
+  
+    if (item) {
+      // Update the item's 'equipped' status
+      item.update({ 'system.equipped': isChecked });
+  
+      console.log(`Item is now ${isChecked ? 'equipped' : 'unequipped'}`);
+
+    // Handle the item's effects (enable/disable based on equip status)
+    if (item.effects) {
+      // Loop through each individual effect
+      for (let effect of item.effects) {
+        // Disable effect if unequipped, enable it if equipped
+        effect.disabled = !isChecked; // Set disabled state based on equip status
+        
+        // Update the individual effect
+        effect.update({ 'disabled': effect.disabled });
+        console.log(`Effect ${effect.name} updated: ${isChecked ? 'equipped' : 'unequipped'}`);
+      }
+    }
+    } else {
+      console.log("Item not found!");
+    }
+  }
+  
+  
 
   /** @override */
   static PARTS = {
@@ -89,6 +144,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
 
+
+  
   /* -------------------------------------------- */
 
   /** @override */
@@ -155,6 +212,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
     return context;
   }
+
+  
 
   /**
    * Generates the data for the generic tab navigation template
@@ -223,6 +282,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   }
 
 
+
   /**
    * Organize and classify Items for Actor sheets.
    *
@@ -271,6 +331,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       }
     }
 
+
+    
     for (const s of Object.values(spells)) {
       s.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     }
@@ -281,6 +343,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.spells = spells;
   }
+
+
 
   /**
    * Actions performed after any render of the Application.
@@ -296,7 +360,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // You may want to add other special handling here
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
     // That you may want to implement yourself.
+
   }
+
+
 
   /**************
    *
@@ -360,6 +427,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     await doc.delete();
   }
 
+
   /**
    * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
    *
@@ -393,6 +461,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     await docCls.create(docData, { parent: this.actor });
   }
 
+
+  
+
   /**
    * Determines effect parent to pass to helper
    *
@@ -405,6 +476,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const effect = this._getEmbeddedDocument(target);
     await effect.update({ disabled: !effect.disabled });
   }
+
+
+
 
   /**
    * Handle clickable rolls.
@@ -479,6 +553,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       return roll;
     }
   }
+
+
 
   evaluateCriticalSuccess(d100Result, successThreshold, failureThreshold) {
     if (d100Result <= successThreshold) {
@@ -835,22 +911,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       }
     }
   }
- 
-  //functioning button example
-    /** @override */
-    activateListeners(html) {
-      super.activateListeners(html);
+
   
-      // Listen for clicks on the "Click Me!" button
-      html.find(".action-btn").on("click", this._onButtonClick.bind(this));
-    }
-  
-    /** Handle button click */
-    _onButtonClick(event) {
-      event.preventDefault(); // Prevent default action if needed
-      console.log("Button was clicked!");
-    }
- 
 
 
 }

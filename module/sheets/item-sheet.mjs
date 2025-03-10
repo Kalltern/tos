@@ -23,6 +23,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       createDoc: this._createEffect,
       deleteDoc: this._deleteEffect,
       toggleEffect: this._toggleEffect,
+      
     },
     form: {
       submitOnChange: true,
@@ -30,6 +31,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
   };
+
 
   /* -------------------------------------------- */
 

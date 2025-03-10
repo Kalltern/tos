@@ -36,6 +36,23 @@ export class ToSActor extends Actor {
     // things organized.
     this._prepareCharacterData(actorData);
     this._prepareNpcData(actorData);
+
+    systemData.armorTotal = 0;
+    systemData.headArmorTotal = 0;
+
+    // Iterate through gear
+         for (const item of this.items) {
+               if (item.type === "gear" && item.system.equipped && !item.system.helmet) {
+            systemData.armorTotal += item.system.armor.value;
+        }
+      }
+
+    // Iterate through gear (only helmets)
+      for (const item of this.items) {
+        if (item.type === "gear" && item.system.equipped && item.system.helmet ) {
+         systemData.headArmorTotal += item.system.armor.value;
+ }
+}
   }
 
   /**
@@ -166,7 +183,7 @@ export class ToSActor extends Actor {
       }
 
     }
-
+   
     // Define critical thresholds influenced by luck
     const luck = systemData.secondaryAttributes.lck.value;
     const baseCriticalSuccess = 5; // Base critical success threshold

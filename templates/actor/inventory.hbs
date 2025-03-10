@@ -1,9 +1,81 @@
 {{! Inventory Tab }}
 <section
-  class="tab weapon {{tab.cssClass}}"
+  class="tab {{tab.cssClass}}"
   data-group="primary"
   data-tab="inventory"
 >
+
+  <ol class="items-list">
+    <li class="item flexrow items-header">
+      <div class="item-name">{{localize "Gear"}}</div>
+      <div class="item-formula">{{localize "TOS.Item.Gear.FIELDS.equipped.label"}}</div>
+      <div class="item-formula">{{localize "TOS.Item.Gear.FIELDS.layer.label"}}</div>
+      <div class="item-formula">{{localize "TOS.Item.Gear.FIELDS.armor.label"}}</div>
+      <div class="item-controls">
+        {{#if @root.editable}}
+          <a class="item-control item-create"
+            title="{{localize 'DOCUMENT.Create' type="Item"}}"
+            data-action="createDoc"
+            data-document-class="Item"
+            data-type="gear">
+            <i class="fas fa-plus"></i>
+            {{localize "DOCUMENT.New" type="item"}}
+          </a>
+        {{/if}}
+      </div>
+    </li>
+    {{#each gear as |item id|}}
+      <li class="item flexrow"
+        data-item-id="{{item._id}}"
+        data-drag="true"
+        data-document-class="Item">
+        
+        <div class="item-name">
+          <div class="item-image">
+            <a class="rollable" data-roll-type="item" data-action="roll">
+              <img src="{{item.img}}" title="{{item.name}}" width="24" height="24" />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+<!-- Equipped Checkbox (Editable) -->
+<div class="item-formula item-prop">
+  <input type="checkbox" class="item-toggle-equipped"
+  data-action="toggleEquipped"
+         data-item-id="{{item._id}}"
+         {{#if item.system.equipped}}checked{{/if}} />
+</div>
+
+
+        <!-- Layer Value -->
+        <div class="item-formula item-prop">
+          {{item.system.armor.layer}}
+        </div>
+
+        <!-- Armor Value -->
+        <div class="item-formula item-prop">
+          {{item.system.armor.value}}
+        </div>
+
+        <div class="item-controls">
+          <a class="item-control item-edit"
+            title="{{localize 'DOCUMENT.Update' type="Gear"}}"
+            data-action="viewDoc">
+            <i class="fas fa-edit"></i>
+          </a>
+          {{#if @root.editable}}
+            <a class="item-control item-delete"
+              title="{{localize 'DOCUMENT.Delete' type="Gear"}}"
+              data-action="deleteDoc">
+              <i class="fas fa-trash"></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+    {{/each}}
+</ol>
+
+
   <ol class="items-list">
     <li class="item flexrow items-header">
       <div class="item-name">{{localize "Name"}}</div>

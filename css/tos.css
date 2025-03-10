@@ -384,9 +384,25 @@
 }
 .tos .items-list .item-prop {
   text-align: center;
-  border-left: 1px solid #c9c7b8;
   border-right: 1px solid #c9c7b8;
+  border-left: 1px solid #c9c7b8;
   font-size: 12px;
+}
+/* Remove left border from all except the first one */
+.tos .items-list .item-prop:first-child {
+  border-left: none;
+}
+
+/* Remove right border from the last one */
+.tos .items-list .item-prop:last-child {
+  border-right: none;
+}
+.tos .item-toggle-equipped {
+  width: 16px;
+  height: 15px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
 }
 .tos .items-list .items-header {
   height: 28px;
@@ -406,7 +422,7 @@
   text-align: left;
 }
 .tos .item-formula {
-  flex: 0 0 200px;
+  flex: 0 0 150px;
   padding: 0 8px;
 }
 .tos .effects-header {
@@ -611,4 +627,44 @@
 
 .checkbox-row label {
   margin-right: 5px; /* Space between label and checkbox */
+}
+
+/* Container for stats row */
+.stat-row {
+  display: flex;
+  justify-content: space-evenly; /* Evenly distribute stats in a single row */
+  align-items: center; /* Center align the items vertically */
+  width: 100%; /* Ensure the row takes full available width */
+  flex-wrap: wrap; /* Allow wrapping when there are more than 7 items */
+  }
+
+/* Each stat block (Health, Stamina, etc.) */
+.attribute {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 100px; /* Set each stat box to 70px width */
+  max-width: 100px; /* Ensure no box exceeds 70px */
+}
+
+/* Label for each stat */
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+/* Container for current and max value inputs */
+.stat-values {
+  display: flex;
+  justify-content: space-between;
+  gap: 5px; /* Space between current and max value inputs */
+  align-items: center;
+}
+
+/* Ensure inputs are properly aligned */
+.stat-input {
+  width: 50px; /* Set input box width */
+  text-align: center; /* Center the text inside the input */
+  padding: 0; /* Remove padding for better alignment */
 }

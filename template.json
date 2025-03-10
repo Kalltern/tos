@@ -13,6 +13,13 @@
        "finesse": false,
        "steelGrip":false,
        "predatorySenses":false,
+       "day":false,
+       "armorTotal":0,
+       "headArmorTotal":0,
+       "rerolls":[ {
+        "name": "",
+        "value": 1
+      }],
             "templates": ["base"],
       "stats": {
         "health": {
@@ -107,7 +114,8 @@
       },
       "secondaryAttributes": {
         "spd": {
-          "value": 1
+          "value": 1,
+          "max": 6
         },
         "lck": {
           "value": 1
@@ -735,6 +743,10 @@
         "extra3": 0
     }
       },
+      "gear": {
+      "templates": ["base"],
+      "equipped": false
+    },
     "feature": {
       "templates": ["base"]
     },
