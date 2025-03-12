@@ -7,33 +7,169 @@
   {{! As you add new fields, add them in here! }}
 
 
+
+<div class="resource">
+  <div class="grid grid-4col">
   <div class="grid-span-1">
         <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.armor.label"
+            "TOS.Item.Gear.FIELDS.rangedCritDefense.label"
           }}</label>
         <input
           type="text"
-          name="system.armor.value"
-          value="{{system.armor.value}}"
+          name="system.rangedCritDefense"
+          value="{{system.rangedCritDefense}}"
           data-dtype="Number"
         />
   </div>
-  <div>
-   <label class="resource-label">{{localize
-     "TOS.Item.Gear.FIELDS.helmet.label"
-       }}</label>
-  <input type="checkbox" name="system.helmet" {{#if system.helmet}}checked{{/if}} />
-  </div>
   <div class="grid-span-1">
         <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.layer.label"
+            "TOS.Item.Gear.FIELDS.iniPenalty.label"
           }}</label>
         <input
           type="text"
-          name="system.armor.layer"
-          value="{{system.armor.layer}}"
-          data-dtype="string"
+          name="system.iniPenalty"
+          value="{{system.iniPenalty}}"
+          data-dtype="Number"
+        />
+ </div>
+ {{#if system.helmet}}
+   <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.perPenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.perPenalty"
+          value="{{system.perPenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+  {{/if}}
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.acroPenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.acroPenalty"
+          value="{{system.acroPenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.critDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critDefense"
+          value="{{system.critDefense}}"
+          data-dtype="Number"
+        />
+  </div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.swimPenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.swimPenalty"
+          value="{{system.swimPenalty}}"
+          data-dtype="Number"
+        />
+   </div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.dodgePenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.dodgePenalty"
+          value="{{system.dodgePenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.castPenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.castPenalty"
+          value="{{system.castPenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.rangedDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.rangedDefense"
+          value="{{system.rangedDefense}}"
+          data-dtype="Number"
+        />
+  </div>
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.stealthPenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.stealthPenalty"
+          value="{{system.stealthPenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+{{#if system.helmet}}
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.archeryPenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.archeryPenalty"
+          value="{{system.archeryPenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+{{/if}}
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.maxSpeed.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.maxSpeed"
+          value="{{system.maxSpeed}}"
+          data-dtype="Number"
+        />
+  </div>
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.Defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.Defense"
+          value="{{system.Defense}}"
+          data-dtype="Number"
+        />
+  </div>
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.healthBonus.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.healthBonus"
+          value="{{system.healthBonus}}"
+          data-dtype="Number"
         />
   </div>
 
+
+</div>
+  </div>
 </section>

@@ -37,22 +37,71 @@ export class ToSActor extends Actor {
     this._prepareCharacterData(actorData);
     this._prepareNpcData(actorData);
 
-    systemData.armorTotal = 0;
-    systemData.headArmorTotal = 0;
+    for (let [key, attribute] of Object.entries(systemData.attributes)) {
+      // Calculate the attribute rating using ToS rules.
+      attribute.baseValue ??= attribute.value;
+      attribute.value = attribute.baseValue + (attribute.bonus ?? 0);
+    }
+  
+    for (let [key, attribute] of Object.entries(systemData.secondaryAttributes)) {
+      // Calculate the attribute rating using ToS rules.
+      attribute.baseValue ??= attribute.value;
+      attribute.value = attribute.baseValue + (attribute.bonus ?? 0);
+    }
+    for (let [key, stat] of Object.entries(systemData.stats)) {
+      // Calculate the attribute rating using ToS rules.
+      stat.baseValue ??= stat.value;
+      stat.value = stat.baseValue + (stat.bonus ?? 0);
+    }
+  
 
+    systemData.armorTotal = 0;
+    systemData.healthBonus = 0; 
+    systemData.initiativeBonus = 0; 
+    systemData.rerolls = {};
+   
     // Iterate through gear
          for (const item of this.items) {
-               if (item.type === "gear" && item.system.equipped && !item.system.helmet) {
+               if (item.type === "gear" && item.system.equipped) {
+            let skill = systemData.skills;
+            let combatSkill = systemData.combatSkills;
+            
+
             systemData.armorTotal += item.system.armor.value;
+            combatSkill.meleeDefense.critbonus += item.system.critDefense ?? 0;
+            combatSkill.rangedDefense.critbonus += item.system.rangedCritDefense ?? 0;
+            combatSkill.dodge.rating += item.system.dodgePenalty ?? 0;
+            combatSkill.channeling.rating += item.system.castPenalty ?? 0;
+            combatSkill.rangedDefense.rating += item.system.rangedDefense ?? 0;
+            combatSkill.meleeDefense.rating += item.system.Defense ?? 0;
+            skill.acrobacy.rating += item.system.acroPenalty ?? 0;
+            skill.athletics.swimming += item.system.swimPenalty ?? 0; // note : add swimming calculation to the skills 
+            skill.stealth.rating += item.system.stealthPenalty ?? 0;
+
+            systemData.initiativeBonus += item.system.iniPenalty ?? 0;
+            systemData.secondaryAttributes.spd.max += item.system.maxSpeed ?? 0;
+            systemData.healthBonus += item.system.healthBonus ?? 0; 
         }
       }
 
+
     // Iterate through gear (only helmets)
       for (const item of this.items) {
+        let combatSkill = systemData.combatSkills;
         if (item.type === "gear" && item.system.equipped && item.system.helmet ) {
-         systemData.headArmorTotal += item.system.armor.value;
+         combatSkill.archery.rating += item.system.archeryPenalty ?? 0;
+         systemData.dodgePenalty += item.system.perPenalty ?? 0;
  }
 }
+    // Calculate initiative
+    const calcIni = [0,0,0,1,2,3,4,5,5,5,5];
+    systemData.secondaryAttributes.ini.value = calcIni[systemData.attributes.per.value] + systemData.initiativeBonus;
+    // Calculate endurance and health
+    const endurance = systemData.attributes.end.value; // Ensure endurance exists
+    const enduranceHealth = endurance * 5;
+    systemData.stats.health.max = systemData.healthBonus + enduranceHealth;
+    systemData.stats.health.value = Math.min(systemData.stats.health.value, systemData.stats.health.max);  // Ensure current health doesn't exceed max
+
   }
 
   /**
@@ -70,10 +119,7 @@ export class ToSActor extends Actor {
     }
     // Debugging: Log the attributes
     console.log(systemData.attributes);
-    // Calculate endurance
-    const endurance = systemData.attributes.end.value; // Ensure endurance exists
-    // Set health correctly under stats
-    systemData.stats.health.max = endurance * 5; // Set health based on endurance
+
 
     //Loop through skill groups and add their ratings depending on their level and attribute score
     const skillset1 = [0, 15, 25, 30, 35, 45, 50, 55, 65, 75, 85];
@@ -105,20 +151,20 @@ export class ToSActor extends Actor {
       // Ensure skill type is valid and matches your criteria
       if (skill.type === 1) {
         // Use skill.id to find the corresponding attribute
-
-        skill.rating = skillset1[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
+        if(key === "athletics"){ skill.swimming += skillset1[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;}
+        skill.rating += skillset1[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 2) {
-        skill.rating = skillset2[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
+        skill.rating += skillset2[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 3) {
-        skill.rating = skillset3[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
+        skill.rating += skillset3[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 4) {
-        skill.rating = skillset4[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
+        skill.rating += skillset4[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 5) {
-        skill.rating = skillset5[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
+        skill.rating += skillset5[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       } else if (skill.type === 6) {
-        skill.rating = skillset6[skill.value] + attributeScore[skill.id] * 6 + skill.bonus;
+        skill.rating += skillset6[skill.value] + attributeScore[skill.id] * 6 + skill.bonus;
       } else if (skill.type === 7) {
-        skill.rating = skillset7[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
+        skill.rating += skillset7[skill.value] + attributeScore[skill.id] * 3 + skill.bonus;
       }
     }
     // Iterate through combat skills
@@ -131,54 +177,70 @@ export class ToSActor extends Actor {
       // looking for ranger=true to use ranger skills instead of classic skills      
         if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
           if (ranger > 0) {
-            combatSkill.finesseRating = rangerGroup[ranger] + attributeScore[1] * 3 + combatSkill.bonus;
+            combat.finesseRating += rangerGroup[ranger] + attributeScore[1] * 3 + combatSkill.bonus;
           } else {
-            combatSkill.finesseRating = combatset1[melee] + attributeScore[1] * 3 + combatSkill.bonus;
+            combat.finesseRating += combatset1[melee] + attributeScore[1] * 3 + combatSkill.bonus;
           }
         } 
+        if (combatSkill === combat){ 
+            // Apply ranger bonus if applicable
          if (ranger > 0) { 
-          combatSkill.rating = rangerGroup[ranger] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+          combatSkill.rating += rangerGroup[ranger] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         } else {
-          combatSkill.rating = combatset1[melee] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+          combatSkill.rating += combatset1[melee] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         }
+      }
         if (combatSkill === rangeddef) {
-          if(archery.value > combat.value ) {rangeddef.rating = rangedDefenseSet[archery.value] }
-          else{rangeddef.rating = rangedDefenseSet[combat.value]}
+          if(archery.value > combat.value && archery.value != 0 ) {combatSkill.rating += rangedDefenseSet[archery.value] }
+          else if (ranger > 0) {combatSkill.rating += rangedDefenseSet[ranger] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;}
+          else{combatSkill.rating += rangedDefenseSet[combat.value]}
         }  
 
-        if (combatSkill === archery) {
-          combatSkill.rating = combatset1[archery.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
-        }  
+        if (combatSkill === archery){
+          if(ranger > 0){archery.rating += combatset1[ranger] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;}
+          else {archery.rating += combatset1[archery.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+          }  
+        }
+      
 
       // Assuming steelGrip and predatorySenses are properties directly on the actor
       if (combatSkill === systemData.combatSkills.meleeDefense) {
       // Check if the actor has steelGrip enabled
         if (systemData.steelGrip) {
-       combatSkill.rating = combatset1[melee] + attributeScore[0] * 3 + combatSkill.bonus;
+       combatSkill.rating += combatset1[melee] + attributeScore[0] * 3 + combatSkill.bonus;
        }
        // Check if the actor has predatorySenses enabled
          else if (systemData.predatorySenses) {
-        combatSkill.rating = combatset1[melee] + attributeScore[6] * 3 + combatSkill.bonus;
-         }
-}
+        combatSkill.rating += combatset1[melee] + attributeScore[6] * 3 + combatSkill.bonus;
+         } else if (ranger > 0) { 
+          combatSkill.rating += rangerGroup[ranger] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        } else {
+          combatSkill.rating += combatset1[melee] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        }
+
+
+
+
+
+        }
 
       }
       if (combatSkill.type === 1) {
         //setting ratings for dodge
-        combatSkill.rating = dodge[systemData.skills.acrobacy.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        combatSkill.rating += dodge[systemData.skills.acrobacy.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
      
       }
       if (combatSkill.type === 2) {
-        combatSkill.rating = throwing[combat.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        combatSkill.rating += throwing[combat.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
         combatSkill.finesseRating = throwing[combat.value] + attributeScore[1] * 3 + combatSkill.bonus;
         }
       }
       if (combatSkill.type === 3) {
         if(combatSkill.lindar){
-          combatSkill.rating = channeling2[combatSkill.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+          combatSkill.rating += channeling2[combatSkill.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
         } else {
-        combatSkill.rating = channeling1[combatSkill.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
+        combatSkill.rating += channeling1[combatSkill.value] + attributeScore[combatSkill.id] * 3 + combatSkill.bonus;
       }
       }
 

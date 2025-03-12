@@ -33,6 +33,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       toggleDay: this._toggleDay,
       toggleEquipped: this._toggleEquipped,
       myAction: this._myAction,
+      toggleReroll: this._toggleReroll
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -40,6 +41,61 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       submitOnChange: true,
     },
   };
+
+  static _toggleReroll(event) {
+    // Ensure we get the element with the correct data attributes
+    const target = event.target.closest("[data-action='toggleReroll']");
+    
+    if (!target) {
+      console.debug("Click did not occur on a valid reroll icon.");
+      return;
+    }
+  
+    console.debug("Event Target:", target);
+  
+    const itemId = target.dataset.itemId;  // Get item ID
+    const index = parseInt(target.dataset.index);  // Get icon index
+    const actor = this.actor; 
+  
+    console.debug("Item ID:", itemId);
+    console.debug("Index:", index);
+  
+    if (!itemId || isNaN(index)) {
+      console.debug("Invalid itemId or index.");
+      return;
+    }
+  
+    // Find the item by its ID
+    const item = actor.items.get(itemId);
+    if (!item) {
+      console.debug("Item not found for ID:", itemId);
+      return;
+    }
+  
+    console.debug("Item found:", item);
+  
+    // Toggle the active state for the reroll
+    const rerollActive = item.system.reroll.active || [];
+    console.debug("Current rerollActive state:", rerollActive);
+    
+    rerollActive[index] = !rerollActive[index];  // Toggle state
+    console.debug("Updated rerollActive state:", rerollActive);
+  
+    // Save the updated reroll state to the item
+    item.update({
+      'system.reroll.active': rerollActive
+    }).then(() => {
+      console.debug("Reroll state saved for item:", itemId);
+    }).catch(error => {
+      console.error("Failed to update reroll state:", error);
+    });
+  
+    // Update the icon's visual state
+    target.classList.toggle('active', rerollActive[index]);
+    console.debug("Icon class toggled:", rerollActive[index] ? "active" : "inactive");
+  }
+  
+  
 
   static _myAction(event) {
     const isChecked = event.target.checked; // Get the state of the checkbox
@@ -88,11 +144,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       console.log("Item not found!");
     }
   }
-  
-  
 
-  /** @override */
-  static PARTS = {
+
+   /** @override */
+   static PARTS = {
     header: {
       template: "systems/tos/templates/actor/header.hbs",
     },
@@ -173,8 +228,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /** @override */
-  async _preparePartContext(partId, context) {
-    switch (partId) {
+     async _preparePartContext(partId, context) {
+     switch (partId) {
       case "features":
       case "testtab":
       case "skills":
@@ -183,7 +238,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       case "config":
         context.tab = context.tabs[partId];
         break;
-      case "biography":
+         case "biography":
         context.tab = context.tabs[partId];
         // Enrich biography info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
@@ -199,7 +254,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           }
         );
         break;
-      case "effects":
+       case "effects":
         context.tab = context.tabs[partId];
         // Prepare active effects
         context.effects = prepareActiveEffectCategories(
@@ -209,7 +264,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         );
         break;
         
-    }
+      }
     return context;
   }
 
@@ -360,7 +415,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // You may want to add other special handling here
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
     // That you may want to implement yourself.
-
+    // Use standard DOM method to select input elements
+    
   }
 
 

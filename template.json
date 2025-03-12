@@ -16,62 +16,68 @@
        "day":false,
        "armorTotal":0,
        "headArmorTotal":0,
-       "rerolls":[ {
-        "name": "",
-        "value": 1
-      }],
-            "templates": ["base"],
+       "templates": ["base"],
       "stats": {
         "health": {
           "value": 10,
           "min": 0,
-          "max": 10
+          "max": 10,
+          "bonus": 0
         },
         "graveWounds": {
           "value": 2,
           "min": 0,
           "treated": 0,
-          "max": 2
+          "max": 2,
+          "bonus": 0
         },
         "stamina": {
           "value": 5,
           "min": 0,
-          "max": 5
+          "max": 5,
+          "bonus": 0
         },
         "toxicity": {
           "value": 5,
           "min": 0,
-          "max": 5
+          "max": 5,
+          "bonus": 0
         },
         "mana": {
           "value": 0,
           "min": 0,
-          "max": 0
+          "max": 0,
+          "bonus": 0
         },
         "mind": {
           "value": 5,
           "min": 0,
-          "max": 5
+          "max": 5,
+          "bonus": 0
         },
         "sanity": {
           "value": 5,
           "min": 0,
-          "max": 5
+          "max": 5,
+          "bonus": 0
         },
         "corruption": {
           "value": 5,
           "min": 0,
-          "max": 5
+          "max": 5,
+          "bonus": 0
         },
         "fatigue": {
           "value": 5,
           "min": 0,
-          "max": 5
+          "max": 5,
+          "bonus": 0
         },
         "holyEnergy": {
           "value": 0,
           "min": 0,
-          "max": 0
+          "max": 0,
+          "bonus": 0
         }
       },
       "effects": {
@@ -85,61 +91,76 @@
       "attributes": {
         "str": {
           "value": 1,
-          "id": 0
+          "id": 0,
+          "bonus": 0
         },
         "dex": {
           "value": 1,
-          "id": 1
+          "id": 1,
+          "bonus": 0
         },
         "end": {
           "value": 1,
-          "id": 2
+          "id": 2,
+          "bonus": 0
         },
         "int": {
           "value": 1,
-          "id": 3
+          "id": 3,
+          "bonus": 0
         },
         "wil": {
           "value": 1,
-          "id": 4
+          "id": 4,
+          "bonus": 0
         },
         "cha": {
           "value": 1,
-          "id": 5
+          "id": 5,
+          "bonus": 0
         },
         "per": {
           "value": 1,
-          "id": 6
+          "id": 6,
+          "bonus": 0
         }
       },
       "secondaryAttributes": {
         "spd": {
           "value": 1,
-          "max": 6
+          "max": 6,
+          "bonus": 0
         },
         "lck": {
-          "value": 1
+          "value": 1,
+          "bonus": 0
         },
         "res": {
-          "value": 0
+          "value": 0,
+          "bonus": 0
         },
         "fth": {
-          "value": 1
+          "value": 1,
+          "bonus": 0
         },
         "sin": {
-          "value": 1
+          "value": 1,
+          "bonus": 0
         },
         "vis": {
-          "value": 1
+          "value": 1,
+          "bonus": 0
         },
         "ini": {
-          "value": 1
+          "value": 1,
+          "bonus": 0
         }
       },
 
       "skills": {
         "athletics": {
           "value": 0,
+          "swimming": 0,
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
@@ -745,10 +766,16 @@
       },
       "gear": {
       "templates": ["base"],
-      "equipped": false
+      "equipped": false,
+      "layerOptions": ["Not Armor", "Bottom", "Middle", "Top"]
     },
     "feature": {
-      "templates": ["base"]
+      "templates": ["base"],
+      "reroll": {
+        "name": "",
+        "active": [false, false],
+        "value": 0
+    }
     },
     "race": {
       "templates": ["base"]

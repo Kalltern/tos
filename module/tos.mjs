@@ -94,6 +94,9 @@ Handlebars.registerHelper("range", function (start, end) {
 Handlebars.registerHelper("hasValue", function(value) {
   return value !== null && value !== undefined && value !== "";
 });
+Handlebars.registerHelper('array-lookup', function(array, index) {
+  return array && array[index] !== undefined ? array[index] : false;
+});
 
 
 

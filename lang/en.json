@@ -123,6 +123,7 @@
       "Gear": {
         "FIELDS": {
           "armor": { "label": "Armor value" },
+          "weight": { "label": "Weight" },
           "headArmor": { "label": "Head armor value" },
           "acidArmor": { "label": "Acid armor value" },
           "fireArmor": { "label": "Fire armor value" },
@@ -130,10 +131,22 @@
           "lightningArmor": { "label": "Lightning armor value" },
           "equipped": { "label": "Equipped" },
           "layer": { "label": "Armor layer" },
-          "helmet": { "label": "Is head gear" },
+          "helmet": { "label": "Has head gear" },
+          "durability": { "label": "Durability" },
+          "swimPenalty": { "label": "Swim penalty" },
           "dodgePenalty": { "label": "Dodge penalty" },
-          "dodgePenalty": { "label": "Dodge penalty" },
-          "dodgePenalty": { "label": "Dodge penalty" }
+          "castPenalty": { "label": "Cast penalty" },
+          "acroPenalty": { "label": "Acrobacy penalty" },
+          "stealthPenalty": { "label": "Stealth penalty" },
+          "iniPenalty": { "label": "Initiative penalty" },
+          "maxSpeed": { "label": "Max speed" },
+          "rangedDefense": { "label": "Ranged defense" },
+          "Defense": { "label": "Defense bonus" },
+          "healthBonus": { "label": "Health bonus" },
+          "critDefense": { "label": "Critical defense" },
+          "rangedCritDefense": { "label": "Ranged critical defense" },
+          "archeryPenalty": { "label": "Archery penalty" },
+          "perPenalty": { "label": "Perception penalty" }
         }
       },
       "Spell": {
@@ -159,6 +172,10 @@
     },
     "Item": {
       "weapon": "Weapon",
+      "item": "Item",
+      "gear": "Gear",
+      "race": "Race",
+      "consumable": "Consumable",
       "feature": "Feature",
       "spell": "Spell"
     }

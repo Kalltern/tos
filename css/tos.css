@@ -668,3 +668,30 @@ label {
   text-align: center; /* Center the text inside the input */
   padding: 0; /* Remove padding for better alignment */
 }
+
+
+.reroll-container span {
+  font-size: 1rem; /* Adjust as needed */
+  font-weight: bold;
+  margin-right: 150px; 
+}
+
+/* Style for the reroll icon */
+.reroll-icon {
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease, background-color 0.3s ease;
+  font-size: 1.5rem; /* Adjust for bigger icons */
+  align-items: center;  /* Vertically center the icon */
+  justify-content: center;  /* Horizontally center the icon */
+}
+
+/* Active (shining) state */
+.reroll-icon.active {
+  color: rgb(243, 195, 92);  /* Icon color changes to white for contrast */
+}
+
+/* Inactive state */
+.reroll-icon:not(.active) {
+  background-color: transparent; /* Transparent when inactive */
+  color: inherit;  /* Default color */
+}
