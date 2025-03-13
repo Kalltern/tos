@@ -557,26 +557,25 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     if (dataset.roll) {
       
-      const attributeMap = {
-        Dexterity: "dex",
-        Strength: "str",
-        Endurance: "end",
-        Intelligence: "int",
-        Will: "wil",
-        Charisma: "cha",
-        Perception: "per",
-        // Add other attributes if necessary
-      };
+// Determine if this is a skill or combat skill roll
+const isSkillRoll =
+  dataset.rollType === "skill" || dataset.rollType === "combat-skill" || dataset.rollType === "attribute";
 
-      // Determine if this is a skill or combat skill roll
-      const isSkillRoll =
-        dataset.rollType === "skill" || dataset.rollType === "combat-skill" ||  dataset.rollType === "attribute" ;
-        const skillKey = dataset.rollType === "attribute" ? attributeMap[dataset.label] : dataset.label;
+// Use dataset.label directly as the key for localization
+const skillKey = dataset.label;
 
+// Use game.i18n to get the localized label for the skill, looking under the correct path in your structure
+let label = dataset.label
+  ? ` ${game.i18n.localize(
+          dataset.rollType === "combat-skill"
+            ? `TOS.Actor.Character.skills.${skillKey}.label`
+            : dataset.rollType === "attribute"
+            ? `TOS.Actor.Character.Attribute.${skillKey}.long`
+            : `TOS.Actor.Character.skills.${skillKey}.label`
+        )}`
+  : "";
+      const rollName = label;
 
-      let label = dataset.label
-      ? `[${dataset.rollType === "skill" ? "Skill" : dataset.rollType === "combat-skill" ? "Combat Skill" : "Attribute"}] ${dataset.label}`
-      : "";
       const roll = new Roll(dataset.roll, this.actor.getRollData());
       await roll.evaluate();
 
@@ -622,6 +621,7 @@ if (skillData) {
     flavor: `<p style="text-align: center; font-size: 20px;"><b>${label}</b></p>`,
     rollMode: game.settings.get("core", "rollMode"),
     flags: {
+      rollName,
       criticalSuccessThreshold, // Store critical success threshold
       criticalFailureThreshold, // Store critical failure threshold
       },

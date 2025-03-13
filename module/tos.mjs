@@ -209,26 +209,18 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         const d100Result = roll.dice[0]?.total; // Extract the d100 result
         const criticalSuccessThreshold = message.flags.criticalSuccessThreshold;
         const criticalFailureThreshold = message.flags.criticalFailureThreshold;
-        const deflect = message.flags.deflectChance;
+        const deflectChance = message.flags.deflectChance;
         const critSuccess = d100Result <= criticalSuccessThreshold;
         const rollName = message.flags.rollName;
         
-        const actorId = message.flags.actorId;
-        const actor = game.actors.get(actorId);
 
-        console.log(actor);
-        console.log(rollName);
-        console.log(d100Result);
-        console.log(deflect);
-        console.log(criticalSuccessThreshold);
-        console.log(criticalFailureThreshold);
         let flavorText = ""
 
         if (critSuccess) {
           flavorText = "Critical Success!";
         } else if (d100Result >= criticalFailureThreshold) {
           flavorText = "Critical Failure!";
-        } else if (!critSuccess && d100Result <= deflect){
+        } else if (!critSuccess && d100Result <= deflectChance){
           flavorText = "Deflect!"
         } else {
           flavorText = "";
@@ -241,7 +233,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
           <p style="text-align: center; font-size: 20px;"><b>${flavorText}</b></p>`,
           flags: {
             rollName,
-            deflect,
+            deflectChance,
             criticalSuccessThreshold, // Store critical success threshold
             criticalFailureThreshold, // Store critical failure threshold
           },
