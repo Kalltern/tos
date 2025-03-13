@@ -33,6 +33,7 @@
             class="resource-label rollable"
             data-action="roll"
             data-roll="(@attributes.{{key}}.mod)-1d100"
+            data-roll-type="attribute"
             data-label="{{localize (lookup @root.config.attributes key)}}"
           >
             {{localize (lookup @root.config.attributes key)}}
@@ -48,6 +49,7 @@
             class="attribute-mod rollable"
             data-action="roll"
             data-roll="(@attributes.{{key}}.mod)-1d100"
+            data-roll-type="attribute"
             data-label="{{localize (lookup @root.config.attributes key)}}"
           >
             {{numberFormat attribute.mod decimals=0}}

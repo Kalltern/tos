@@ -26,7 +26,7 @@
         data-roll-type="combat-skill"
         data-label="{{key}}"
       >
-        {{key}}
+        {{localize (concat 'TOS.Actor.Character.combatSkills.' key '.label')}}
       </label>
 
       <input
@@ -80,11 +80,11 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.weaponSkills.' key '.label')}}
           </label>
           <input
             type="text"
-            name="system.skills.{{key}}.value"
+            name="system.weaponSkills.{{key}}.value"
             value="{{skill.value}}"
             class="skill-value align-left"
             data-dtype="Number"
@@ -108,11 +108,11 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.doctrines.' key '.label')}}
           </label>
           <input
             type="text"
-            name="system.skills.{{key}}.value"
+            name="system.doctrines.{{key}}.value"
             value="{{skill.value}}"
             class="skill-value align-left"
             data-dtype="Number"
@@ -136,11 +136,11 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.schools.' key '.label')}}
           </label>
           <input
             type="text"
-            name="system.skills.{{key}}.value"
+            name="system.schools.{{key}}.value"
             value="{{skill.value}}"
             class="skill-value align-left"
             data-dtype="Number"
@@ -165,7 +165,7 @@
             data-roll-type="combat-skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.combatSkills.' key '.label')}}
           </label>
           <span
             class="skill-mod rollable skill-rating"  
@@ -206,7 +206,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
           <input
             type="text"
@@ -247,7 +247,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
             <input
               type="text"
@@ -291,7 +291,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
             <input
               type="text"
@@ -334,7 +334,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
             <input
               type="text"
@@ -378,7 +378,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
             <input
               type="text"
@@ -420,7 +420,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+             {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
          
             <input
@@ -463,7 +463,7 @@
             data-roll-type="skill"
             data-label="{{key}}"
           >
-            {{key}}
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
           </label>
             <input
               type="text"

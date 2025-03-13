@@ -137,9 +137,10 @@ function calculateSkillThresholds(skillsObject) {
   }
 }
 
-// Calculate thresholds for regular skills and combat skills
+// Calculate thresholds for regular skills and combat skills and attributes
 calculateSkillThresholds(systemData.skills);
 calculateSkillThresholds(systemData.combatSkills);
+calculateSkillThresholds(systemData.attributes);
 
 // Global thresholds based on luck.value
 this.criticalSuccessThreshold = Math.max(

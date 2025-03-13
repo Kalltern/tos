@@ -14,7 +14,8 @@
             {{#if skill.visible}}checked{{/if}}>
              {{key}}
         </label>       
-  {{/each}}
+{{/each}}
+
 {{#each system.weaponSkills as |skill key|}}
          <label class="toggle-label">
           <input 
@@ -25,6 +26,7 @@
              {{key}}
         </label>       
   {{/each}}
+
 {{#each system.doctrines as |skill key|}}
          <label class="toggle-label">
           <input 
@@ -35,6 +37,7 @@
              {{key}}
         </label>       
    {{/each}}
+
 {{#each system.schools as |skill key|}}
          <label class="toggle-label">
           <input 
@@ -45,6 +48,7 @@
              {{key}}
         </label>       
   {{/each}}     
+  
 {{#each system.skills as |skill key|}}
          <label class="toggle-label">
           <input 

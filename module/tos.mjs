@@ -8,6 +8,7 @@ import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 import { TOS } from "./helpers/config.mjs";
 
 
+
 /* -------------------------------------------- */
 /*  Init Hook                                   */
 /* -------------------------------------------- */
@@ -175,7 +176,9 @@ function rollItemMacro(itemUuid) {
     item.roll();
   });
 }
+
 Hooks.on("renderChatMessage", (message, html, data) => {
+  
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
     // Add logic to check if the message is a roll message
@@ -203,28 +206,46 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         const rollFormula = message.rolls[0].formula;
         const roll = new Roll(rollFormula);
         await roll.evaluate();
+        const d100Result = roll.dice[0]?.total; // Extract the d100 result
+        const criticalSuccessThreshold = message.flags.criticalSuccessThreshold;
+        const criticalFailureThreshold = message.flags.criticalFailureThreshold;
+        const deflect = message.flags.deflectChance;
+        const critSuccess = d100Result <= criticalSuccessThreshold;
+        const rollName = message.flags.rollName;
+        
+        const actorId = message.flags.actorId;
+        const actor = game.actors.get(actorId);
 
-        // Check if we have critical success or failure info to add
-        let criticalMessage = "";
-        if (message.system.rollType === "skill" || message.system.rollType === "cskill") {
-          const skillKey = message.system.skillKey; // Assuming this is available in message.data
-          const skillData = message.system.rollType === "skill"
-            ? game.actors.get(message.speaker.actor).system.skills[skillKey]
-            : game.actors.get(message.speaker.actor).system.cskills[skillKey];
+        console.log(actor);
+        console.log(rollName);
+        console.log(d100Result);
+        console.log(deflect);
+        console.log(criticalSuccessThreshold);
+        console.log(criticalFailureThreshold);
+        let flavorText = ""
 
-          if (skillData) {
-            criticalMessage = evaluateCriticalSuccess(
-              roll.total, 
-              skillData.criticalSuccessThreshold, 
-              skillData.criticalFailureThreshold
-            );
-          }
+        if (critSuccess) {
+          flavorText = "Critical Success!";
+        } else if (d100Result >= criticalFailureThreshold) {
+          flavorText = "Critical Failure!";
+        } else if (!critSuccess && d100Result <= deflect){
+          flavorText = "Deflect!"
+        } else {
+          flavorText = "";
         }
-
+        
         // Send the new roll to chat or update the message as needed
         roll.toMessage({
           speaker: ChatMessage.getSpeaker({ user: game.user }),
-          flavor: `[Re-Roll] ${message.flavor}`,
+          flavor: `<p style="text-align: center; font-size: 20px;"><b><i class="fa-light fa-dice-d20"></i> ${rollName} <i class="fa-light fa-dice-d20"></i><hr></b></p>
+          <p style="text-align: center; font-size: 20px;"><b>${flavorText}</b></p>`,
+          flags: {
+            rollName,
+            deflect,
+            criticalSuccessThreshold, // Store critical success threshold
+            criticalFailureThreshold, // Store critical failure threshold
+          },
+          
         });
       });
     }
@@ -233,15 +254,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
 
 
 Hooks.once("ready", () => {
-  $(document).on("click", ".action-btn", function (event) {
-    event.preventDefault();
-    console.log("Button clicked!");
-
-    // Toggle visibility of skills and checkboxes
-    $(".skill-entry").toggleClass("hidden-skill");  // Toggle skill visibility
-    $(".toggle-label").toggleClass("hidden");  // Toggle checkbox visibility
-  });
-
   // Listen for checkbox changes to update skill visibility
   $(document).on("change", ".toggle-skill-visibility", function () {
     let skillKey = $(this).attr("data-skill");
@@ -249,7 +261,9 @@ Hooks.once("ready", () => {
 
     console.log(`Toggling visibility for skill: ${skillKey}, Checked: ${isChecked}`);
 
-    let skillEntry = $(`.skill-label[data-label="${skillKey}"]`).closest(".skill-entry");
+   // Target the specific skill entry
+   let skillEntry = $(`.skill-entry[data-skill="${skillKey}"]`);  // Ensure uniqueness with section-based targeting
+
 
     // Reverse the logic: if checked, hide the skill, else show the skill
     if (isChecked) {

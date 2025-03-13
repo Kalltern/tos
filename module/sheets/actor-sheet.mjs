@@ -556,33 +556,45 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
 
     if (dataset.roll) {
+      
+      const attributeMap = {
+        Dexterity: "dex",
+        Strength: "str",
+        Endurance: "end",
+        Intelligence: "int",
+        Will: "wil",
+        Charisma: "cha",
+        Perception: "per",
+        // Add other attributes if necessary
+      };
+
       // Determine if this is a skill or combat skill roll
       const isSkillRoll =
-        dataset.rollType === "skill" || dataset.rollType === "combat-skill";
-      const skillKey = dataset.label; // This should hold either "skill name" or "combat skill name"
+        dataset.rollType === "skill" || dataset.rollType === "combat-skill" ||  dataset.rollType === "attribute" ;
+        const skillKey = dataset.rollType === "attribute" ? attributeMap[dataset.label] : dataset.label;
+
 
       let label = dataset.label
-        ? `[${dataset.rollType === "skill" ? "Skill" : "combat-skill"}] ${
-            dataset.label
-          }`
-        : "";
+      ? `[${dataset.rollType === "skill" ? "Skill" : dataset.rollType === "combat-skill" ? "Combat Skill" : "Attribute"}] ${dataset.label}`
+      : "";
       const roll = new Roll(dataset.roll, this.actor.getRollData());
       await roll.evaluate();
 
       const d100Result = roll.dice[0]?.total; // Extract the d100 result
-
+      let skillData = null; 
       // Only evaluate critical status if it's a skill or combat skill roll
       if (isSkillRoll) {
         // Retrieve the skill data based on the roll type
 
         console.log("Roll Type:", dataset.rollType);
         console.log("Skill Key:", skillKey);
-        const skillData =
-          dataset.rollType === "skill"
-            ? this.actor.system.skills[skillKey]
-            : this.actor.system.combatSkills[skillKey];
-
-        console.log("Skill Data:", skillData);
+        skillData =
+        dataset.rollType === "skill"
+          ? this.actor.system.skills[skillKey]
+          : dataset.rollType === "combat-skill"
+          ? this.actor.system.combatSkills[skillKey]
+          : this.actor.system.attributes[skillKey]; // Handle attributes
+        
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
             d100Result,
@@ -592,7 +604,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
           // Modify the label to include critical success/failure indication
           if (criticalMessage) {
-            label += ` - ${criticalMessage}`;
+            label += `<hr><p style="text-align: center; font-size: 20px;"><b>${criticalMessage}</b></p>`;
           }
           console.log(`Critical Message: ${criticalMessage}`);
         } else {
@@ -600,12 +612,23 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         }
       }
 
-      // Send the roll result to the chat
-      await roll.toMessage({
-        flavor: label,
-        rollMode: game.settings.get("core", "rollMode"),
-      });
 
+if (skillData) {
+  // Deconstruct the critical thresholds from skillData
+  const { criticalSuccessThreshold, criticalFailureThreshold } = skillData;
+
+  // Now, pass only the deconstructed values in the flags
+  await roll.toMessage({
+    flavor: `<p style="text-align: center; font-size: 20px;"><b>${label}</b></p>`,
+    rollMode: game.settings.get("core", "rollMode"),
+    flags: {
+      criticalSuccessThreshold, // Store critical success threshold
+      criticalFailureThreshold, // Store critical failure threshold
+      },
+  });
+} else {
+  console.error("No skill data found for:", skillKey);
+}
       return roll;
     }
   }
