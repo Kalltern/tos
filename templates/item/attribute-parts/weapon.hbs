@@ -13,53 +13,6 @@
     <span>{{system.formula}}</span>
 
     <div class="grid grid-4col">
-      <div class="item-details">
-        <label for="damage-dice">{{localize
-            "TOS.Item.Weapon.FIELDS.diceNum.label"
-          }}:</label>
-        <input
-          type="text"
-          name="system.roll.diceNum"
-          value="{{system.roll.diceNum}}"
-          data-dtype="Number"
-        />
-      </div>
-      <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.dieSize.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.roll.diceSize"
-          value="{{system.roll.diceSize}}"
-          data-dtype="String"
-        />
-      </div>
-      <div class="grid-span-2">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.rollMod.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.roll.diceBonus"
-          value="{{system.roll.diceBonus}}"
-          data-dtype="String"
-          placeholder="e.g. 5+2d6"
-        />
-      </div>
-
-
-         <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.penetration.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.penetration"
-          value="{{system.penetration}}"
-          data-dtype="Number"
-        />
-      </div>
 
          <div class="grid-span-1">
         <label class="resource-label">{{localize
@@ -116,6 +69,41 @@
           type="text"
           name="system.critFail"
           value="{{system.critFail}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+     <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critDefense"
+          value="{{system.critDefense}}"
+          data-dtype="Number"
+        />
+      </div>
+       <div class="grid-span-1">
+           <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critDodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critDodge"
+          value="{{system.critDodge}}"
+          data-dtype="Number"
+        />
+      </div>
+
+ <div class="grid-span-1">
+      <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.dodge"
+          value="{{system.dodge}}"
           data-dtype="Number"
         />
       </div>
@@ -192,6 +180,7 @@
           placeholder="e.g. 2d6"
         />
       </div>
+      <div class="grid-span-2"></div>
           <div class="checkbox-row">
   <label class="resource-label">{{localize "TOS.Item.Weapon.FIELDS.finesse.label"}}</label>
   <input type="checkbox" name="system.finesse" {{checked system.finesse}} />

@@ -12,7 +12,55 @@
     </div>
     {{! You may prefer to have a separate header file instead of this if statement}}
     {{#if (eq item.type "weapon")}}
-      <div class="resource">
+
+ <div class="grid grid-2col">
+         <div class="item-details">
+        <label for="damage-dice">{{localize
+            "TOS.Item.Weapon.FIELDS.diceNum.label"
+          }}:</label>
+        <input
+          type="text"
+          name="system.roll.diceNum"
+          value="{{system.roll.diceNum}}"
+          data-dtype="Number"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dieSize.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.diceSize"
+          value="{{system.roll.diceSize}}"
+          data-dtype="String"
+        />
+      </div>
+     
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.rollMod.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.diceBonus"
+          value="{{system.roll.diceBonus}}"
+          data-dtype="String"
+          placeholder="e.g. 5+2d6"
+        />
+      </div>
+   <div class="grid-span-1">
+          <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.penetration.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.penetration"
+          value="{{system.penetration}}"
+          data-dtype="Number"
+        />
+      </div>
+      <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Weapon.FIELDS.weight.label"
           }}</label>
@@ -23,7 +71,7 @@
           data-dtype="Number"
         />
       </div>
-
+<div class="grid-span-1">
      <label for="weapon-class">Weapon Class:</label>
 <select name="system.class" id="weapon-class">
   <option value="">-- Select a Class --</option> <!-- Empty option for initial state -->
@@ -32,20 +80,33 @@
       {{classOption}}
     </option>
   {{/each}}
+    </div>    
+
+
+ </div>
     {{/if}}
 
+
    {{#if (eq item.type "gear")}}
-      <div class="resource">
-        <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.weight.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.weight"
-          value="{{system.weight}}"
-          data-dtype="Number"
-        />
-      </div>
+    <div class="grid grid-2col">
+     
+  <div class="grid-span-1">
+     <label class="resource-label">{{localize
+     "TOS.Item.Gear.FIELDS.shield.label"
+       }}</label>
+     <input type="checkbox" name="system.shield" {{#if system.shield}}checked{{/if}} />
+ </div>
+ {{#if system.shield}} <div class="grid-span-1"></div>{{/if}}
+{{#unless system.shield}}
+  <div class="grid-span-1">
+    
+     <label class="resource-label">{{localize
+     "TOS.Item.Gear.FIELDS.helmet.label"
+       }}</label>
+     <input type="checkbox" name="system.helmet" {{#if system.helmet}}checked{{/if}} />
+  </div>
+  {{/unless}}
+
 
    <div class="grid-span-1">
         <label class="resource-label">{{localize
@@ -61,12 +122,6 @@
         
   </div>
 
-    <div>
-   <label class="resource-label">{{localize
-     "TOS.Item.Gear.FIELDS.helmet.label"
-       }}</label>
-  <input type="checkbox" name="system.helmet" {{#if system.helmet}}checked{{/if}} />
-
     <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.durability.label"
@@ -77,8 +132,21 @@
           value="{{system.armor.durability}}"
           data-dtype="Number"
         />
-  </div>
-  </div>
+    </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.weight.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.weight"
+          value="{{system.weight}}"
+          data-dtype="Number"
+        />
+      </div>
+ {{#unless system.shield}}
+       <div class="grid-span-1">
      <label for="gear-layer">Gear layer:</label>
 <select name="system.layer" id="gear-layer">
   <option value="">-- Select a layer --</option> <!-- Empty option for initial state -->
@@ -87,6 +155,17 @@
       {{layerOption}}
     </option>
   {{/each}}
+ </select>  
+</div>
+  {{/unless}}
+
+      
+
+
+
+  
     {{/if}}
+    
+  </div>
   </div>
 </header>

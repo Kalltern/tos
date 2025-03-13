@@ -21,6 +21,7 @@
           data-dtype="Number"
         />
   </div>
+    {{#unless system.shield}}
   <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.iniPenalty.label"
@@ -56,6 +57,7 @@
           data-dtype="Number"
         />
   </div>
+{{/unless}}
     <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.critDefense.label"
@@ -67,6 +69,40 @@
           data-dtype="Number"
         />
   </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.rangedDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.rangedDefense"
+          value="{{system.rangedDefense}}"
+          data-dtype="Number"
+        />
+  </div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.defense"
+          value="{{system.defense}}"
+          data-dtype="Number"
+        />
+  </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.dodgePenalty.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.dodgePenalty"
+          value="{{system.dodgePenalty}}"
+          data-dtype="Number"
+        />
+  </div>
+   {{#unless system.shield}}
     <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.swimPenalty.label"
@@ -78,17 +114,7 @@
           data-dtype="Number"
         />
    </div>
-    <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.dodgePenalty.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.dodgePenalty"
-          value="{{system.dodgePenalty}}"
-          data-dtype="Number"
-        />
-  </div>
+
   <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.castPenalty.label"
@@ -97,17 +123,6 @@
           type="text"
           name="system.castPenalty"
           value="{{system.castPenalty}}"
-          data-dtype="Number"
-        />
-  </div>
-    <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.rangedDefense.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.rangedDefense"
-          value="{{system.rangedDefense}}"
           data-dtype="Number"
         />
   </div>
@@ -146,18 +161,7 @@
           data-dtype="Number"
         />
   </div>
-  <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.Defense.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.Defense"
-          value="{{system.Defense}}"
-          data-dtype="Number"
-        />
-  </div>
-  <div class="grid-span-1">
+    <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Gear.FIELDS.healthBonus.label"
           }}</label>
@@ -168,6 +172,9 @@
           data-dtype="Number"
         />
   </div>
+  {{/unless}}
+
+
 
 
 </div>
