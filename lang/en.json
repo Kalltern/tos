@@ -47,9 +47,9 @@
             "value": { "label": "Mind" },
             "max": { "label": "Maximum Mind" }
           },
-          "sanity": {
-            "value": { "label": "Sanity" },
-            "max": { "label": "Maximum Sanity" }
+          "insanity": {
+            "value": { "label": "Insanity" },
+            "max": { "label": "Maximum Insanity" }
           },
           "corruption": {
             "value": { "label": "Corruption" },
