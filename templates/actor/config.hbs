@@ -3,6 +3,53 @@
   data-group="primary"
   data-tab="config"
   >
+   <div class="attributes flexrow">
+      {{#each system.attributes as |attribute key|}}
+        <div class="attribute flexcolumn flex-group-center">
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll="(@attributes.{{key}}.mod)-1d100"
+            data-roll-type="attribute"
+            data-label="{{localize (lookup @root.config.attributes key)}}"
+          >
+            {{localize (lookup @root.config.attributes key)}}
+          </label>
+          <input
+            type="text"
+            name="system.attributes.{{key}}.value"
+            value="{{attribute.value}}"
+            class="attribute-score"
+            data-dtype="Number"
+               />
+        </div>
+      {{/each}}
+    </div>
+    <div class="Attributes flexrow">
+      {{#each system.secondaryAttributes as |attribute key|}}
+        <div class="attribute flexcolumn flex-group-center">
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll="(@secondaryAttributes.{{key}}.mod)-1d100"
+            data-label="{{localize
+              (lookup @root.config.secondaryAttributes key)
+            }}"
+          >
+            {{localize (lookup @root.config.secondaryAttributes key)}}
+          </label>
+          <input
+            type="text"
+            name="system.secondaryAttributes.{{key}}.value"
+            value="{{attribute.value}}"
+            class="attribute-score"
+            data-dtype="Number"
+          />
+
+        </div>
+      {{/each}}
+    </div>
+<hr>
   <section class="config-container grid grid-3col"> 
     
 {{#each system.combatSkills as |skill key|}}

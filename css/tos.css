@@ -213,6 +213,7 @@
   justify-content: space-between;
 }
 
+
 .flexlarge {
   flex: 2;
 }
@@ -284,6 +285,10 @@
   padding: 0.4rem;  /* Optional: Adjust padding */
   text-align: left;  /* Ensure text is left-aligned */
   }
+
+  .skill-label {
+ margin-right: 10px;
+    }
 
 .tos .attributes {
   display: flex; /* Align attributes in a row */
@@ -559,9 +564,9 @@
 }
 .skill-value {
   width: 4rem; /* Adjust the width as needed */
-  max-width: 34px; /* Optional: Set a maximum width */
+  max-width: 38px; /* Optional: Set a maximum width */
   padding: 0.4rem; /* Adjust padding for a more compact input */
-  text-align: left; /* Center the text for better appearance */
+  text-align: left !important;; /* Center the text for better appearance */
   font-size: 0.9rem; /* Adjust font size if the text appears too large */
   max-height: 20px;
 }

@@ -18,68 +18,84 @@
        "day":false,
        "armorTotal":0,
        "headArmorTotal":0,
+       "critDamage":0,
+       "critRangeMelee":0,
+       "critRangeRanged":0,
+       "critRangeCast":0,
        "templates": ["base"],
       "stats": {
         "health": {
-          "value": 10,
+          "value": 20,
           "min": 0,
-          "max": 10,
+          "max": 20,
+          "total": 20,
           "bonus": 0
         },
         "graveWounds": {
-          "value": 2,
+          "value": 0,
           "min": 0,
           "treated": 0,
           "max": 2,
+          "total": 5,
           "bonus": 0
         },
         "stamina": {
-          "value": 5,
+          "value": 0,
           "min": 0,
-          "max": 5,
+          "max": 0,
+          "total": 5,
           "bonus": 0
         },
         "toxicity": {
-          "value": 5,
+          "value": 0,
           "min": 0,
-          "max": 5,
+          "max": 25,
+          "total": 25,
           "bonus": 0
         },
         "mana": {
           "value": 0,
           "min": 0,
           "max": 0,
+          "total": 10,
           "bonus": 0
         },
         "mind": {
-          "value": 5,
+          "value": 1,
           "min": 0,
-          "max": 5,
+          "max": 0,
+          "total": 1,
           "bonus": 0
         },
         "insanity": {
           "value": 0,
           "min": 0,
-          "max": 5,
+          "max": 4,
+          "total": 10,
           "bonus": 0
         },
         "corruption": {
           "value": 0,
           "min": 0,
           "max": 101,
+          "total": 10,
           "bonus": 0
         },
         "fatigue": {
-          "value": 5,
+          "value": 0,
           "min": 0,
           "max": 6,
+          "total": 6,
           "bonus": 0
         },
         "holyEnergy": {
           "value": 0,
           "min": 0,
           "max": 0,
-          "bonus": 0
+          "total": 10,
+          "bonus": 0,
+          "holyPower": 0
+
         }
       },
       "effects": {
@@ -89,7 +105,8 @@
         "extra2": 0,
         "extra3": 0
     },
-    "critDamage":0,
+    
+    
       "attributes": {
         "str": {
           "value": 1,
@@ -111,6 +128,7 @@
           "value": 1,
           "total": 1,
           "id": 2,
+          "rank": 2,
           "critbonus": 0,
           "critfailpenalty": 0,
           "bonus": 0
@@ -140,7 +158,7 @@
           "bonus": 0
         },
         "per": {
-          "value": 1,
+          "value": 1, 
           "total": 1,
           "id": 6,
           "critbonus": 0,
@@ -150,39 +168,39 @@
       },
       "secondaryAttributes": {
         "spd": {
-          "value": 1,
-          "total": 1,
+          "value": 0,
+          "total": 0,
           "max": 6,
           "bonus": 0
         },
         "lck": {
-          "value": 1,
-          "total": 1,
+          "value": 0,
+          "total": 0,
           "bonus": 0
         },
         "res": {
           "value": 0,
-          "total": 1,
-          "bonus": 0
+          "total": 0,
+          "bonus": 2
         },
         "fth": {
-          "value": 1,
-          "total": 1,
+          "value": 0,
+          "total": 0,
           "bonus": 0
         },
         "sin": {
-          "value": 1,
-          "total": 1,
+          "value": 0,
+          "total": 0,
           "bonus": 0
         },
         "vis": {
-          "value": 1,
-          "total": 1,
+          "value": 0,
+          "total": 0,
           "bonus": 0
         },
         "ini": {
-          "value": 1,
-          "total": 1,
+          "value": 0,
+          "total": 0,
           "bonus": 0
         }
       },
@@ -729,35 +747,51 @@
       "schools": {
         "fire": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "water": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "earth": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "air": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "spirit": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "body": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "darkness": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         },
         "blood": {
           "value": 0,
-          "visible":false
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         }
       }
     },
