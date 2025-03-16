@@ -93,11 +93,7 @@ export class ToSActor extends Actor {
     const systemData = actorData.system; //everything else
     // Loop through attribute scores, and add their modifiers to our sheet output.
         for (let [key, attribute] of Object.entries(systemData.attributes)) {
-      console.log(`Before update: ${key} total=${attribute.total}, value=${attribute.value}, bonus=${attribute.bonus}`);
-
         attribute.total = attribute.value + attribute.bonus;
-        console.log(`After update: ${key} total=${attribute.total}`);
-
     }    
     for (let [key, attribute] of Object.entries(systemData.secondaryAttributes)) {
       // Calculate the attribute rating using ToS rules.
@@ -111,8 +107,6 @@ export class ToSActor extends Actor {
       // Calculate the attribute rating using ToS rules.
       attribute.mod = Math.floor(15 + (attribute.bonus + attribute.value) * 10);
     }
-    // Debugging: Log the attributes
-    console.log(systemData.attributes);
 
 
     //Loop through skill groups and add their ratings depending on their level and attribute score
@@ -241,9 +235,7 @@ export class ToSActor extends Actor {
 
     }
 
-    // [attributeScore[x].total]
-    //| 0 - str | 1 - dex | 2 - end | 3 - int | 
-    //| 4 - wil | 5 - cha | 6 - per |
+
     // Prepare secondary attributes and stat calculations
     const secAttribute = systemData.secondaryAttributes;
     const stat = systemData.stats;
@@ -258,7 +250,7 @@ export class ToSActor extends Actor {
     
     // Calculate initiative
     const calcIni = [0,0,0,1,2,3,4,5,5,5,5];
-    secAttribute.ini.total = calcIni[per] + (systemData.initiativeBonus || 0) + secAttribute.ini.bonus;
+    secAttribute.ini.total = calcIni[per] + (systemData.initiativeBonus || 0) + secAttribute.ini.value + secAttribute.ini.bonus;
 
 
     // Calculate speed
@@ -412,10 +404,6 @@ export class ToSActor extends Actor {
     // Store thresholds in actor data if needed
     actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
     actorData.criticalFailureThreshold = this.criticalFailureThreshold;
-
-    // Debugging: Log all skills and combat skills
-    console.log("Updated Skills:", systemData.skills);
-    console.log("Updated Combat Skills:", systemData.combatSkills);
 
 
 

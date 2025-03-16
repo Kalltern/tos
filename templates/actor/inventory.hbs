@@ -75,10 +75,11 @@
     {{/each}}
 </ol>
 
+ <br>
 
   <ol class="items-list">
     <li class="item flexrow items-header">
-      <div class="item-name">{{localize "Name"}}</div>
+      <div class="item-name">{{localize "Weapon"}}</div>
       <div class="item-formula">{{localize
           "TOS.Item.Weapon.FIELDS.rollFormula.label"
         }}</div>
@@ -96,7 +97,8 @@
           </a>
         {{/if}}
       </div>
-    </li>
+        </li>
+ 
     {{#each weapon as |item id|}}
       <li
         class="item flexrow"
@@ -140,4 +142,144 @@
     {{/each}}
   </ol>
 
+ <br>
+
+   <ol class="items-list">
+    <li class="item flexrow items-header">
+      <div class="item-name">{{localize "Consumable"}}</div>
+
+      <div class="item-formula">{{localize
+          "TOS.Item.Weapon.FIELDS.rollFormula.label"
+        }}</div>
+      <div class="item-formula">{{localize "TOS.Item.Consumable.FIELDS.quantity.label"}}</div>
+      <div class="item-controls">
+        {{#if @root.editable}}
+          <a
+            class="item-control item-create"
+            title="{{localize 'DOCUMENT.Create' type="Item"}}"
+            data-action="createDoc"
+            data-document-class="Item"
+            data-type="consumable"
+          >
+            <i class="fas fa-plus"></i>
+            {{localize "DOCUMENT.New" type="item"}}
+          </a>
+        {{/if}}
+      </div>
+        </li>
+ 
+    {{#each consumables as |item id|}}
+      <li
+        class="item flexrow"
+        data-item-id="{{item._id}}"
+        data-drag="true"
+        data-document-class="Item"
+      >
+        <div class="item-name">
+          <div class="item-image">
+            <a class="rollable" data-roll-type="item" data-action="roll">
+              <img
+                src="{{item.img}}"
+                title="{{item.name}}"
+                width="24"
+                height="24"
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+        
+        <div class="item-formula item-prop">{{item.system.formula}}</div>
+     <div class="item-formula item-prop">
+          {{item.system.quantity}}
+        </div>
+        <div class="item-controls">
+          <a
+            class="item-control item-edit"
+            title="{{localize 'DOCUMENT.Update' type="Consumable"}}"
+            data-action="viewDoc"
+          >
+            <i class="fas fa-edit"></i>
+          </a>
+          {{#if @root.editable}}
+            <a
+              class="item-control item-delete"
+              title="{{localize 'DOCUMENT.Delete' type="Consumable"}}"
+              data-action="deleteDoc"
+            >
+              <i class="fas fa-trash"></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+    {{/each}}
+  </ol>
+
+
+ <br>
+
+   <ol class="items-list">
+    <li class="item flexrow items-header">
+      <div class="item-name">{{localize "Items"}}</div>
+      <div class="item-formula">{{localize
+          "TOS.Item.Weapon.FIELDS.rollFormula.label"
+        }}</div>
+      <div class="item-controls">
+        {{#if @root.editable}}
+          <a
+            class="item-control item-create"
+            title="{{localize 'DOCUMENT.Create' type="Item"}}"
+            data-action="createDoc"
+            data-document-class="Item"
+            data-type="consumable"
+          >
+            <i class="fas fa-plus"></i>
+            {{localize "DOCUMENT.New" type="item"}}
+          </a>
+        {{/if}}
+      </div>
+        </li>
+ 
+    {{#each items as |item id|}}
+      <li
+        class="item flexrow"
+        data-item-id="{{item._id}}"
+        data-drag="true"
+        data-document-class="Item"
+      >
+        <div class="item-name">
+          <div class="item-image">
+            <a class="rollable" data-roll-type="item" data-action="roll">
+              <img
+                src="{{item.img}}"
+                title="{{item.name}}"
+                width="24"
+                height="24"
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+        <div class="item-formula item-prop">{{item.system.formula}}</div>
+        <div class="item-controls">
+          <a
+            class="item-control item-edit"
+            title="{{localize 'DOCUMENT.Update' type="Item"}}"
+            data-action="viewDoc"
+          >
+            <i class="fas fa-edit"></i>
+          </a>
+          {{#if @root.editable}}
+            <a
+              class="item-control item-delete"
+              title="{{localize 'DOCUMENT.Delete' type="Item"}}"
+              data-action="deleteDoc"
+            >
+              <i class="fas fa-trash"></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+    {{/each}}
+  </ol>
 </section>

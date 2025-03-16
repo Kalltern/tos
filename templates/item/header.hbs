@@ -9,12 +9,12 @@
   <div class="header-fields">
     <div class="document-name">
       <input name="name" type="text" value="{{item.name}}" placeholder="Name" />
-    </div>
+       </div>
     {{! You may prefer to have a separate header file instead of this if statement}}
     {{#if (eq item.type "weapon")}}
 
  <div class="grid grid-2col">
-         <div class="item-details">
+    <div class="item-details">
         <label for="damage-dice">{{localize
             "TOS.Item.Weapon.FIELDS.diceNum.label"
           }}:</label>
@@ -71,6 +71,7 @@
           data-dtype="Number"
         />
       </div>
+
 <div class="grid-span-1">
      <label for="weapon-class">Weapon Class:</label>
 <select name="system.class" id="weapon-class">
@@ -87,10 +88,9 @@
     {{/if}}
 
 
-   {{#if (eq item.type "gear")}}
+ {{#if (eq item.type "gear")}}
     <div class="grid grid-2col">
-     
-  <div class="grid-span-1">
+     <div class="grid-span-1">
      <label class="resource-label">{{localize
      "TOS.Item.Gear.FIELDS.shield.label"
        }}</label>
@@ -158,14 +158,167 @@
  </select>  
 </div>
   {{/unless}}
-
-      
-
-
-
   
-    {{/if}}
+  {{/if}}
     
+
+
+{{#if (eq item.type "consumable")}}
+<div class="grid grid-2col">
+  <div class="grid-span-1">
+    <label for="consumable-option">Type:</label>
+    <select name="system.option" id="consumable-option">
+      <option value="">-- Select a type --</option>
+      {{#each system.options as |option|}}
+        <option value="{{option}}" {{#if (eq ../system.option option)}}selected{{/if}}>
+          {{option}}
+        </option>
+      {{/each}}
+    </select>
   </div>
+
+{{#if (eq item.system.option "potion")}}
+<div class="grid-span-1">
+ <label for="potion-type">Potion type:</label>
+    <select name="system.type" id="potion-type">
+      <option value="">-- Select a type --</option>
+      {{#each system.types as |type|}}
+        <option value="{{type}}" {{#if (eq ../system.type type)}}selected{{/if}}>
+          {{type}}
+        </option>
+      {{/each}}
+    </select>
   </div>
+  
+       <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Consumable.FIELDS.toxicity.label"
+          }}</label>
+        
+        <input
+          type="text"
+          name="system.toxicity"
+          value="{{system.toxicity}}"
+          data-dtype="Number"
+        />
+         </div>
+
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Consumable.FIELDS.bleed.label"
+          }}</label>
+        
+        <input
+          type="text"
+          name="system.bleed"
+          value="{{system.bleed}}"
+          data-dtype="Number"
+        />
+         </div>     
+
+{{/if}}
+
+{{#if (eq item.system.option "explosive")}}
+  
+     <div class="grid-span-1">{{localize
+     "TOS.Item.Consumable.FIELDS.aimed.label"
+       }}</label>
+     <input type="checkbox" name="system.aimed" {{#if system.aimed}}checked{{/if}} />
+     </div> 
+
+   <div class="grid-span-1">
+          <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.penetration.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.penetration"
+          value="{{system.penetration}}"
+          data-dtype="Number"
+          placeholder="0"
+        />
+      </div>
+
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Consumable.FIELDS.burn.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.burn"
+          value="{{system.burn}}"
+          data-dtype="Number"
+          placeholder="0"
+        />
+      </div>
+
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+           "TOS.Item.Consumable.FIELDS.freeze.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.freeze"
+          value="{{system.freeze}}"
+          data-dtype="Number"
+          placeholder="0"
+        />
+      </div>
+
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+           "TOS.Item.Consumable.FIELDS.stun.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.stun"
+          placeholder="0"
+          value="{{system.stun}}"
+          data-dtype="Number"
+        />
+      </div>
+{{/if}}
+
+<!-- Separate row for diceNum to prevent layout issues -->
+<div class="grid-span-1">
+  <label for="damage-dice">{{localize "TOS.Item.Weapon.FIELDS.diceNum.label"}}:</label>
+  <input
+    type="text"
+    name="system.roll.diceNum"
+    value="{{system.roll.diceNum}}"
+    placeholder="0"
+    data-dtype="Number"
+  />
+</div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dieSize.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.diceSize"
+          placeholder="0"
+          value="{{system.roll.diceSize}}"
+          data-dtype="String"
+        />
+      </div>
+     
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.rollMod.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.roll.diceBonus"
+          value="{{system.roll.diceBonus}}"
+          data-dtype="String"
+          placeholder="e.g. 5+2d6"
+        />
+       </div>
+
+
+
+  </div>
+    {{/if}}
 </header>

@@ -94,7 +94,7 @@
           "max": 0,
           "total": 10,
           "bonus": 0,
-          "holyPower": 0
+          "power": 0
 
         }
       },
@@ -870,6 +870,12 @@
     },
     "race": {
       "templates": ["base"]
+    },
+    "consumable": {
+      "templates": ["base"],
+      "options": ["potion", "explosive", "misc"],
+      "types": ["mana", "health", "stamina"],
+      "quantity": 1
     },
     "spell": {
       "templates": ["base"],

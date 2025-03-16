@@ -351,6 +351,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const features = [];
     const weapon = [];
     const gear = [];
+    const consumables = [];
+    const items = [];
     const spells = {
       0: [],
       1: [],
@@ -375,9 +377,17 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         features.push(i);
       }
      // Append to gear.
-        else if (i.type === "gear") {
-            gear.push(i);
-            }
+     else if (i.type === "gear") {
+        gear.push(i);
+        }
+     // Append to consumable.
+     else if (i.type === "consumable") {
+      consumables.push(i);
+      }
+     // Append to item.
+     else if (i.type === "item") {
+      items.push(i);
+      }                  
       // Append to spells.
       else if (i.type === "spell") {
         if (i.system.spellLevel != undefined) {
@@ -396,6 +406,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     context.weapon = weapon.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.consumables = consumables.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.spells = spells;
   }
 
@@ -554,7 +566,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         const item = this._getEmbeddedDocument(target);
         if (item) return item.roll();
     }
-
+    
     if (dataset.roll) {
       
 // Determine if this is a skill or combat skill roll
@@ -845,6 +857,17 @@ if (skillData) {
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid)
       return this._onSortItem(event, item);
+        // Check if the item is a consumable
+        if (item.type === "consumable") {
+          // Look for an existing stackable consumable with the same name
+          let existingItem = this.actor.items.find(i => i.name === item.name && i.type === "consumable");
+  
+          if (existingItem) {
+              // Increase the quantity instead of creating a new item
+              let newQuantity = (existingItem.system.quantity || 1) + (item.system.quantity || 1);
+              return existingItem.update({ "system.quantity": newQuantity });
+          }
+      }
 
     // Create the owned item
     return this._onDropItemCreate(item, event);

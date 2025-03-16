@@ -244,6 +244,17 @@
           "perPenalty": { "label": "Per. penalty" }
         }
       },
+      "Consumable": {
+        "FIELDS": {
+          "toxicity": { "label": "Toxicity" },
+          "bleed": { "label": "Stop bleed %" },
+          "aimed": { "label": "Single target" },
+          "burn": { "label": "Burn" },
+          "freeze": { "label": "Freeze" },
+          "stun": { "label": "Stun" },
+          "quantity": { "label": "Quantity" }
+        }
+      },
       "Spell": {
         "FIELDS": {
           "level": { "label": "Spell Level" }

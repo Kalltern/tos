@@ -26,10 +26,10 @@
       "thumbnail": "systems/tos/assets/anvil-impact.png"
     }
   ],
-  "version": "0.2.4",
+  "version": "0.2.9",
   "compatibility": {
-    "minimum": "12.328",
-    "verified": "12.330"
+    "minimum": "12.331",
+    "verified": "12.331"
   },
   "esmodules": ["module/tos.mjs"],
   "styles": ["css/tos.css"],

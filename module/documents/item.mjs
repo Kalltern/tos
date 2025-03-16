@@ -11,44 +11,53 @@ export class ToSItem extends Item {
   
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;
-  
-      // Default to Strength
-      let attr = "str";
-  
-      if (this.actor) {
-        let str = this.actor.system.attributes.str.value;
-        let dex = this.actor.system.attributes.dex.value;
+    
+      let formula = "";
+    
+      if (this.type === "consumable") {
+        // Define a unique formula for consumables
+        formula = `${diceNum}d${diceSize} ${diceBonus ? `+${diceBonus}` : ''}`;
+      } else {
+        // Default to Strength
+        let attr = "str";
+    
+        if (this.actor) {
+          let str = this.actor.system.attributes.str.total;
+          let dex = this.actor.system.attributes.dex.total;
+          let per = this.actor.system.attributes.per.total;
+    
+          // Check if the actor owns an item named "Finesse"
+          const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
+    
+          // Check if *this* weapon has finesse
+          if (this.system.finesse === true && hasFinesse && str <= dex) {
+            attr = "dex";  // Use Dexterity if all conditions are met
+          }
+    
+          // Check if *this* weapon is bow or crossbow
+          if (this.system.class === "crossbow" || this.system.class === "bow") {
+            attr = "per";  // Use Perception if ranged weapon
+          }
           
-        // Retrieve STUN & BLEED from the weapon
-        const stun = this.system.effects.stun || 0;   // Default to 0 if undefined
-        const bleed = this.system.effects.bleed || 0; // Default to 0 if undefined
-  
-        // Check if the actor owns an item named "Finesse"
-        const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
-  
-        
-        // Check if *this* weapon has finesse
-        if (this.system.finesse === true && hasFinesse && str <= dex) {
-          attr = "dex";  // Use Dexterity if all conditions are met
+         // Check if *this* weapon is throwing and compare str with per
+         if (this.system.thrown && str <= per) {
+            attr = "per"; 
+              // Check if *this* weapon has finesse
+            if (this.system.finesse === true && hasFinesse && str <= dex && str <= per)  {
+              attr = "dex";  // Use Dexterity if all conditions are met
+            }
+            }
+          // Define the formula 
+          formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
         }
-  
-        // Check if *this* weapon is bow or crossbow
-        if (this.system.class === "crossbow" ||this.system.class === "bow") {
-         attr = "per";  // Use Perception if ranged weapon
-                }
-        // Define the formula (without stun/bleed effects)
-        let formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
-  
-        // Store the main formula for the main roll
-        this.system.formula = formula;
-  
-        // Store stun and bleed rolls separately for later use
-        this.system.effectRolls = {
-          stun: stun > 0 ? `${stun} - 1d100` : null,
-          bleed: bleed > 0 ? `${bleed} - 1d100` : null
-        };
       }
+    
+      // Store the formula in system.formula
+      this.system.formula = formula;
+
+      // Potentially possible to add roll.total and roll.toMessage
     }
+    
     
   }
   
@@ -73,8 +82,8 @@ export class ToSItem extends Item {
     rollData.actor = this.actor.getRollData();
 
     // Include specific actor attributes in rollData
-    rollData.str = this.actor.system.attributes.str.value;
-    rollData.dex = this.actor.system.attributes.dex.value;
+    rollData.str = this.actor.system.attributes.str.total;
+    rollData.dex = this.actor.system.attributes.dex.total;
   }
 
     return rollData;
