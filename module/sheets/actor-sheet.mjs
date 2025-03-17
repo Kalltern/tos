@@ -323,7 +323,11 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         case "spells":
           tab.id = "spells";
           tab.label += "Spells";
-          break;
+  // Check if magicPotential exists and is greater than 0
+  if (!this.actor.system.magicPotential || this.actor.system.magicPotential <= 0) {
+    tab.cssClass += " hidden"; // Add 'hidden' class to tab
+  }
+  break;
         case "effects":
           tab.id = "effects";
           tab.label += "Effects";
@@ -712,7 +716,6 @@ if (skillData) {
   _onDragStart(event) {
     const docRow = event.currentTarget.closest("li");
     if ("link" in event.target.dataset) return;
-
     // Chained operation
     let dragData = this._getEmbeddedDocument(docRow)?.toDragData();
 
