@@ -101,7 +101,7 @@ export class ToSActor extends Actor {
     }
     for (let [key, stat] of Object.entries(systemData.stats)) {
       // Calculate the attribute rating using ToS rules.
-        stat.total = stat.max + (stat.bonus ?? 0);
+        stat.max = stat.base + (stat.bonus ?? 0);
     }
     for (let [key, attribute] of Object.entries(systemData.attributes)) {
       // Calculate the attribute rating using ToS rules.
@@ -264,7 +264,7 @@ export class ToSActor extends Actor {
      secAttribute.res.total = calcResEnd[end] + calcResWill[wil] + secAttribute.res.value + secAttribute.res.bonus;
     // Calculate wounds
     const calcWounds = [0,0,0,0,1,1,1,2,2,2,2];
-    stat.graveWounds.total = calcWounds[end] + stat.graveWounds.max + stat.graveWounds.bonus;
+    stat.graveWounds.max = calcWounds[end] + stat.graveWounds.base + stat.graveWounds.bonus;
     // Calculate critRanges
     const calcCritRange = [0,0,0,0,1,1,2,3,3,3,3];
     systemData.critRangeMelee = calcCritRange[str] + calcCritRange[per];
@@ -275,24 +275,24 @@ export class ToSActor extends Actor {
     secAttribute.vis.total = secAttribute.vis.value + secAttribute.vis.bonus;
     secAttribute.sin.total = secAttribute.sin.value + secAttribute.sin.bonus;
     secAttribute.fth.total = secAttribute.fth.value + secAttribute.fth.bonus;
-    stat.corruption.total = stat.corruption.max + stat.corruption.bonus;
-    stat.fatigue.total = stat.fatigue.max + stat.fatigue.bonus;
+    stat.corruption.max = stat.corruption.base + stat.corruption.bonus;
+    stat.fatigue.max = stat.fatigue.base + stat.fatigue.bonus;
     if (systemData.priest){
-    stat.holyEnergy.total = stat.holyEnergy.max + stat.holyEnergy.bonus + (secAttribute.fth.total * 5);
+    stat.holyEnergy.max = stat.holyEnergy.base + stat.holyEnergy.bonus + (secAttribute.fth.total * 5);
     stat.holyEnergy.power = secAttribute.fth.total + (stat.holyEnergy.power.bonus || 0);
     }
     
-    stat.mind.total = wil + stat.mind.bonus + stat.mind.max;
-    stat.insanity.total = wil + stat.insanity.bonus + stat.insanity.max;
+    stat.mind.max = wil + stat.mind.bonus + stat.mind.base;
+    stat.insanity.max = wil + stat.insanity.bonus + stat.insanity.base;
 
     
     // Calculate Health, systemData.healthBonus comes from Armor
-    systemData.stats.health.total =  ((end) * attribute.end.rank) + stat.health.max + stat.health.bonus + (str) + (systemData.healthBonus || 0);
+    systemData.stats.health.max =  ((end) * attribute.end.rank) + stat.health.base + stat.health.bonus + (str) + (systemData.healthBonus || 0);
     // Calculate toxicity
-  systemData.stats.toxicity.total = ((end) * 2) + stat.toxicity.bonus + stat.toxicity.max;
+  systemData.stats.toxicity.max = ((end) * 2) + stat.toxicity.bonus + stat.toxicity.base;
 
     // Calculate stamina
-   systemData.stats.stamina.total = ((end) * 5) + stat.stamina.bonus + stat.stamina.max + (2 * systemData.skills.athletics.value) - (5 * stat.fatigue.value);
+   systemData.stats.stamina.max = ((end) * 5) + stat.stamina.bonus + stat.stamina.base + (2 * systemData.skills.athletics.value) - (5 * stat.fatigue.value);
 
 
     
@@ -328,33 +328,33 @@ export class ToSActor extends Actor {
       const calcVeneficus = [1,1,1,1,1,1.5,1.5,1.5,1.5,1.5,1.5];
       
       if (magicDoctrine.elymas.value === maxValue && systemData.elymas) {
-        systemData.stats.mana.total = 
-        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value)) 
+        systemData.stats.mana.max = 
+        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value)) 
         * calcElymas[magicDoctrine.elymas.value]  ;
 
       }
       if (magicDoctrine.incantator.value === maxValue && systemData.incantator) {
-        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value)) 
+        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value)) 
         * calcIncantator[magicDoctrine.incantator.value]  ;
       }
       if (magicDoctrine.elementalist.value === maxValue && systemData.elementalist) {
-        systemData.stats.mana.total = 
-        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value))
+        systemData.stats.mana.max = 
+        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value))
         * calcElementalist[magicDoctrine.elementalist.value]  ;
         
 
       }
       if (magicDoctrine.veneficus.value === maxValue && systemData.veneficus) {
-        systemData.stats.mana.total = 
-        (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value))
+        systemData.stats.mana.max = 
+        (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value))
         * calcVeneficus[magicDoctrine.veneficus.value]  ;
 
       }       else {
-        systemData.stats.mana.total = 
-        (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value));
+        systemData.stats.mana.max = 
+        (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value));
       } 
       // prevent mana to go below 0
-      systemData.stats.mana.total = Math.max(systemData.stats.mana.total, systemData.stats.mana.min);
+      systemData.stats.mana.max = Math.max(systemData.stats.mana.max, systemData.stats.mana.min);
 
       
 
@@ -362,10 +362,10 @@ export class ToSActor extends Actor {
 
 
     // Prevent current health exceed max
-    systemData.stats.health.value = Math.min(systemData.stats.health.value, systemData.stats.health.total); 
-    systemData.stats.stamina.value = Math.min(systemData.stats.stamina.value, systemData.stats.stamina.total);  
-    systemData.stats.toxicity.value = Math.min(systemData.stats.toxicity.value, systemData.stats.toxicity.total);  
-    systemData.stats.mana.value = Math.min(systemData.stats.mana.value, systemData.stats.mana.total);   
+    systemData.stats.health.value = Math.min(systemData.stats.health.value, systemData.stats.health.max); 
+    systemData.stats.stamina.value = Math.min(systemData.stats.stamina.value, systemData.stats.stamina.max);  
+    systemData.stats.toxicity.value = Math.min(systemData.stats.toxicity.value, systemData.stats.toxicity.max);  
+    systemData.stats.mana.value = Math.min(systemData.stats.mana.value, systemData.stats.mana.max);   
 
    // Define critical thresholds influenced by luck
     const luck = secAttribute.lck.value;
