@@ -130,11 +130,14 @@ table tr td:nth-child(3) {
 .grid-7col {
   grid-column: span 7 / span 7;
   grid-template-columns: repeat(7, minmax(0, 1fr));
+  
 }
 
 .grid-8col {
   grid-column: span 8 / span 8;
   grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 10px; /* Space between grid items */
+  text-align: center; /* Centers the label text */
 }
 
 .grid-9col {
@@ -199,6 +202,13 @@ table tr td:nth-child(3) {
 
 .grid-start-12 {
   grid-column-start: 12;
+}
+
+.grid-span-1-spell {
+  grid-column: span 1;
+  display: flex;
+  flex-direction: column; /* Places label above input */
+  align-items: center; /* Centers everything inside */
 }
 
 .grid-span-2 {
@@ -304,6 +314,8 @@ table tr td:nth-child(3) {
   font-family: "Roboto", sans-serif;
 }
 .tos .sheet-header {
+  height: 365px; /* Adjust the height as needed */
+  overflow: hidden; /* Ensures content does not exceed the height */
   flex: 0 auto;
   overflow: hidden;
   display: flex;
@@ -427,7 +439,6 @@ table tr td:nth-child(3) {
 }
 .tos .items-list .item-controls {
   display: flex;
-  flex: 0 0 100px;
   justify-content: flex-end;
 }
 .tos .items-list .item-controls a {
@@ -445,6 +456,10 @@ table tr td:nth-child(3) {
 }
 .tos .items-list .item .item-name {
   color: var(--tos-c-dark);
+  max-width: 150px; /* Adjust as needed */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap; /* Prevent text from wrapping */
 }
 .tos .items-list .item .item-name .item-image {
   flex: 0 0 30px;
@@ -459,6 +474,21 @@ table tr td:nth-child(3) {
   border-left: 1px solid #c9c7b8;
   font-size: 12px;
 }
+
+.tos .item-prop-difficulty {
+  text-align: center;
+  border-right: 1px solid #c9c7b8;
+  border-left: 1px solid #c9c7b8;
+  font-size: 12px;
+  padding-left: 15px; /* Adjust as needed */
+}
+.item.flexrow.spell {
+  font-size: 12px;
+  padding: 2px 5px;
+  text-align: center;
+  min-width: 15px;  /* Set a minimum width to prevent overflow */
+}
+
 /* Remove left border from all except the first one */
 .tos .items-list .item-prop:first-child {
   border-left: none;
@@ -493,8 +523,10 @@ table tr td:nth-child(3) {
   text-align: left;
 }
 .tos .item-formula {
-  flex: 0 0 150px;
-  padding: 0 8px;
+  display: flex;
+  justify-content: center; /* Center content */
+  align-items: center; /* Align vertically */
+  flex: 2.1; /* Allow cells to scale */
 }
 .tos .effects-header {
   height: 28px;
@@ -636,6 +668,12 @@ table tr td:nth-child(3) {
   font-size: 0.9rem; /* Adjust font size if the text appears too large */
   max-height: 20px;
 }
+.spell-value {
+  width: 2.5rem; /* Small box for max 2-digit numbers */
+  text-align: center; /* Centers text inside */
+  font-size: 1rem; /* Ensures readability */
+  padding: 2px; /* Small padding for cleaner look */
+}
 .skill-rating {
   margin-left: 15px; /* Adds a small space between the input value and the skill rating */
 }
@@ -643,10 +681,31 @@ table tr td:nth-child(3) {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  max-height: 700px; /* Ensure no overflow of the skills tab */
   overflow-y: auto; /* Scrollbar for long content */
 }
+@media (max-height: 1080px) {
+  .tab.skills {
+    max-height: 420px; /* Height for 1920x1080 resolution */
+  }
+}
 
+@media (min-height: 1081px) {
+  .tab.skills {
+    max-height: 700px; /* Height for higher resolutions */
+  }
+}
+
+@media (max-height: 1080px) {
+  .tab.config {
+    max-height: 420px; /* Height for 1920x1080 resolution */
+  }
+}
+
+@media (min-height: 1081px) {
+  .tab.config {
+    max-height: 700px; /* Height for higher resolutions */
+  }
+}
 
 .skill-entry.hidden-skill,
 .hidden,
@@ -666,7 +725,6 @@ table tr td:nth-child(3) {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  max-height: 700px; /* Ensure no overflow of the skills tab */
   overflow-y: auto; /* Scrollbar for long content */
 }
 

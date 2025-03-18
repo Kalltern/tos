@@ -182,7 +182,7 @@ export class ToSActor extends Actor {
         if (combatSkill === rangeddef) {
           if(archery.value > combat.value && archery.value != 0 ) {combatSkill.rating += rangedDefenseSet[archery.value] }
           else if (ranger > 0) {combatSkill.rating += rangedDefenseSet[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;}
-          else{combatSkill.rating += rangedDefenseSet[combat.value]}
+          else{combatSkill.rating += rangedDefenseSet[combat.value] + attributeScore[combatSkill.id].total * 3}
         }  
 
         if (combatSkill === archery){
@@ -307,7 +307,12 @@ export class ToSActor extends Actor {
       for (const [key, school] of Object.entries(systemData.schools)) {
         if (key !== "blood") { 
             schoolBonus += calcSchool[school.value]; // Add based on school value
-            school.spellPower = spellPowerSchool[school.value] + school.bonus;
+            school.spellPower = spellPowerSchool[school.value] + school.bonus + Math.floor(int/2);
+        }
+        if(key === "blood"){
+           schoolBonus += calcSchool[school.value]; // Add based on school value
+          school.spellPower = spellPowerSchool[school.value] + school.bonus +  Math.max(Math.floor(int / 2), Math.floor(wil / 2));
+
         }
     }
       let magicDoctrine = systemData.doctrines;
@@ -344,7 +349,10 @@ export class ToSActor extends Actor {
         (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value))
         * calcVeneficus[magicDoctrine.veneficus.value]  ;
 
-      }
+      }       else {
+        systemData.stats.mana.total = 
+        (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.max - (3 * stat.fatigue.value));
+      } 
       // prevent mana to go below 0
       systemData.stats.mana.total = Math.max(systemData.stats.mana.total, systemData.stats.mana.min);
 

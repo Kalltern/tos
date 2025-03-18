@@ -4,69 +4,107 @@
   data-group='primary'
   data-tab='spells'
 >
-  <ol class='items-list'>
-    {{#each spells as |spells spellLevel|}}
-      <li class='item flexrow items-header'>
-        <div class='item-name'>
-          {{localize 'TOS.Item.Spell.SpellLVL' level=spellLevel}}
+<h2 class="flex-group-center">
+{{localize "TOS.Actor.Character.schools.spellPower.label"}}
+</h2>
+
+<div class='grid grid-9col'>
+  {{#each system.schools as |school key|}}
+      <div class="grid-span-1-spell">
+        <label class="resource-label">
+    {{localize (concat "TOS.Actor.Character.schools." key ".label")}}
+          </label>
+        <input
+          class="spell-value"
+          type="text"
+          name="system.schools.{{key}}.spellPower"
+          value="{{school.spellPower}}"
+          data-dtype="Number"
+          readonly
+        />
+      </div>
+  {{/each}}
+
+
+</div>
+<h2
+class="flex-group-center">
+Spells
+</h2>
+{{#each (groupBySchool spells) as |group|}}
+  <ol class='items-list' data-school='{{group.school}}'>
+    <li class='item flexrow items-header'>
+      <div class="item-name">  {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}</div>
+            <div class='item-name'>
+      {{localize "TOS.Item.Spell.FIELDS.difficulty.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerCost.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerActions.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerRange.label"}}
+      </div>
+
+    </li>
+
+    {{#each group.spells as |item|}}
+      <li
+        class='item flexrow'
+        data-item-id='{{item._id}}'
+        data-drag='true'
+        data-document-class='Item'
+      >
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-roll-type='item' data-action='roll'>
+              <img
+                src='{{item.img}}'
+                title='{{item.name}}'
+                width='24'
+                height='24'
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
         </div>
+
+          <div class="item-formula item-prop-dificulty">{{item.system.difficulty}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.cost}}{{#if item.system.perRound}} / {{item.system.perRound}} {{/if}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.actionCost}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.range}}</div>
+
+
         <div class='item-controls'>
+          <a
+            class='item-control item-edit'
+            title='{{localize "DOCUMENT.Update" type='spell'}}'
+            data-action='viewDoc'
+          >
+            <i class='fas fa-edit'></i>
+          </a>
           {{#if @root.editable}}
             <a
-              class='item-control item-create'
-              title='{{localize "DOCUMENT.Create" type='Spell'}}'
-              data-action='createDoc'
-              data-document-class='Item'
-              data-type='spell'
-              data-system.spell-level='{{spellLevel}}'
+              class='item-control item-delete'
+              title='{{localize "DOCUMENT.Delete" type='spell'}}'
+              data-action='deleteDoc'
             >
-              <i class='fas fa-plus'></i>
-              {{localize 'TOS.Item.Spell.AddLVL' level=spellLevel}}
+              <i class='fas fa-trash'></i>
             </a>
           {{/if}}
         </div>
       </li>
-      {{#each spells as |item id|}}
-        <li
-          class='item flexrow'
-          data-item-id='{{item._id}}'
-          data-drag='true'
-          data-document-class='Item'
-        >
-          <div class='item-name flexrow'>
-            <div class='item-image'>
-              <a class='rollable' data-roll-type='item' data-action='roll'>
-                <img
-                  src='{{item.img}}'
-                  title='{{item.name}}'
-                  width='24'
-                  height='24'
-                />
-              </a>
-            </div>
-            <div>{{item.name}}</div>
-          </div>
-          <div class='item-controls'>
-            <a
-              class='item-control item-edit'
-              title='{{localize "DOCUMENT.Update" type='spell'}}'
-              data-action='viewDoc'
-            >
-              <i class='fas fa-edit'></i>
-            </a>
-            {{#if @root.editable}}
-              <a
-                class='item-control item-delete'
-                title='{{localize "DOCUMENT.Delete" type='spell'}}'
-                data-action='deleteDoc'
-              >
-                <i class='fas fa-trash'></i>
-              </a>
-            {{/if}}
-          </div>
-        </li>
-      {{/each}}
     {{/each}}
   </ol>
+{{/each}}
+
+
+
+
+
+
+
 
 </section>

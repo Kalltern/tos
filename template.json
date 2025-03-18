@@ -792,6 +792,12 @@
           "visible":false,
           "spellPower":0,
           "bonus":0
+        },
+        "gnosis": {
+          "value": 0,
+          "visible":false,
+          "spellPower":0,
+          "bonus":0
         }
       }
     },
@@ -879,7 +885,17 @@
     },
     "spell": {
       "templates": ["base"],
-      "spellLevel": 1
+      "options": ["divine","magic"],
+      "spellRanks": ["wild","apprentice","expert","master","grandmaster"],
+      "miracleRanks": ["novice","acolyte","cleric"],
+      "effectOptions": ["and","or"],
+      "classOptions": ["support","lesser","greater"],
+      "spellTypes": ["fire","water","air","earth","spirit","body","darkness","blood","gnosis"],
+      "dmgTypes": ["fire", "frost", "lightning", "acid", "poison", "magic", "dark", "physical", "psychic","blunt", "piercing", "slash"],
+      "difficulty": 0,
+      "cost": 0,
+      "perRound": 0
+
     }
   }
 }

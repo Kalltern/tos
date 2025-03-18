@@ -357,18 +357,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const gear = [];
     const consumables = [];
     const items = [];
-    const spells = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-    };
+    const spells = [];
 
     // Iterate through items, allocating to containers
     for (let i of this.document.items) {
@@ -394,16 +383,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       }                  
       // Append to spells.
       else if (i.type === "spell") {
-        if (i.system.spellLevel != undefined) {
-          spells[i.system.spellLevel].push(i);
-        }
+        spells.push(i);
+        
       }
-    }
-
-
-    
-    for (const s of Object.values(spells)) {
-      s.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     }
 
     // Sort then assign
@@ -412,7 +394,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.consumables = consumables.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    context.spells = spells;
+    context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   }
 
 

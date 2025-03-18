@@ -99,6 +99,41 @@ Handlebars.registerHelper('array-lookup', function(array, index) {
   return array && array[index] !== undefined ? array[index] : false;
 });
 
+Handlebars.registerHelper("groupSpellsBySchool", function (spells) {
+  const grouped = {};
+
+  
+
+  // Group spells by their school type
+  for (const spell of spells) {
+    const school = spell.system.type;
+    if (!grouped[school]) {
+      grouped[school] = [];
+    }
+    grouped[school].push(spell);
+  }
+
+  return Object.entries(grouped).map(([school, spells]) => ({ school, spells }));
+});
+
+Handlebars.registerHelper("groupBySchool", function (spells, options) {
+  const schools = {};
+
+  // Group spells by school type
+  spells.forEach(spell => {
+    const school = spell.system.type; // Assuming `type` is the school field
+    if (!schools[school]) {
+      schools[school] = [];
+    }
+    schools[school].push(spell);
+  });
+
+  // Convert into an array to loop over in Handlebars
+  return Object.entries(schools).map(([school, spells]) => ({
+    school,
+    spells
+  }));
+});
 
 
 

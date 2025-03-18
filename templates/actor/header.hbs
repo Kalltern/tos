@@ -86,7 +86,7 @@
 <div class="stats">
   <div class="stat-row">
     {{#each system.stats as |stat key|}}
-      {{#if (not (or (eq key "corruption") (eq key "holyEnergy") (eq key "mana")))}}
+      {{#if (not (or (eq key "corruption") (eq key "holyEnergy")))}}
         <div class="attribute">
           <label>{{localize (concat 'TOS.Actor.Character.stats.' key '.value.label')}}</label>
           
