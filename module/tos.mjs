@@ -144,6 +144,11 @@ Handlebars.registerHelper("groupBySchool", function (spells, options) {
   }));
 });
 
+Handlebars.registerHelper('healthPercentage', function(current, max) {
+  if (max === 0) return 0; // Avoid division by zero
+  return (current / max) * 100;
+});
+
 
 
 /* -------------------------------------------- */

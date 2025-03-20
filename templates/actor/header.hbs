@@ -1,14 +1,143 @@
 {{! Sheet Header }}
 <header class="sheet-header">
-  <img
-    class="profile-img"
-    src="{{actor.img}}"
-    data-edit="img"
-    data-action="onEditImage"
-    title="{{actor.name}}"
-    height="216"
-    width="216"
-  />
+  <div class="profile-container">
+    <img
+      class="profile-img"
+      src="{{actor.img}}"
+      data-edit="img"
+      data-action="onEditImage"
+      title="{{actor.name}}"
+      height="216"
+      width="216"
+    />
+
+  <div class="grid grid-2col">
+ 
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.health.value"
+              value=" {{system.stats.health.value}}" 
+              data-value="system.stats.health.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.health.max}}" 
+              data-value="system.stats.health.max" 
+              readonly
+            />
+          </div>
+        </div>
+
+         <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.stamina.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.stamina.value"
+              value="{{system.stats.stamina.value}}" 
+              data-value="system.stats.stamina.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.stamina.max}}" 
+              data-value="system.stats.stamina.max" 
+              readonly
+            />
+          </div>
+        </div>
+
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.toxicity.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.toxicity.value"
+              value="{{system.stats.toxicity.value}}" 
+              data-value="system.stats.toxicity.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.toxicity.max}}" 
+              data-value="system.stats.toxicity.max" 
+              readonly
+            />
+          </div>
+        </div>
+       {{#if system.magicPotential}}
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.mana.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.mana.value"
+              value="{{system.stats.mana.value}}" 
+              data-value="system.stats.mana.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.mana.max}}" 
+              data-value="system.stats.mana.max" 
+              readonly
+            />
+          </div>
+        </div>
+      {{/if}}
+      {{#if system.priest}}
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.holyEnergy.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.holyEnergy.value"
+              value="{{system.stats.holyEnergy.value}}" 
+              data-value="system.stats.holyEnergy.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.holyEnergy.max}}" 
+              data-value="system.stats.holyEnergy.max" 
+              readonly
+            />
+          </div>
+        </div>
+      {{/if}}
+
+  </div>
+</div>
+
   <div class="header-fields">
      <div class="grid grid-2col">
     <div class="document-name grid-span-1 ">
@@ -107,7 +236,7 @@
 <div class="stats">
   <div class="stat-row">
     {{#each system.stats as |stat key|}}
-      {{#if (not (or (eq key "corruption")))}}
+      {{#if (or (eq key "wounds") (eq key "fatigue") (eq key "corruption") (eq key "mind") (eq key "insanity") )}}
         <div class="attribute">
           <label>{{localize (concat 'TOS.Actor.Character.stats.' key '.value.label')}}</label>
           
@@ -133,13 +262,9 @@
         </div>
       {{/if}}
     {{/each}}
-  </div>
-</div>
-<hr>
-
-  <div>
-        <label class="resource-label">{{localize
-            "TOS.Item.Gear.FIELDS.armor.label"
+      <div>
+        <div class="attribute-armor">
+        <label class="resource-label">{{localize "Armor"
           }}</label>
         <input
           type="text"
@@ -148,7 +273,13 @@
           data-dtype="Number"
           readonly
         />
+        </div>
   </div>
+  </div>
+</div>
+
+
+
   </div>
   
 

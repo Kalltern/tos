@@ -20,7 +20,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   static DEFAULT_OPTIONS = {
     classes: ["tos", "actor"],
     position: {
-      width: 800,
+      width: 860,
       height: 1200,
     },
     actions: {
