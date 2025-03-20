@@ -15,6 +15,9 @@
        "predatorySenses":false,
        "defenseDeflect":false,
        "dodgeDeflect":false,
+       "shepherdsWill":{
+        "shepherdOptions": ["persuasion","deception","seduction","intimidation","insight"]
+              },
        "day":false,
        "armorTotal":0,
        "headArmorTotal":0,
@@ -94,6 +97,7 @@
           "base": 0,
           "max": 10,
           "bonus": 0,
+          "cast": 0,
           "power": 0
 
         }
@@ -680,6 +684,8 @@
           "visible":false,
           "lindar":false,
           "bonus": 0,
+          "attack": 0,
+          "defense": 0,
           "isSkill": 1
         },
         "ranger": {
@@ -868,6 +874,7 @@
     },
     "feature": {
       "templates": ["base"],
+      "options": ["feature","trait","priest"],
       "reroll": {
         "name": "",
         "active": [false, false],

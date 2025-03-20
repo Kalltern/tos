@@ -173,6 +173,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     spells: {
       template: "systems/tos/templates/actor/spells.hbs",
     },
+    miracles: {
+      template: "systems/tos/templates/actor/miracles.hbs",
+    },
     effects: {
       template: "systems/tos/templates/actor/effects.hbs",
     },
@@ -191,7 +194,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case "character":
-        options.parts.push("features", "inventory", "spells", "effects", "config");
+        options.parts.push("features", "inventory", "spells", "miracles", "effects", "config");
         break;
       case "npc":
         options.parts.push("inventory", "effects");
@@ -234,6 +237,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       case "testtab":
       case "skills":
       case "spells":
+      case "miracles":
       case "inventory":
       case "config":
         context.tab = context.tabs[partId];
@@ -328,6 +332,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     tab.cssClass += " hidden"; // Add 'hidden' class to tab
   }
   break;
+  case "miracles":
+    tab.id = "miracles";
+    tab.label += "Miracles";
+  // Check if magicPotential exists and is greater than 0
+  if (!this.actor.system.priest || this.actor.system.priest <= 0) {
+  tab.cssClass += " hidden"; // Add 'hidden' class to tab
+  }
+        break;
         case "effects":
           tab.id = "effects";
           tab.label += "Effects";
@@ -354,6 +366,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // this sheet does with spells
     const features = [];
     const weapon = [];
+    const race = [];
     const gear = [];
     const consumables = [];
     const items = [];
@@ -380,12 +393,17 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
      // Append to item.
      else if (i.type === "item") {
       items.push(i);
-      }                  
-      // Append to spells.
-      else if (i.type === "spell") {
-        spells.push(i);
-        
-      }
+    }                  
+    // Append to spells.
+    else if (i.type === "spell") {
+      spells.push(i);
+      
+    }
+    // Append to race.
+     else if (i.type === "race") {
+        race.push(i);
+         
+          }
     }
 
     // Sort then assign
@@ -395,6 +413,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     context.consumables = consumables.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.race = race.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   }
 
 
@@ -554,23 +573,32 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
     
     if (dataset.roll) {
-      
+      const attributeMap = {
+        Strength: "Str",
+        Dexterity: "Dex",
+        Endurance: "End",
+        Intelligence: "Int",
+        Will: "Wil",
+        Charism: "Cha",
+        Perception: "Per",
+      };
 // Determine if this is a skill or combat skill roll
 const isSkillRoll =
   dataset.rollType === "skill" || dataset.rollType === "combat-skill" || dataset.rollType === "attribute";
 
+  const skillKey = dataset.label;
 // Use dataset.label directly as the key for localization
-const skillKey = dataset.label;
+const mappedKey = dataset.rollType === "attribute" ? attributeMap[skillKey] || skillKey : skillKey;
 
 // Use game.i18n to get the localized label for the skill, looking under the correct path in your structure
 let label = dataset.label
   ? ` ${game.i18n.localize(
-          dataset.rollType === "combat-skill"
-            ? `TOS.Actor.Character.skills.${skillKey}.label`
-            : dataset.rollType === "attribute"
-            ? `TOS.Actor.Character.Attribute.${skillKey}.long`
-            : `TOS.Actor.Character.skills.${skillKey}.label`
-        )}`
+      dataset.rollType === "combat-skill"
+        ? `TOS.Actor.Character.skills.${skillKey}.label`
+        : dataset.rollType === "attribute"
+        ? `TOS.Actor.Character.Attribute.${skillKey.charAt(0).toUpperCase() + skillKey.slice(1)}.long`  // Capitalizing the first letter
+        : `TOS.Actor.Character.skills.${skillKey}.label`
+    )}`
   : "";
       const rollName = label;
 
@@ -838,7 +866,15 @@ if (skillData) {
   async _onDropItem(event, data) {
     if (!this.actor.isOwner) return false;
     const item = await Item.implementation.fromDropData(data);
-
+    
+  // Prevent adding multiple races
+  if (item.type === "race") {
+    let existingRace = this.actor.items.find(i => i.type === "race");
+    if (existingRace) {
+      ui.notifications.warn("This character already has a race!");
+      return false; // Stop item from being added
+    }
+  }
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid)
       return this._onSortItem(event, item);

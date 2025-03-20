@@ -14,7 +14,7 @@ export class ToSItem extends Item {
     
       let formula = "";
     
-      if (this.type === "consumable") {
+      if (this.type === "consumable" || this.type === "spell") {
         // Define a unique formula for consumables
         formula = `${diceNum}d${diceSize} ${diceBonus ? `+${diceBonus}` : ''}`;
       } else {

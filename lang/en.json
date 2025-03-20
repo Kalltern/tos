@@ -12,6 +12,7 @@
         "Features": "Features",
         "Inventory": "Inventory",
         "Spells": "Spells",
+        "Miracles": "Miracles",
         "Effects": "Effects",
         "Config": "Config"
       },
@@ -269,6 +270,9 @@
           "headerCost": { "label": "Cost / Per round" },
           "headerActions": { "label": "Action cost | C" },
           "headerRange": { "label": "Range" },
+          "holyPower": { "label": "Holy power" },
+          "domain": { "label": "Domain" },
+          "shepherdsWill": { "label": "Shepherd's will" },
           "headerType": { "label": "Type" }
         }
       }

@@ -89,7 +89,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         options.parts.push("attributesGear", "effects");
         break;  
       case "race":
-        options.parts.push("effects");
+        options.parts.push("attributesRace", "effects");
         break;  
       case "weapon":
         options.parts.push("attributesWeapon");

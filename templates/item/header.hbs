@@ -11,6 +11,20 @@
       <input name="name" type="text" value="{{item.name}}" placeholder="Name" />
        </div>
     {{! You may prefer to have a separate header file instead of this if statement}}
+        {{#if (eq item.type "feature")}}
+          <div class="grid-span-1">
+    <label for="feature-option">Option:</label>
+    <select name="system.option" id="feature-option">
+      <option value="">-- Select a type --</option>
+      {{#each system.options as |option|}}
+        <option value="{{option}}" {{#if (eq ../system.option option)}}selected{{/if}}>
+          {{option}}
+        </option>
+      {{/each}}
+    </select>
+    </div>
+
+        {{/if}}
     {{#if (eq item.type "weapon")}}
 
  <div class="grid grid-2col">
@@ -378,7 +392,7 @@
 
 {{/if}}
 
-{{#if (eq item.system.option "miracle")}}
+{{#if (eq item.system.option "divine")}}
   
   <div class="grid-span-1">
  <label for="spell-rank">Rank:</label>

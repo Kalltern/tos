@@ -246,6 +246,7 @@ export class ToSActor extends Actor {
     const int = attribute.int.total;
     const wil = attribute.wil.total;
     const per = attribute.per.total;
+    const cha = attribute.cha.total;
 
     
     // Calculate initiative
@@ -277,9 +278,25 @@ export class ToSActor extends Actor {
     secAttribute.fth.total = secAttribute.fth.value + secAttribute.fth.bonus;
     stat.corruption.max = stat.corruption.base + stat.corruption.bonus;
     stat.fatigue.max = stat.fatigue.base + stat.fatigue.bonus;
+    // persuasion seduction deception intimidation insight ; shepherds will
     if (systemData.priest){
     stat.holyEnergy.max = stat.holyEnergy.base + stat.holyEnergy.bonus + (secAttribute.fth.total * 5);
     stat.holyEnergy.power = secAttribute.fth.total + (stat.holyEnergy.power.bonus || 0);
+    let chosenSkill = systemData.shepherdsWill.skill;
+    // Check if the chosen skill is valid
+    if (systemData.shepherdsWill.shepherdOptions.includes(chosenSkill)) {
+      let skill = systemData.skills[chosenSkill]; // Get the skill dynamically
+
+  if (skill.id === 5) {
+      // Replace its core attribute with Willpower (Wil)
+      skill.rating +=  ((-cha) + (wil))* 6;
+  }
+  if (skill.id === 6) {
+      // Replace its core attribute with Perception (Per)
+       skill.rating +=  ((-per) + (wil))* 6;
+}
+}
+      
     }
     
     stat.mind.max = wil + stat.mind.bonus + stat.mind.base;
@@ -289,10 +306,10 @@ export class ToSActor extends Actor {
     // Calculate Health, systemData.healthBonus comes from Armor
     systemData.stats.health.max =  ((end) * attribute.end.rank) + stat.health.base + stat.health.bonus + (str) + (systemData.healthBonus || 0);
     // Calculate toxicity
-  systemData.stats.toxicity.max = ((end) * 2) + stat.toxicity.bonus + stat.toxicity.base;
+     systemData.stats.toxicity.max = ((end) * 2) + stat.toxicity.bonus + stat.toxicity.base;
 
     // Calculate stamina
-   systemData.stats.stamina.max = ((end) * 5) + stat.stamina.bonus + stat.stamina.base + (2 * systemData.skills.athletics.value) - (5 * stat.fatigue.value);
+    systemData.stats.stamina.max = ((end) * 5) + stat.stamina.bonus + stat.stamina.base + (2 * systemData.skills.athletics.value) - (5 * stat.fatigue.value);
 
 
     
@@ -355,10 +372,8 @@ export class ToSActor extends Actor {
       } 
       // prevent mana to go below 0
       systemData.stats.mana.max = Math.max(systemData.stats.mana.max, systemData.stats.mana.min);
+     }
 
-      
-
-  }
 
 
     // Prevent current health exceed max

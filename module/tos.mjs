@@ -102,19 +102,28 @@ Handlebars.registerHelper('array-lookup', function(array, index) {
 Handlebars.registerHelper("groupSpellsBySchool", function (spells) {
   const grouped = {};
 
-  
-
-  // Group spells by their school type
   for (const spell of spells) {
-    const school = spell.system.type;
-    if (!grouped[school]) {
-      grouped[school] = [];
-    }
-    grouped[school].push(spell);
+    // Only include spells where system.option is "magic" but it does not work
+    if (spell.system.option === "magic") {
+      const school = spell.system?.type;
+
+      // Ensure school is defined and not empty
+      if (school) {
+        if (!grouped[school]) {
+          grouped[school] = [];
+        }
+
+        grouped[school].push(spell);
+      } 
+    } 
   }
 
+  console.log("Final grouped spells:", grouped);
+
+  // Return grouped spells as an array of objects with school and spells
   return Object.entries(grouped).map(([school, spells]) => ({ school, spells }));
 });
+
 
 Handlebars.registerHelper("groupBySchool", function (spells, options) {
   const schools = {};

@@ -31,8 +31,11 @@
 class="flex-group-center">
 Spells
 </h2>
+
 {{#each (groupBySchool spells) as |group|}}
-  <ol class='items-list' data-school='{{group.school}}'>
+   {{#unless (eq item.system.option "divine")}}
+
+    <ol class='items-list' data-school='{{group.school}}'>
     <li class='item flexrow items-header'>
       <div class="item-name">  {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}</div>
             <div class='item-name'>
@@ -49,8 +52,11 @@ Spells
       </div>
 
     </li>
+  {{/unless}}
 
+  
     {{#each group.spells as |item|}}
+       {{#unless (eq item.system.option "divine")}}
       <li
         class='item flexrow'
         data-item-id='{{item._id}}'
@@ -96,8 +102,10 @@ Spells
           {{/if}}
         </div>
       </li>
-    {{/each}}
+    {{/unless}}
+    {{/each}}    
   </ol>
+
 {{/each}}
 
 

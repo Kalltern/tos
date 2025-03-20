@@ -6,17 +6,40 @@
     data-edit="img"
     data-action="onEditImage"
     title="{{actor.name}}"
-    height="432"
-    width="330"
+    height="216"
+    width="216"
   />
   <div class="header-fields">
-    <div class="document-name">
+     <div class="grid grid-2col">
+    <div class="document-name grid-span-1 ">
       <input
         name="name"
         type="text"
         value="{{actor.name}}"
         placeholder="Name"
       />
+    </div>
+<div class="grid-span-1">
+  {{#if race.length}}
+    {{#each race as |item id|}}
+      <div class="item-name">
+        <input 
+          type="text" 
+          value="{{item.name}}" 
+          readonly
+        />
+      </div>
+    {{/each}}
+  {{else}}
+    <input 
+      type="text" 
+      value="" 
+      placeholder="Choose a race" 
+      readonly
+    />
+  {{/if}}
+</div>
+
     </div>
     <hr>
     {{! The grid classes are defined in scss/global/_grid.scss. To use,
@@ -34,7 +57,7 @@
             data-action="roll"
             data-roll="(@attributes.{{key}}.mod)-1d100"
             data-roll-type="attribute"
-            data-label="{{localize (lookup @root.config.attributes key)}}"
+            data-label="{{key}}"
           >
             {{localize (lookup @root.config.attributes key)}}
           </label>
@@ -51,7 +74,7 @@
             data-action="roll"
             data-roll="(@attributes.{{key}}.mod)-1d100"
             data-roll-type="attribute"
-            data-label="{{localize (lookup @root.config.attributes key)}}"
+            data-label="{{key}}"
           >
             {{numberFormat attribute.mod decimals=0}}
           </span>
@@ -65,9 +88,7 @@
             class="resource-label rollable"
             data-action="roll"
             data-roll="(@secondaryAttributes.{{key}}.mod)-1d100"
-            data-label="{{localize
-              (lookup @root.config.secondaryAttributes key)
-            }}"
+            data-label="{{key}}"
           >
             {{localize (lookup @root.config.secondaryAttributes key)}}
           </label>
@@ -86,7 +107,7 @@
 <div class="stats">
   <div class="stat-row">
     {{#each system.stats as |stat key|}}
-      {{#if (not (or (eq key "corruption") (eq key "holyEnergy")))}}
+      {{#if (not (or (eq key "corruption")))}}
         <div class="attribute">
           <label>{{localize (concat 'TOS.Actor.Character.stats.' key '.value.label')}}</label>
           

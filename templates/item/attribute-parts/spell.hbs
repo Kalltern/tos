@@ -34,7 +34,7 @@
           data-dtype="String"
         />
          </div>
-
+{{#if (eq item.system.option "magic")}}
         <div class="grid-span-1">
           <label for="spell-class">Class:</label>
           <select name="system.spellClass" id="spell-class">
@@ -46,6 +46,25 @@
   {{/each}}
 </select>
 </div>
+{{/if}}
+
+{{#if (eq item.system.option "divine")}}
+                <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.domain.label"
+          }}</label>
+        
+        <input
+          type="text"
+          name="system.domain"
+          value="{{system.domain}}"
+          data-dtype="String"
+        />
+         </div>
+{{/if}}
+
+
+
                 <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Spell.FIELDS.perRound.label"
@@ -111,14 +130,10 @@
         />
       </div>
 
-<select name="system.bool1" id="effect-bool-1">
-  <option value="">-- Select a type --</option>
-  {{#each system.effectOptions as |effectOption|}}
-    <option value="{{effectOption}}" {{#if (eq ../system.bool1 effectOption)}}selected{{/if}}>
-      {{effectOption}}
-    </option>
-  {{/each}}
-</select>
+<div class="grid-span-1">
+<label class="resource-label">{{localize
+     "TOS.Item.Spell.FIELDS.headerType.label"
+  }}</label></div>
 
 <select name="system.dmgType1" id="dmg-type-1">
   <option value="">-- Select a type --</option>
