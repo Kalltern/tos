@@ -118,7 +118,9 @@
           "id": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         },
         "dex": {
           "value": 1,
@@ -126,7 +128,9 @@
           "id": 1,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         },
         "end": {
           "value": 1,
@@ -135,7 +139,9 @@
           "rank": 2,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         },
         "int": {
           "value": 1,
@@ -143,7 +149,9 @@
           "id": 3,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         },
         "wil": {
           "value": 1,
@@ -151,7 +159,9 @@
           "id": 4,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         },
         "cha": {
           "value": 1,
@@ -159,7 +169,9 @@
           "id": 5,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         },
         "per": {
           "value": 1, 
@@ -167,7 +179,9 @@
           "id": 6,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "bonus": 0
+          "bonus": 0,
+          "modBonus": 0
+
         }
       },
       "secondaryAttributes": {

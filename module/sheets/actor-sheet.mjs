@@ -187,8 +187,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
-    // Not all parts always render
-    options.parts = ["header", "tabs", "biography", "testtab", "skills"];
+    // Not all parts always render, add "testtab" for testing
+    options.parts = ["header", "tabs", "biography", "skills"];
     // Don't show the other tabs if only limited view
     if (this.document.limited) return;
     // Control which parts show based on document subtype
@@ -327,6 +327,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         case "spells":
           tab.id = "spells";
           tab.label += "Spells";
+          
   // Check if magicPotential exists and is greater than 0
   if (!this.actor.system.magicPotential || this.actor.system.magicPotential <= 0) {
     tab.cssClass += " hidden"; // Add 'hidden' class to tab
@@ -335,7 +336,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   case "miracles":
     tab.id = "miracles";
     tab.label += "Miracles";
-  // Check if magicPotential exists and is greater than 0
+  // Check if Priest exists and is greater than 0
   if (!this.actor.system.priest || this.actor.system.priest <= 0) {
   tab.cssClass += " hidden"; // Add 'hidden' class to tab
   }
@@ -581,24 +582,33 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         Will: "Wil",
         Charism: "Cha",
         Perception: "Per",
+        Speed: "Spd",
+        Luck: "Lck",
+        Resolve: "Res",
+        Faith: "Fth",
+        Sinfulness: "Sin",
+        Visage: "Vis",
+        Initiative: "Ini",
       };
-// Determine if this is a skill or combat skill roll
+// Determine if this is a skill or attribute. Combat skills unrollable without macro, left here in case of change
 const isSkillRoll =
-  dataset.rollType === "skill" || dataset.rollType === "combat-skill" || dataset.rollType === "attribute";
+  dataset.rollType === "skill" || dataset.rollType === "combat-skill" || dataset.rollType === "attribute" || dataset.rollType === "secondaryAttribute";
 
   const skillKey = dataset.label;
 // Use dataset.label directly as the key for localization
-const mappedKey = dataset.rollType === "attribute" ? attributeMap[skillKey] || skillKey : skillKey;
+const mappedKey = dataset.rollType === "attribute" || "secondaryAttribute" ? attributeMap[skillKey] || skillKey : skillKey;
 
 // Use game.i18n to get the localized label for the skill, looking under the correct path in your structure
 let label = dataset.label
-  ? ` ${game.i18n.localize(
-      dataset.rollType === "combat-skill"
-        ? `TOS.Actor.Character.skills.${skillKey}.label`
-        : dataset.rollType === "attribute"
-        ? `TOS.Actor.Character.Attribute.${skillKey.charAt(0).toUpperCase() + skillKey.slice(1)}.long`  // Capitalizing the first letter
-        : `TOS.Actor.Character.skills.${skillKey}.label`
-    )}`
+? ` ${game.i18n.localize(
+  dataset.rollType === "combat-skill"
+    ? `TOS.Actor.Character.skills.${skillKey}.label`
+    : dataset.rollType === "attribute"
+    ? `TOS.Actor.Character.Attribute.${skillKey.charAt(0).toUpperCase() + skillKey.slice(1)}.long`
+    : dataset.rollType === "secondaryAttribute"
+    ? `TOS.Actor.Character.SecondaryAttribute.${skillKey.charAt(0).toUpperCase() + skillKey.slice(1)}.long`
+    : `TOS.Actor.Character.skills.${skillKey}.label`
+)}`
   : "";
       const rollName = label;
 
@@ -617,9 +627,11 @@ let label = dataset.label
         dataset.rollType === "skill"
           ? this.actor.system.skills[skillKey]
           : dataset.rollType === "combat-skill"
-          ? this.actor.system.combatSkills[skillKey]
-          : this.actor.system.attributes[skillKey]; // Handle attributes
-        
+          ? this.actor.system.combatSkills[skillKey] 
+          : this.actor.system.attributes[skillKey] // Handle attributes
+          ? this.actor.system.secondaryAttributes[skillKey]
+          : dataset.rollType === "secondaryAttribute";
+
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
             d100Result,

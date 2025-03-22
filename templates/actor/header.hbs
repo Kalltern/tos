@@ -213,12 +213,51 @@
     <div class="Attributes flexrow">
       {{#each system.secondaryAttributes as |attribute key|}}
         <div class="attribute flexcolumn flex-group-center">
+           {{#if (eq key "spd")}} 
           <label
             class="resource-label rollable"
             data-action="roll"
-            data-roll="(@secondaryAttributes.{{key}}.mod)-1d100"
+            data-roll-type="secondaryAttribute"
+            data-roll="(@secondaryAttributes.{{key}}.total)+1d12"
             data-label="{{key}}"
           >
+           {{/if}}
+          {{#if (eq key "lck")}} 
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll-type="secondaryAttribute"
+            data-roll="(@secondaryAttributes.{{key}}.total*5)+50-1d100"
+            data-label="{{key}}"
+          >
+           {{/if}}    
+         {{#if (eq key "res")}} 
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll-type="secondaryAttribute"
+            data-roll="(@secondaryAttributes.{{key}}.total*10)-1d100"
+            data-label="{{key}}"
+          >
+           {{/if}} 
+         {{#if (eq key "fth")}} 
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll-type="secondaryAttribute"
+            data-roll="(@secondaryAttributes.{{key}}.total*8)-1d100"
+            data-label="{{key}}"
+          >
+           {{/if}}   
+         {{#if (eq key "sin")}} 
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll-type="secondaryAttribute"
+            data-roll="(@secondaryAttributes.res.total*10)-(@secondaryAttributes.{{key}}.total*3)-1d100"
+            data-label="{{key}}"
+          >
+           {{/if}}                      
             {{localize (lookup @root.config.secondaryAttributes key)}}
           </label>
           <input

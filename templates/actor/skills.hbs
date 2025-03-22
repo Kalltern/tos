@@ -36,27 +36,13 @@
         data-dtype="Number"
       />
       
-      <span
-        class="skill-mod  skill-rating"  
-        data-roll="{{#if (eq key 'combat')}}{{#if skill.finesseRating}}{{#if (gt skill.finesseRating skill.rating)}}{{skill.finesseRating}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}-1d100"
-        data-roll-type="combat-skill"
-        data-label="{{key}}"
-        data-dtype="Number"
-      >
-        {{#if (eq key 'combat')}}
-          {{#if skill.finesseRating}}
-            {{#if (gt skill.finesseRating skill.rating)}} 
-              {{skill.finesseRating}}
-            {{else}}
-              {{skill.rating}}
-            {{/if}}
-          {{else}}
-            {{skill.rating}}
-          {{/if}}
-        {{else}}
-          {{skill.rating}}
-        {{/if}}
-      </span>
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
       
     </div>
 
@@ -74,7 +60,7 @@
         </label>       
         <div class="skill-entry {{#unless skill.visible}}hidden-skill{{/unless}}">
           <label
-            class="skill-label align-left skill-name"  
+            class="skill-label flexlarge align-left skill-name"  
             data-action="roll"
             data-roll="{{skill.rating}}-1d100"
             data-roll-type="skill"
@@ -167,13 +153,13 @@
           >
              {{localize (concat 'TOS.Actor.Character.combatSkills.' key '.label')}}
           </label>
-          <span
-            class="skill-mod rollable skill-rating"  
-            data-roll="{{skill.rating}}-1d100"
-            data-roll-type="skill"
-            data-label="{{key}}"
-            data-dtype="Number"
-          >{{skill.rating}}</span>
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
         </div>
     
   {{/if}}
@@ -215,11 +201,13 @@
             class="skill-value"
             data-dtype="Number"
           />
-          <span
-            class="skill-mod  skill-rating"  
-              data-label="{{key}}"
-            data-dtype="Number"
-          >{{skill.rating}}</span>
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
 
 
         </div>
@@ -258,14 +246,13 @@
               class="skill-value"
               data-dtype="Number"
             />
-            <span
-              class="skill-mod rollable skill-rating"
-              data-action="roll"
-              data-roll="{{skill.rating}}-1d100"
-              data-roll-type="skill"
-              data-label="{{key}}"
+            <input
+              type="text"
+              class="skill-rating"
               data-dtype="Number"
-            >{{skill.rating}} </span>
+              value="{{skill.rating}}"
+              readonly
+            />
           </div>
         </div>
         {{/if}}
@@ -302,14 +289,13 @@
               class="skill-value"
               data-dtype="Number"
             />
-            <span
-              class="skill-mod rollable skill-rating"
-              data-action="roll"
-              data-roll="{{skill.rating}}-1d100"
-              data-roll-type="skill"
-              data-label="{{key}}"
+            <input
+              type="text"
+              class="skill-rating"
               data-dtype="Number"
-            >{{skill.rating}} </span>
+              value="{{skill.rating}}"
+              readonly
+            />
           </div>
           </div>
         {{/if}}
@@ -345,14 +331,13 @@
               class="skill-value"
               data-dtype="Number"
             />
-            <span
-              class="skill-mod rollable skill-rating"
-              data-action="roll"
-              data-roll="{{skill.rating}}-1d100"
-              data-roll-type="skill"
-              data-label="{{key}}"
+            <input
+              type="text"
+              class="skill-rating"
               data-dtype="Number"
-            >{{skill.rating}} </span>
+              value="{{skill.rating}}"
+              readonly
+            />
           </div>
           </div>
         {{/if}}
@@ -389,14 +374,13 @@
               class="skill-value"
               data-dtype="Number"
             />
-            <span
-              class="skill-mod rollable skill-rating"
-              data-action="roll"
-              data-roll="{{skill.rating}}-1d100"
-              data-roll-type="skill"
-              data-label="{{key}}"
+            <input
+              type="text"
+              class="skill-rating"
               data-dtype="Number"
-            >{{skill.rating}} </span>
+              value="{{skill.rating}}"
+              readonly
+            />
           </div>
           </div>
         {{/if}}
@@ -432,14 +416,13 @@
               class="skill-value"
               data-dtype="Number"
             />
-            <span
-              class="skill-mod rollable skill-rating"
-              data-action="roll"
-              data-roll="{{skill.rating}}-1d100"
-              data-roll-type="skill"
-              data-label="{{key}}"
+            <input
+              type="text"
+              class="skill-rating"
               data-dtype="Number"
-            >{{skill.rating}} </span>
+              value="{{skill.rating}}"
+              readonly
+            />
           </div>
            </div>
         {{/if}}
@@ -474,15 +457,14 @@
               class="skill-value"
               data-dtype="Number"
             />
-            <span
-              class="skill-mod rollable skill-rating"
-              data-action="roll"
-              data-roll="{{skill.rating}}-1d100"
-              data-roll-type="skill"
-              data-label="{{key}}"
+            <input
+              type="text"
+              class="skill-rating"
               data-dtype="Number"
-            >{{skill.rating}} </span>
-          </div>
+              value="{{skill.rating}}"
+              readonly
+            />
+            </div>
           </div>
         {{/if}}
       {{/each}}

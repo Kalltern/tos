@@ -103,9 +103,11 @@ export class ToSActor extends Actor {
       // Calculate the attribute rating using ToS rules.
         stat.max = stat.base + (stat.bonus ?? 0);
     }
+
+    
     for (let [key, attribute] of Object.entries(systemData.attributes)) {
-      // Calculate the attribute rating using ToS rules.
-      attribute.mod = Math.floor(15 + (attribute.bonus + attribute.value) * 10);
+      // Calculate the attribute rating using ToS rules. Rework calculations for stun effects
+      attribute.mod = Math.floor(15 + attribute.modBonus + (attribute.bonus + attribute.value) * 10);
     }
 
 
@@ -180,9 +182,9 @@ export class ToSActor extends Actor {
         }
       }
         if (combatSkill === rangeddef) {
-          if(archery.value > combat.value && archery.value != 0 ) {combatSkill.rating += rangedDefenseSet[archery.value] }
+          if(archery.value > combat.value && archery.value != 0 ) {combatSkill.rating += rangedDefenseSet[archery.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus }
           else if (ranger > 0) {combatSkill.rating += rangedDefenseSet[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;}
-          else{combatSkill.rating += rangedDefenseSet[combat.value] + attributeScore[combatSkill.id].total * 3}
+          else{combatSkill.rating += rangedDefenseSet[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus}
         }  
 
         if (combatSkill === archery){
@@ -324,7 +326,7 @@ export class ToSActor extends Actor {
       for (const [key, school] of Object.entries(systemData.schools)) {
         if (key !== "blood") { 
             schoolBonus += calcSchool[school.value]; // Add based on school value
-            school.spellPower = spellPowerSchool[school.value] + school.bonus + Math.floor(int/2);
+            school.spellPower = spellPowerSchool[school.value] + school.bonus + (systemData.baseSpellPower || 0) + Math.floor(int/2);
         }
         if(key === "blood"){
            schoolBonus += calcSchool[school.value]; // Add based on school value
@@ -403,7 +405,7 @@ export class ToSActor extends Actor {
     // Calculate critical failure threshold for each skill
     anySkill.criticalFailureThreshold = Math.min(
       100,
-      baseCriticalFailure - Math.max(0, -luck) - critFailPenalty
+      baseCriticalFailure - Math.max(0, -luck) + critFailPenalty
     );
     }
     }

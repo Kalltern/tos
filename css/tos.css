@@ -261,7 +261,7 @@ table tr td:nth-child(3) {
   margin: 10px 0 ;
   padding: 0 ;  
   width: 100% ;
-  max-width: 1200px ; /* Adjust if necessary */
+  max-width: 100px ; /* Adjust if necessary */
 }
 
 .flex-group-center,
@@ -373,11 +373,21 @@ table tr td:nth-child(3) {
   max-width: 140px;  /* Optional: Keep the max-width */
   width: 100%;
   padding: 0.4rem;  /* Optional: Adjust padding */
-  text-align: left;  /* Ensure text is left-aligned */
+  text-align: center;  /* Ensure text is left-aligned */
   }
 
   .skill-label {
  margin-right: 10px;
+    }
+
+    .tos .attribute-armor{
+      display: flex;
+      flex-direction: column; /* Stack label above input and modifier */
+      align-items: center; /* Center items horizontally */
+      margin: 0 2px; /* Reduced horizontal spacing between attributes */
+      flex: 1 1 0; /* Allow attributes to grow and shrink */
+      max-width: 45px; /* Set a max width to keep them compact */
+      text-align: center;
     }
 
 .tos .attributes {
@@ -688,7 +698,7 @@ table tr td:nth-child(3) {
   width: 4rem; /* Adjust the width as needed */
   max-width: 38px; /* Optional: Set a maximum width */
   padding: 0.4rem; /* Adjust padding for a more compact input */
-  text-align: left !important;; /* Center the text for better appearance */
+  text-align: center; /* Center the text for better appearance */
   font-size: 0.9rem; /* Adjust font size if the text appears too large */
   max-height: 20px;
 }
@@ -700,12 +710,16 @@ table tr td:nth-child(3) {
 }
 .skill-rating {
   margin-left: 15px; /* Adds a small space between the input value and the skill rating */
+  max-width: 40px;
+  max-height: 20px;
+  text-align: center;
 }
 .tab.skills {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
   overflow-y: auto; /* Scrollbar for long content */
+  text-align: center;
 }
 @media (max-height: 1080px) {
   .tab.skills {

@@ -20,14 +20,18 @@ export class ToSItem extends Item {
       } else {
         // Default to Strength
         let attr = "str";
+        
     
         if (this.actor) {
           let str = this.actor.system.attributes.str.total;
           let dex = this.actor.system.attributes.dex.total;
           let per = this.actor.system.attributes.per.total;
+          let giant = this.actor.system.giant;
     
           // Check if the actor owns an item named "Finesse"
           const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
+          // Check if the actor owns an item named "Finesse"
+          const hasGiant = this.actor.items.some(item => item.name.toLowerCase() === "giant");
     
           // Check if *this* weapon has finesse
           if (this.system.finesse === true && hasFinesse && str <= dex) {
@@ -47,9 +51,12 @@ export class ToSItem extends Item {
               attr = "dex";  // Use Dexterity if all conditions are met
             }
             }
-          // Define the formula 
-          formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
-        }
+            if (hasGiant && this.system.class !== "crossbow" && this.system.class !== "bow") {
+              formula = `${diceNum}d${diceSize} + 1d4 + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+          } else {
+              formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+          }
+      }
       }
     
       // Store the formula in system.formula
