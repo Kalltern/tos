@@ -42,7 +42,6 @@ export class ToSActor extends Actor {
 
 
     systemData.armorTotal = 0;
-    systemData.healthBonus = 0; 
     systemData.initiativeBonus = 0; 
     systemData.rerolls = {};
    
@@ -67,7 +66,7 @@ export class ToSActor extends Actor {
 
             systemData.initiativeBonus += item.system.iniPenalty ?? 0;
             systemData.secondaryAttributes.spd.max += item.system.maxSpeed ?? 0;
-            systemData.healthBonus += item.system.healthBonus ?? 0; 
+            systemData.healthBonus += item.system.healthBonus ?? 0; // has to be fixed, healthBonus is not applied to actor
         }
       }
 
@@ -129,6 +128,8 @@ export class ToSActor extends Actor {
     const ranger = systemData.combatSkills.ranger.value;
     const hasFinesse = systemData.finesse;
     const rangeddef = systemData.combatSkills.rangedDefense;
+    const stat = systemData.stats;
+    const graveWounds = ((5 * stat.graveWounds.value)-(3*stat.graveWounds.treated));
     const archery = systemData.combatSkills.archery;
     const combat = systemData.combatSkills.combat;
     const melee = systemData.combatSkills.combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
@@ -142,20 +143,20 @@ export class ToSActor extends Actor {
       // Ensure skill type is valid and matches your criteria
       if (skill.type === 1) {
         // Use skill.id to find the corresponding attribute
-        if(key === "athletics"){ skill.swimming += skillset1[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus;}
-        skill.rating += skillset1[skill.value] + (attributeScore[skill.id].total )* 3 + skill.bonus;
+        if(key === "athletics"){ skill.swimming += skillset1[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;}
+        skill.rating = skillset1[skill.value] + (attributeScore[skill.id].total )* 3 + skill.bonus - graveWounds;
       } else if (skill.type === 2) {
-        skill.rating += skillset2[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus;
+        skill.rating = skillset2[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       } else if (skill.type === 3) {
-        skill.rating += skillset3[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus;
+        skill.rating = skillset3[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       } else if (skill.type === 4) {
-        skill.rating += skillset4[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus;
+        skill.rating = skillset4[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       } else if (skill.type === 5) {
-        skill.rating += skillset5[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus;
+        skill.rating = skillset5[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       } else if (skill.type === 6) {
-        skill.rating += skillset6[skill.value] + (attributeScore[skill.id].total ) * 6 + skill.bonus;
+        skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 6 + skill.bonus - graveWounds;
       } else if (skill.type === 7) {
-        skill.rating += skillset7[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus;
+        skill.rating = skillset7[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       }
     }
     // Iterate through combat skills
@@ -165,31 +166,32 @@ export class ToSActor extends Actor {
         
 
       // Looking for finesse=true to use dexterity, otherwise use strength      
-      // looking for ranger=true to use ranger skills instead of classic skills      
+      // looking for ranger=true to use ranger skills instead of classic skills  
+      // Hotfixed for Finesse added    
         if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
           if (ranger > 0) {
-            combat.finesseRating += rangerGroup[ranger] + attributeScore[1].total * 3 + combatSkill.bonus;
+            combat.finesseRating = rangerGroup[ranger] + attributeScore[1].total * 3 + combatSkill.bonus - graveWounds;
           } else {
-            combat.finesseRating += combatset1[melee] + attributeScore[1].total * 3 + combatSkill.bonus;
+            combat.finesseRating = combatset1[melee] + attributeScore[1].total * 3 + combatSkill.bonus - graveWounds;
           }
         } 
         if (combatSkill === combat){ 
             // Apply ranger bonus if applicable
          if (ranger > 0) { 
-          combatSkill.rating += rangerGroup[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+          combatSkill.rating = rangerGroup[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         } else {
-          combatSkill.rating += combatset1[melee] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+          combatSkill.rating = combatset1[melee] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         }
       }
         if (combatSkill === rangeddef) {
-          if(archery.value > combat.value && archery.value != 0 ) {combatSkill.rating += rangedDefenseSet[archery.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus }
-          else if (ranger > 0) {combatSkill.rating += rangedDefenseSet[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;}
-          else{combatSkill.rating += rangedDefenseSet[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus}
+          if(archery.value > combat.value && archery.value != 0 ) {combatSkill.rating = rangedDefenseSet[archery.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds; }
+          else if (ranger > 0) {combatSkill.rating = rangedDefenseSet[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;}
+          else{combatSkill.rating = rangedDefenseSet[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;}
         }  
 
         if (combatSkill === archery){
-          if(ranger > 0){archery.rating += combatset1[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;}
-          else {archery.rating += combatset1[archery.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+          if(ranger > 0){archery.rating = combatset1[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;}
+          else {archery.rating = combatset1[archery.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
           }  
         }
       
@@ -198,15 +200,15 @@ export class ToSActor extends Actor {
       if (combatSkill === systemData.combatSkills.meleeDefense) {
       // Check if the actor has steelGrip enabled
         if (systemData.steelGrip) {
-       combatSkill.rating += combatset1[melee] + attributeScore[0].total * 3 + combatSkill.bonus;
+       combatSkill.rating = combatset1[melee] + attributeScore[0].total * 3 + combatSkill.bonus - graveWounds;
        }
        // Check if the actor has predatorySenses enabled
          else if (systemData.predatorySenses) {
-        combatSkill.rating += combatset1[melee] + attributeScore[6].total * 3 + combatSkill.bonus;
+        combatSkill.rating = combatset1[melee] + attributeScore[6].total * 3 + combatSkill.bonus - graveWounds;
          } else if (ranger > 0) { 
-          combatSkill.rating += rangerGroup[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+          combatSkill.rating = rangerGroup[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         } else {
-          combatSkill.rating += combatset1[melee] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+          combatSkill.rating = combatset1[melee] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         }
 
 
@@ -218,20 +220,20 @@ export class ToSActor extends Actor {
       }
       if (combatSkill.type === 1) {
         //setting ratings for dodge
-        combatSkill.rating += dodge[systemData.skills.acrobacy.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+        combatSkill.rating = dodge[systemData.skills.acrobacy.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
      
       }
       if (combatSkill.type === 2) {
-        combatSkill.rating += throwing[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+        combatSkill.rating = throwing[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
-        combatSkill.finesseRating = throwing[combat.value] + attributeScore[1].total * 3 + combatSkill.bonus;
+        combatSkill.finesseRating = throwing[combat.value] + attributeScore[1].total * 3 + combatSkill.bonus - graveWounds;
         }
       }
       if (combatSkill.type === 3) {
         if(combatSkill.lindar){
-          combatSkill.rating += channeling2[combatSkill.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+          combatSkill.rating = channeling2[combatSkill.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         } else {
-        combatSkill.rating += channeling1[combatSkill.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus;
+        combatSkill.rating = channeling1[combatSkill.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
       }
       }
 
@@ -240,7 +242,7 @@ export class ToSActor extends Actor {
 
     // Prepare secondary attributes and stat calculations
     const secAttribute = systemData.secondaryAttributes;
-    const stat = systemData.stats;
+
     const attribute = systemData.attributes;
     const str = attribute.str.total;
     const dex = attribute.dex.total;
@@ -334,44 +336,48 @@ export class ToSActor extends Actor {
 
         }
     }
-      let magicDoctrine = systemData.doctrines;
-      const maxValue = Math.max(
-        magicDoctrine.elymas.value,
-        magicDoctrine.incantator.value,
-        magicDoctrine.veneficus.value,
-        magicDoctrine.elementalist.value
-      );
-      const calcElymas = [1,2.5,2.5,2.5,3,3,3.5,3.5,4,4,4];
-      const calcIncantator = [1,5,5,5,8,8,10,10,12,12,12];
-      const calcElementalist = [1,2,2,2,2,4,4,6,6,6,8];
-      const calcVeneficus = [1,1,1,1,1,1.5,1.5,1.5,1.5,1.5,1.5];
-      
-      if (magicDoctrine.elymas.value === maxValue && systemData.elymas) {
-        systemData.stats.mana.max = 
-        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value)) 
-        * calcElymas[magicDoctrine.elymas.value]  ;
-
-      }
-      if (magicDoctrine.incantator.value === maxValue && systemData.incantator) {
-        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value)) 
-        * calcIncantator[magicDoctrine.incantator.value]  ;
-      }
-      if (magicDoctrine.elementalist.value === maxValue && systemData.elementalist) {
-        systemData.stats.mana.max = 
-        (calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value))
-        * calcElementalist[magicDoctrine.elementalist.value]  ;
-        
-
-      }
-      if (magicDoctrine.veneficus.value === maxValue && systemData.veneficus) {
-        systemData.stats.mana.max = 
-        (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value))
-        * calcVeneficus[magicDoctrine.veneficus.value]  ;
-
-      }       else {
-        systemData.stats.mana.max = 
+    let magicDoctrine = systemData.doctrines;
+    const maxValue = Math.max(
+      magicDoctrine.elymas.value || 0,
+      magicDoctrine.incantator.value || 0,
+      magicDoctrine.veneficus.value || 0,
+      magicDoctrine.elementalist.value || 0
+    );
+    
+    console.log("Max Doctrine Value:", maxValue);
+    console.log("Current Doctrine Values:", magicDoctrine);
+    
+    const calcElymas = [1,2.5,2.5,2.5,3,3,3.5,3.5,4,4,4];
+    const calcIncantator = [1,5,5,5,8,8,10,10,12,12,12];
+    const calcElementalist = [1,2,2,2,2,4,4,6,6,6,8];
+    const calcVeneficus = [1,1,1,1,1,1.5,1.5,1.5,1.5,1.5,1.5];
+    
+    if (magicDoctrine.elymas.value === maxValue) {
+      console.log("Selected: Elymas");
+      systemData.stats.mana.max = 
+        Math.floor((calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value)) 
+        * calcElymas[magicDoctrine.elymas.value]);
+    } else if (magicDoctrine.incantator.value === maxValue) {
+      console.log("Selected: Incantator");
+      systemData.stats.mana.max = 
+      Math.floor((calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value)) 
+        * calcIncantator[magicDoctrine.incantator.value]);
+    } else if (magicDoctrine.elementalist.value === maxValue) {
+      console.log("Selected: Elementalist");
+      systemData.stats.mana.max = 
+      Math.floor((calcCast[channeling] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value))
+        * calcElementalist[magicDoctrine.elementalist.value]);
+    } else if (magicDoctrine.veneficus.value === maxValue) {
+      console.log("Selected: Veneficus");
+      systemData.stats.mana.max = 
+      Math.floor((calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value))
+        * calcVeneficus[magicDoctrine.veneficus.value]);
+    } else {
+      console.log("No matching doctrine, using default calculation.");
+      systemData.stats.mana.max = 
         (calcCast[melee] + int + wil + schoolBonus + stat.mana.bonus + stat.mana.base - (3 * stat.fatigue.value));
-      } 
+    }
+    
       // prevent mana to go below 0
       systemData.stats.mana.max = Math.max(systemData.stats.mana.max, systemData.stats.mana.min);
      }

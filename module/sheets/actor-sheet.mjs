@@ -628,10 +628,10 @@ let label = dataset.label
           ? this.actor.system.skills[skillKey]
           : dataset.rollType === "combat-skill"
           ? this.actor.system.combatSkills[skillKey] 
-          : this.actor.system.attributes[skillKey] // Handle attributes
-          ? this.actor.system.secondaryAttributes[skillKey]
+          :  dataset.rollType === "attribute"
+          ? this.actor.system.attributes[skillKey] // Handle attributes
           : dataset.rollType === "secondaryAttribute";
-
+   
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
             d100Result,

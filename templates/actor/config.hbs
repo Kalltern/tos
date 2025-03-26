@@ -49,6 +49,30 @@
         </div>
       {{/each}}
     </div>
+    <div class="grid grid-10col">
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "Endurance Rank"
+          }}</label>
+        <input
+          type="text"
+          name="system.attributes.end.rank"
+          value="{{system.attributes.end.rank}}"
+          data-dtype="Number"
+        />
+  </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "Treated wounds"
+          }}</label>
+        <input
+          type="text"
+          name="system.stats.graveWounds.treated"
+          value="{{system.stats.graveWounds.treated}}"
+          data-dtype="Number"
+        />
+  </div>
+    </div>
 <hr>
   <section class="config-container grid grid-3col"> 
     

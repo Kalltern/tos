@@ -218,7 +218,7 @@
             class="resource-label rollable"
             data-action="roll"
             data-roll-type="secondaryAttribute"
-            data-roll="(@secondaryAttributes.{{key}}.total)+1d12"
+            data-roll="(@secondaryAttributes.{{key}}.total)+(@secondaryAttributes.ini.total)+1d12"
             data-label="{{key}}"
           >
            {{/if}}
@@ -275,7 +275,7 @@
 <div class="stats">
   <div class="stat-row">
     {{#each system.stats as |stat key|}}
-      {{#if (or (eq key "wounds") (eq key "fatigue") (eq key "corruption") (eq key "mind") (eq key "insanity") )}}
+      {{#if (or (eq key "graveWounds") (eq key "fatigue") (eq key "corruption") (eq key "mind") (eq key "insanity") )}}
         <div class="attribute">
           <label>{{localize (concat 'TOS.Actor.Character.stats.' key '.value.label')}}</label>
           

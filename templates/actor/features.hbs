@@ -13,23 +13,23 @@
           </div>
         </li>
 {{#each features as |item|}}
-  <div class="reroll-container ">
-    <span>{{item.system.reroll.name}}</span>
+  {{#if (gt item.system.reroll.value 0)}}  <!-- Now this works -->
+    <div class="reroll-container">
+      <span>{{item.system.reroll.name}}</span>
 
-    <!-- Loop over the reroll value to create icons -->
-{{#each (range 1 item.system.reroll.value) as |n|}}
-
-<i 
-  data-item-id="{{item.id}}" 
-  data-index="{{n}}" 
-  class="reroll-icon fa-duotone fa-light fa-dice-d20  {{#if (array-lookup item.system.reroll.active n)}}active{{/if}}"
-  title="Click to toggle reroll"
-  data-action="toggleReroll">
-</i>
-<hr>
-
-{{/each}}
-  </div>
+      <!-- Loop over the reroll value to create icons -->
+      {{#each (range 1 item.system.reroll.value) as |n|}}
+        <i 
+          data-item-id="{{item.id}}" 
+          data-index="{{n}}" 
+          class="reroll-icon fa-duotone fa-light fa-dice-d20  {{#if (array-lookup item.system.reroll.active n)}}active{{/if}}"
+          title="Click to toggle reroll"
+          data-action="toggleReroll">
+        </i>
+        <hr>
+      {{/each}}
+    </div>
+  {{/if}}
 {{/each}}
 
       </ol>

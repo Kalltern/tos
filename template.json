@@ -20,7 +20,7 @@
               },
        "day":false,
        "armorTotal":0,
-       "headArmorTotal":0,
+       "healthBonus":0,
        "critDamage":0,
        "critRangeMelee":0,
        "critRangeRanged":0,

@@ -39,7 +39,7 @@ Hooks.once("init", function () {
    * @type {String}
    */
   CONFIG.Combat.initiative = {
-    formula: "1d12 + @secondaryAttributes.ini.total",
+    formula: "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total",
     decimals: 0,
   };
 
@@ -90,6 +90,10 @@ Handlebars.registerHelper("range", function (start, end) {
     range.push(i);
   }
   return range;
+});
+
+Handlebars.registerHelper("gt", function (a, b) {
+  return a > b;
 });
 
 Handlebars.registerHelper("hasValue", function(value) {
