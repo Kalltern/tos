@@ -102,14 +102,7 @@ export class ToSActor extends Actor {
       // Calculate the attribute rating using ToS rules.
         stat.max = stat.base + (stat.bonus ?? 0);
     }
-
-    
-    for (let [key, attribute] of Object.entries(systemData.attributes)) {
-      // Calculate the attribute rating using ToS rules. Rework calculations for stun effects
-      attribute.mod = Math.floor(15 + attribute.modBonus + (attribute.bonus + attribute.value) * 10);
-    }
-
-
+ 
     //Loop through skill groups and add their ratings depending on their level and attribute score
     const skillset1 = [0, 15, 25, 30, 35, 45, 50, 55, 65, 75, 85];
     const skillset2 = [0, 5, 10, 15, 20, 30]; // muscles, nimbleness
@@ -146,7 +139,7 @@ export class ToSActor extends Actor {
         if(key === "athletics"){ skill.swimming += skillset1[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;}
         skill.rating = skillset1[skill.value] + (attributeScore[skill.id].total )* 3 + skill.bonus - graveWounds;
       } else if (skill.type === 2) {
-        skill.rating = skillset2[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
+        skill.rating = skillset2[skill.value];
       } else if (skill.type === 3) {
         skill.rating = skillset3[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       } else if (skill.type === 4) {
@@ -159,6 +152,19 @@ export class ToSActor extends Actor {
         skill.rating = skillset7[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       }
     }
+// Calculate the attribute rating using ToS rules. Rework calculations for stun effects
+    for (let [key, attribute] of Object.entries(systemData.attributes)) {
+      attribute.mod = Math.floor(15 + attribute.modBonus + (attribute.bonus + attribute.value) * 10);
+      if(key === "str"){
+        attribute.mod = Math.floor(15 + attribute.modBonus + systemData.skills.muscles.rating + (attribute.bonus + attribute.value) * 10);
+      }
+      if(key === "dex"){
+        attribute.mod = Math.floor(15 + attribute.modBonus + systemData.skills.nimbleness.rating + (attribute.bonus + attribute.value) * 10);
+      }
+    }
+
+
+
     // Iterate through combat skills
     for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
       // Ensure skill type is valid and matches your criteria
@@ -264,7 +270,7 @@ export class ToSActor extends Actor {
      ? 1 
      : (calcSpd[dex] + secAttribute.spd.value + secAttribute.spd.bonus - (stat.fatigue.value >= 3 ? 1 : 0));
      // Calculate resolve from endurance and will
-     const calcResEnd = [0,0,0,1,1,1,2,3,3,3,3];
+     const calcResEnd = [0,0,0,1,1,2,2,3,3,3,3];
      const calcResWill = [0,0,0,1,2,2,3,3,3,3,3];
      secAttribute.res.total = calcResEnd[end] + calcResWill[wil] + secAttribute.res.value + secAttribute.res.bonus;
     // Calculate wounds
