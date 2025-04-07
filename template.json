@@ -849,6 +849,17 @@
       "critDefense": 0,
       "critDodge": 0,
       "dodge": 0,
+      "doctrines": {
+        "cavalry": false,
+        "dimakerus": false,
+        "duelist": false,
+        "monk": false,
+        "pikeman": false,
+        "reaver": false,
+        "rogue": false,
+        "shieldbearer": false,
+        "swordsman": false
+    },
       "effects": {
         "stun": 0,
         "bleed": 0,

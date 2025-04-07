@@ -47,6 +47,9 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     description: {
       template: "systems/tos/templates/item/description.hbs",
     },
+    doctrines: {
+      template: "systems/tos/templates/item/doctrines.hbs",
+    },
     attributesFeature: {
       template: "systems/tos/templates/item/attribute-parts/feature.hbs",
     },
@@ -92,7 +95,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         options.parts.push("attributesRace", "effects");
         break;  
       case "weapon":
-        options.parts.push("attributesWeapon");
+        options.parts.push("attributesWeapon", "doctrines");
         break;
       case "spell":
         options.parts.push("attributesSpell");
@@ -132,8 +135,10 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       case "attributesGear":
       case "attributesRace":
       case "attributesConsumable":
+      case "doctrines":
       case "attributesWeapon":
       case "attributesSpell":
+
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         break;
@@ -206,6 +211,10 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
           tab.id = "effects";
           tab.label += "Effects";
           break;
+          case "doctrines":
+            tab.id = "doctrines";
+            tab.label += "Doctrines";
+            break;
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;

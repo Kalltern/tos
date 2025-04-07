@@ -6,6 +6,8 @@ import { ToSActorSheet } from "./sheets/actor-sheet.mjs";
 import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { TOS } from "./helpers/config.mjs";
+import { usePotion } from "./utils/usePotion.mjs";
+import { getDoctrineBonuses, getWeaponSkillBonuses} from "./utils/combatSkillBonuses.mjs";
 
 
 
@@ -33,6 +35,11 @@ globalThis.tos = {
 Hooks.once("init", function () {
   // Add custom constants for configuration.
   CONFIG.TOS = TOS;
+
+  game.tos = game.tos || {};
+  game.tos.usePotion = usePotion;
+  game.tos.getDoctrineBonuses = getDoctrineBonuses;
+  game.tos.getWeaponSkillBonuses = getWeaponSkillBonuses;
 
   /**
    * Set an initiative formula for the system
