@@ -104,14 +104,3 @@ return {
   weaponSkillCritPen
 };
 }
-
-  export async function getWeaponSkillBonuses(actor, weapon) {
-  // Critical success and failure thresholds
-  let criticalSuccessThreshold = actor.system.combatSkills.combat.criticalSuccessThreshold + (weapon.system.critChance + doctrineCritBonus || 0);
-  let criticalFailureThreshold = actor.system.combatSkills.combat.criticalFailureThreshold - (weapon.system.critFail || 0);
-   // Log thresholds value to confirm
-    return {
-  criticalSuccessThreshold,
-  criticalFailureThreshold,
-};
-}
