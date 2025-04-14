@@ -197,7 +197,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         options.parts.push("features", "inventory", "spells", "miracles", "effects", "config");
         break;
       case "npc":
-        options.parts.push("inventory", "effects");
+        options.parts.push("effects");
         break;
     }
   }

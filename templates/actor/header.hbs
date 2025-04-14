@@ -1,4 +1,5 @@
 {{! Sheet Header }}
+{{#if (eq actor.type "character")}}
 <header class="sheet-header">
   <div class="profile-container">
     <img
@@ -22,7 +23,7 @@
               type="text" 
               class="stat-input stat-current" 
               name="system.stats.health.value"
-              value=" {{system.stats.health.value}}" 
+              value="{{system.stats.health.value}}" 
               data-value="system.stats.health.value"
             />
             
@@ -323,3 +324,316 @@
   
 
 </header>
+{{/if}}
+
+
+{{#if (eq actor.type "npc")}}
+<header class="sheet-header">
+  <div class="profile-container">
+    <img
+      class="profile-img"
+      src="{{actor.img}}"
+      data-edit="img"
+      data-action="onEditImage"
+      title="{{actor.name}}"
+      height="216"
+      width="216"
+    />
+
+  <div class="grid grid-2col">
+ 
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.health.value"
+              value=" {{system.stats.health.value}}" 
+              data-value="system.stats.health.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.health.max}}" 
+              data-value="system.stats.health.max" 
+             />
+          </div>
+        </div>
+
+         <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.stamina.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.stamina.value"
+              value="{{system.stats.stamina.value}}" 
+              data-value="system.stats.stamina.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.stamina.max}}" 
+              data-value="system.stats.stamina.max" 
+              
+            />
+          </div>
+        </div>
+
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.toxicity.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.toxicity.value"
+              value="{{system.stats.toxicity.value}}" 
+              data-value="system.stats.toxicity.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.toxicity.max}}" 
+              data-value="system.stats.toxicity.max" 
+              
+            />
+          </div>
+        </div>
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.mana.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.mana.value"
+              value="{{system.stats.mana.value}}" 
+              data-value="system.stats.mana.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.mana.max}}" 
+              data-value="system.stats.mana.max" 
+              
+            />
+          </div>
+        </div>
+      {{#if system.priest}}
+        <div class="grid-span-1">
+          <label>{{localize (concat 'TOS.Actor.Character.stats.holyEnergy.value.label')}}</label>
+          
+          <!-- Current value input (editable) -->
+          <div class="stat-values">
+            <input 
+              type="text" 
+              class="stat-input stat-current" 
+              name="system.stats.holyEnergy.value"
+              value="{{system.stats.holyEnergy.value}}" 
+              data-value="system.stats.holyEnergy.value"
+            />
+            
+            <!-- Max value input (grayed out, readonly) -->
+            <input 
+              type="text" 
+              class="stat-input stat-max" 
+              value="{{system.stats.holyEnergy.max}}" 
+              data-value="system.stats.holyEnergy.max" 
+              readonly
+            />
+          </div>
+        </div>
+      {{/if}}
+
+  </div>
+</div>
+
+  <div class="header-fields">
+     <div class="grid grid-2col">
+    <div class="document-name grid-span-1 ">
+      <input
+        name="name"
+        type="text"
+        value="{{actor.name}}"
+        placeholder="Name"
+      />
+    </div>
+<div class="grid-span-1">
+  <div class="item-name">
+    <input 
+      type="text" 
+      name="system.raceName" 
+      value="{{system.raceName}}" 
+      placeholder="Choose a race"
+    />
+  </div>
+</div>
+
+    </div>
+    <hr>
+    {{! The grid classes are defined in scss/global/_grid.scss. To use,
+      use both the "grid" and "grid-Ncol" class where "N" can be any number
+      from 1 to 12 and will create that number of columns.  }}
+
+    {{! "flex-group-center" is also defined in the _grid.scss file
+        and it will add a small amount of padding, a border, and will
+        center all of its child elements content and text. }}
+    <div class="attributes flexrow">
+      {{#each system.attributes as |attribute key|}}
+        <div class="attribute flexcolumn flex-group-center">
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll="(@attributes.{{key}}.value)-1d100"
+            data-roll-type="attribute"
+            data-label="{{key}}"
+          >
+            {{localize (lookup @root.config.attributes key)}}
+          </label>
+          <input
+            type="text"
+            name="system.attributes.{{key}}.value"
+            value="{{attribute.value}}"
+            class="attribute-score"
+            data-dtype="Number"
+                 />
+         
+        </div>
+      {{/each}}
+    </div>
+   
+
+ 
+<hr>
+<div class="stats">
+  <div class="stat-row">
+    
+    <div class="attribute-armor">
+      <label class="resource-label">
+        {{localize "TOS.Actor.NPC.FIELDS.mov.label"}}
+      </label>
+      <input
+        type="text"
+        name="system.secondaryAttributes.mov.value"
+        class="attribute-score"
+        data-dtype="Number"
+      />
+    </div>
+
+    <div class="attribute-armor">
+      <label class="resource-label">
+        {{localize "TOS.Actor.Character.SecondaryAttribute.Ini.long"}}
+      </label>
+      <input
+        type="text"
+        name="system.secondaryAttributes.ini.value"
+        class="attribute-score"
+        data-dtype="Number"
+      />
+    </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.armorTotal.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.total"
+      value="{{system.armor.total}}"
+      class="attribute-score"
+      data-dtype="Number"
+      readonly
+    />
+  </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.armor.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.value"
+      value="{{system.armor.value}}"
+      class="attribute-score"
+      data-dtype="Number"
+       />
+  </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.acidArmor.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.acidArmor"
+      value="{{system.armor.acidArmor}}"
+      class="attribute-score"
+      data-dtype="Number"
+    />
+  </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.fireArmor.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.fireArmor"
+      value="{{system.armor.fireArmor}}"
+      class="attribute-score"
+      data-dtype="Number"
+    />
+  </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.frostArmor.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.frostArmor"
+      value="{{system.armor.frostArmor}}"
+      class="attribute-score"
+      data-dtype="Number"
+    />
+  </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.lightningArmor.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.lightningArmor"
+      value="{{system.armor.lightningArmor}}"
+      class="attribute-score"
+      data-dtype="Number"
+    />
+  </div>
+
+  <div class="attribute-armor">
+    <label class="resource-label">{{localize "TOS.Item.Gear.FIELDS.durability.label"}}</label>
+    <input
+      type="text"
+      name="system.armor.durability"
+      value="{{system.armor.durability}}"
+      class="attribute-score"
+      data-dtype="Number"
+    />
+  </div>
+
+  </div>
+</div>
+</div>
+
+
+
+  </div>
+  
+
+</header>
+        {{/if}}

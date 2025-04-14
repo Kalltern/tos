@@ -7,7 +7,14 @@ import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { TOS } from "./helpers/config.mjs";
 import { usePotion } from "./utils/usePotion.mjs";
-import { getDoctrineBonuses, getWeaponSkillBonuses} from "./utils/combatSkillBonuses.mjs";
+import { getDoctrineBonuses, 
+  getWeaponSkillBonuses,
+  getAttackRolls,
+  getDamageRolls,
+  getEffectRolls,
+  getCriticalRolls
+
+ } from "./utils/combatSkillBonuses.mjs";
 
 
 
@@ -40,6 +47,10 @@ Hooks.once("init", function () {
   game.tos.usePotion = usePotion;
   game.tos.getDoctrineBonuses = getDoctrineBonuses;
   game.tos.getWeaponSkillBonuses = getWeaponSkillBonuses;
+  game.tos.getAttackRolls = getAttackRolls;
+  game.tos.getDamageRolls = getDamageRolls;
+  game.tos.getEffectRolls = getEffectRolls;
+  game.tos.getCriticalRolls = getCriticalRolls;
 
   /**
    * Set an initiative formula for the system

@@ -6,13 +6,11 @@
   }
 
   const actor = selectedToken.actor;
-  const weapons = actor.items.filter(i => i.type === "weapon" && 
-          ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-          i.system.thrown !== true ); 
-        if (!weapons.length) {
-          ui.notifications.warn("This actor has no melee weapons.");
-          return;
-        }
+  const weapons = actor.items.filter(i => i.type === "weapon"); 
+  if (!weapons.length) {
+    ui.notifications.warn("This actor has no melee weapons.");
+    return;
+  }
 
   // Create a list of weapon options
   const weaponChoices = weapons.map((weapon, index) => {
@@ -26,33 +24,41 @@
   const handleWeaponSelection = async (weaponIndex) => {
     const weapon = weapons[weaponIndex];
 
-    const {
-      doctrineCritDefenseBonus,
-      doctrineDefenseBonus,
-     } = await game.tos.getDoctrineBonuses(actor, weapon);
+    // Now you can use the selectedWeapon for the defense
+    console.log(`You selected the weapon: ${weapon.name}`);
+
 
     
   // Critical success and failure thresholds
-  let defense = actor.system.combatSkills.meleeDefense
-  let criticalSuccessThreshold = defense.criticalSuccessThreshold + (weapon.system.critDefense) + doctrineCritDefenseBonus;
-  let criticalFailureThreshold = defense.criticalFailureThreshold;
+  let dodge = actor.system.combatSkills.dodge
+  let criticalSuccessThreshold = dodge.criticalSuccessThreshold + (weapon.system.critDodge);
+  let criticalFailureThreshold = dodge.criticalFailureThreshold;
    // Log thresholds value to confirm
   console.log("Crit thresholds for",selectedToken.actor.name,"Success", criticalSuccessThreshold,"Fail", criticalFailureThreshold);
 
-  
+  // Deduct stamina
+let stamina = actor.system.stats.stamina.value ?? 0;
+let staminaCost = 4;
+// Check if the actor has enough stamina
+if (stamina >= staminaCost) {
+  let newStamina = stamina - staminaCost;
+  actor.update({ "system.stats.stamina.value": newStamina });
+} else {
+  ui.notifications.warn("Not enough stamina!");
+  return; 
+}
+let newStamina = Math.max(0, stamina - staminaCost);
+actor.update({ "system.stats.stamina.value": newStamina });
 
   // Roll data setup
   const rollName = this.name;
   const rollData = {
     combatSkills: actor.system.combatSkills,
-    weaponDefense: weapon.system.defense || 0,
-    str: actor.system.attributes.str.value,
-    dex: actor.system.attributes.dex.value,
-    per: actor.system.attributes.per.value,
-    
+     dex: actor.system.attributes.dex.value,
+      
    };
      // DEFENSE ROLL
-  const defenseRollFormula = `@combatSkills.meleeDefense.rating + @weaponDefense + ${doctrineDefenseBonus} - 1d100`;
+  const defenseRollFormula = `@combatSkills.dodge.rating + @weaponDodge - 1d100`;
   
   const defenseRoll = new Roll(defenseRollFormula, rollData);
   await defenseRoll.evaluate();
@@ -61,7 +67,7 @@
   const critSuccess = rollResult <= criticalSuccessThreshold;
   const critFailure = rollResult >= criticalFailureThreshold;
   let deflectChance = 0;
-  if (actor.system.defenseDeflect) {
+  if (actor.system.dodgeDeflect) {
     deflectChance = criticalSuccessThreshold * 2
   }
   const deflect = !critSuccess && rollResult <= deflectChance || 0;
@@ -70,8 +76,6 @@
   const fireArmor = actor.system.fireArmor;
   const frostArmor = actor.system.frostArmor;
   const lightningArmor = actor.system.lightningArmor;
-
-
   // Prepared for deflect
  
   
@@ -101,7 +105,7 @@ if (frostArmor > 0) {
 if (lightningArmor > 0) {
   armorText += `<tr><td>Lightning Armor</td><td>${lightningArmor}</td></tr>`;
 }
-if (actor.system.defenseDeflect) {
+if (actor.system.dodgeDeflect) {
   armorText += `<tr><td>Deflect Chance</td><td>${deflectChance}</td></tr>`;
 }
 
@@ -115,11 +119,10 @@ armorText += `</table>`;
     rolls: [defenseRoll], 
     flavor: `
     <h2>
-      <img src="${weapon.img}" title="${weapon.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
-      Melee defense
+      <img src="${weapon.img}" title="${weapon.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;"> Dodge
     </h2>
     <p style="text-align: center; font-size: 20px;"><b>
-      ${deflect && actor.system.defenseDeflect ? "Deflect" :critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}
+      ${deflect && actor.system.dodgeDeflect  ? "Deflect" :critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}
     </b></p>
     ${armorText}
     <hr>

@@ -823,7 +823,81 @@
     },
     "npc": {
       "templates": ["base"],
-      "cr": 0
+      "cr": 0,
+      "stats": {
+        "health": {
+          "value": 20,
+          "min": 0,
+          "base": 20,
+          "max": 20,
+          "bonus": 0
+        },
+        "stamina": {
+          "value": 0,
+          "min": 0,
+          "base": 0,
+          "max": 5,
+          "bonus": 0
+        },
+        "toxicity": {
+          "value": 0,
+          "min": 0,
+          "base": 25,
+          "max": 25,
+          "bonus": 0
+        },
+        "mana": {
+          "value": 0,
+          "min": 0,
+          "base": 0,
+          "max": 10,
+          "bonus": 0
+        } 
+      },
+      "attributes": {
+        "str": {
+          "value": 50
+
+        },
+        "dex": {
+         "value": 50
+
+        },
+        "end": {
+          "value": 50
+
+        },
+        "int": {
+         "value": 50
+
+        },
+        "wil": {
+         "value": 50
+
+        },
+        "cha": {
+         "value": 50
+
+        },
+        "per": {
+         "value": 50
+        }
+      },
+      "secondaryAttributes": {
+        "mov": {
+          "value": 0
+        },
+        "ini": {
+          "value": 0
+        }
+      },
+      "armor":{"value": 0,
+      "total": 0,
+      "acidArmor": 0,
+      "fireArmor": 0,
+      "frostArmor": 0,
+      "lightningArmor": 0,
+      "durability": 0}
     }
   },
   "Item": {

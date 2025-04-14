@@ -6,13 +6,11 @@
   }
 
   const actor = selectedToken.actor;
-  const weapons = actor.items.filter(i => i.type === "weapon" && 
-          ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-          i.system.thrown !== true ); 
-        if (!weapons.length) {
-          ui.notifications.warn("This actor has no melee weapons.");
-          return;
-        }
+  const weapons = actor.items.filter(i => i.type === "weapon"); 
+  if (!weapons.length) {
+    ui.notifications.warn("This actor has no weapons.");
+    return;
+  }
 
   // Create a list of weapon options
   const weaponChoices = weapons.map((weapon, index) => {
@@ -26,15 +24,18 @@
   const handleWeaponSelection = async (weaponIndex) => {
     const weapon = weapons[weaponIndex];
 
+
     const {
       doctrineCritDefenseBonus,
-      doctrineDefenseBonus,
+      doctrineRangedDefenseBonus,
      } = await game.tos.getDoctrineBonuses(actor, weapon);
+
+
 
     
   // Critical success and failure thresholds
-  let defense = actor.system.combatSkills.meleeDefense
-  let criticalSuccessThreshold = defense.criticalSuccessThreshold + (weapon.system.critDefense) + doctrineCritDefenseBonus;
+  let defense = actor.system.combatSkills.rangedDefense
+  let criticalSuccessThreshold = defense.criticalSuccessThreshold + doctrineCritDefenseBonus;
   let criticalFailureThreshold = defense.criticalFailureThreshold;
    // Log thresholds value to confirm
   console.log("Crit thresholds for",selectedToken.actor.name,"Success", criticalSuccessThreshold,"Fail", criticalFailureThreshold);
@@ -51,8 +52,8 @@
     per: actor.system.attributes.per.value,
     
    };
-     // DEFENSE ROLL
-  const defenseRollFormula = `@combatSkills.meleeDefense.rating + @weaponDefense + ${doctrineDefenseBonus} - 1d100`;
+     // DEFENSE ROLL something like @weaponRangedDefense might be needed here
+  const defenseRollFormula = `@combatSkills.rangedDefense.rating - 1d100 + ${doctrineRangedDefenseBonus}`;
   
   const defenseRoll = new Roll(defenseRollFormula, rollData);
   await defenseRoll.evaluate();
@@ -70,8 +71,6 @@
   const fireArmor = actor.system.fireArmor;
   const frostArmor = actor.system.frostArmor;
   const lightningArmor = actor.system.lightningArmor;
-
-
   // Prepared for deflect
  
   
@@ -116,7 +115,7 @@ armorText += `</table>`;
     flavor: `
     <h2>
       <img src="${weapon.img}" title="${weapon.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
-      Melee defense
+      Ranged defense
     </h2>
     <p style="text-align: center; font-size: 20px;"><b>
       ${deflect && actor.system.defenseDeflect ? "Deflect" :critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}

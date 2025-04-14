@@ -4,7 +4,7 @@
       "Actor": "ToS Actor Sheet",
       "Item": "ToS Item Sheet"
     },
-    "Actor": {
+      "Actor": {
       "Tabs": {
         "Biography": "Biography",
         "TestTab": "TestTab",
@@ -183,7 +183,8 @@
       },
       "NPC": {
         "FIELDS": {
-          "cr": { "label": "CR" }
+          "cr": { "label": "CR" },
+          "mov": { "label": "Movement" }
         },
         "xp": { "label": "XP" }
       }
@@ -225,6 +226,7 @@
       "Gear": {
         "FIELDS": {
           "armor": { "label": "Armor value" },
+          "armorTotal": { "label": "Armor total" },
           "weight": { "label": "Weight" },
           "acidArmor": { "label": "Acid armor value" },
           "fireArmor": { "label": "Fire armor value" },
