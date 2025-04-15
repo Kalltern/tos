@@ -210,7 +210,7 @@ export class ToSActor extends Actor {
        }
        // Check if the actor has predatorySenses enabled
          else if (systemData.predatorySenses) {
-        combatSkill.rating = combatset1[melee] + attributeScore[6].total * 3 + combatSkill.bonus - graveWounds;
+        combatSkill.rating = rangerGroup[ranger] + attributeScore[6].total * 3 + combatSkill.bonus - graveWounds;
          } else if (ranger > 0) { 
           combatSkill.rating = rangerGroup[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         } else {
@@ -230,9 +230,13 @@ export class ToSActor extends Actor {
      
       }
       if (combatSkill.type === 2) {
-        combatSkill.rating = throwing[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
-        if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
+        if(ranger > 0){
+          combatSkill.rating  = combatset1[ranger] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
+        }
+        else if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
         combatSkill.finesseRating = throwing[combat.value] + attributeScore[1].total * 3 + combatSkill.bonus - graveWounds;
+        } else {
+           combatSkill.rating = throwing[combat.value] + attributeScore[combatSkill.id].total * 3 + combatSkill.bonus - graveWounds;
         }
       }
       if (combatSkill.type === 3) {

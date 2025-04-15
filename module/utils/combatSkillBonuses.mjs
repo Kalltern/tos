@@ -10,6 +10,8 @@ export async function getDoctrineBonuses(actor, weapon) {
   let doctrineCritDefenseBonus = 0;
   let doctrineDefenseBonus = 0;
   let doctrineRangedDefenseBonus = 0;
+  let doctrineCritDmg = 0;
+  let doctrineSkillCritPen = 0;
 
     for(const [doctrineName, doctrineValue] of Object.entries(weapon.system.doctrines)){
       if (doctrineValue === true){
@@ -78,6 +80,73 @@ export async function getDoctrineBonuses(actor, weapon) {
             doctrineDefenseBonus = 8;
            }
         }
+        if(doctrineName === "archer" && doctrine.archer.value >= 1){
+          doctrineBonus = 10;
+          if(doctrine.archer.value >= 4){
+            doctrineBleedBonus = 10;
+            doctrineSkillCritPen = 5;
+            doctrineCritDmg = 5;
+            }
+            if(doctrine.archer.value >= 6){
+              doctrineCritBonus = 3;
+              }
+              if(doctrine.archer.value >= 7){
+                doctrineSkillCritPen = 10;
+                doctrineCritDmg = 10;
+                }                          
+        }
+        if(doctrineName === "crossbowman" && doctrine.crossbowman.value >= 1){
+          doctrineBonus = 10;
+          if(doctrine.crossbowman.value >= 4){
+            doctrineSkillCritPen = 5;
+            doctrineCritDmg = 5;
+            }
+            if(doctrine.crossbowman.value >= 6){
+              doctrineBleedBonus = 10;
+              doctrineBonus = 15;
+              }
+              if(doctrine.crossbowman.value >= 7){
+                doctrineSkillCritPen = 10;
+                doctrineCritDmg = 10;
+                }                       
+                if(doctrine.crossbowman.value >= 8){
+                  doctrineCritBonus = 5;
+                  }                                       
+        }
+        if(doctrineName === "peltast" && doctrine.peltast.value >= 1){
+          doctrineBleedBonus = 20;
+          doctrineStunBonus = 10;
+          if(doctrine.peltast.value >= 4){
+            doctrineSkillCritPen = 5;
+            doctrineCritDmg = 5;
+            }
+            if(doctrine.peltast.value >= 6){
+              doctrineCritBonus = 3;
+              }            
+              if(doctrine.peltast.value >= 7){
+                doctrineSkillCritPen = 10;
+                doctrineCritDmg = 10;
+                }   
+                if(doctrine.peltast.value >= 9){
+         // add zatizeni stitu
+                doctrineCritRangeBonus = 2;
+                  }                                        
+        }
+        if(doctrineName === "juggler" && doctrine.juggler.value >= 3){
+          doctrineBonus = 5;
+          if(doctrine.juggler.value >= 2){
+            doctrineCritBonus = 3;
+           }           
+             if(doctrine.juggler.value >= 4){
+              doctrineBleedBonus = 10;
+              doctrineSkillCritPen = 5;
+              doctrineCritDmg = 5;
+           }
+           if(doctrine.juggler.value >= 7){
+            doctrineSkillCritPen = 10;
+            doctrineCritDmg = 10;
+         }
+        }
       }
     }
     console.log(`Doctrine Bonus: ${doctrineBonus}, ${doctrineCritBonus}, ${doctrineCritRangeBonus}, ${doctrineStunBonus}, ${doctrineBleedBonus}`);
@@ -90,7 +159,9 @@ export async function getDoctrineBonuses(actor, weapon) {
       doctrineBleedBonus,
       doctrineRangedDefenseBonus,
       doctrineDefenseBonus,
-      doctrineCritDefenseBonus
+      doctrineCritDefenseBonus,
+      doctrineSkillCritPen,
+      doctrineCritDmg
     };
   }
 
@@ -138,21 +209,37 @@ export async function getAttackRolls(actor, weapon,
   doctrineBonus, doctrineCritBonus, weaponSkillCrit, customAttack
 ) {
 
-  // Critical success and failure thresholds
-   let criticalSuccessThreshold = actor.system.combatSkills.combat.criticalSuccessThreshold + (weapon.system.critChance + doctrineCritBonus + weaponSkillCrit|| 0);
-   let criticalFailureThreshold = actor.system.combatSkills.combat.criticalFailureThreshold - (weapon.system.critFail || 0);
-
-  // ATTACK ROLL
+  let criticalSuccessThreshold = 0;
+  let criticalFailureThreshold = 0;
   const finesse = actor.system.combatSkills.combat.finesseRating;
   const normalCombat = actor.system.combatSkills.combat.rating;
-  let attackRollFormula = (finesse > normalCombat && weapon.system.finesse)
-    ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} - 1d100`
-    : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
-  if(customAttack){
-    attackRollFormula = (finesse > normalCombat && weapon.system.finesse)
-    ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`
-    : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`;
-  }
+  let attackRollFormula = 0;
+
+if(weapon.system.class === 'bow' || weapon.system.class === 'crossbow'){
+  // Critical success and failure thresholds
+  criticalSuccessThreshold = actor.system.combatSkills.archery.criticalSuccessThreshold + doctrineCritBonus + (weapon.system.critChance || 0);
+  criticalFailureThreshold = actor.system.combatSkills.archery.criticalFailureThreshold - (weapon.system.critFail || 0);
+  // ATTACK ROLL
+  attackRollFormula =  `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
+  
+} else {
+  // Critical success and failure thresholds
+  criticalSuccessThreshold = actor.system.combatSkills.combat.criticalSuccessThreshold + (weapon.system.critChance + doctrineCritBonus + weaponSkillCrit|| 0);
+  criticalFailureThreshold = actor.system.combatSkills.combat.criticalFailureThreshold - (weapon.system.critFail || 0);
+// ATTACK ROLL
+attackRollFormula = (finesse > normalCombat && weapon.system.finesse)
+  ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} - 1d100`
+  : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
+if(customAttack){
+  attackRollFormula = (finesse > normalCombat && weapon.system.finesse)
+  ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`
+  : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`;
+}
+
+
+}
+
+
   
   // Roll data setup
   const rollName = this.name;
@@ -181,6 +268,7 @@ export async function getAttackRolls(actor, weapon,
 
   };
 }
+
 
 export async function getDamageRolls(actor, weapon, customDamage) {
   const rollData = {
@@ -216,7 +304,7 @@ export async function getDamageRolls(actor, weapon, customDamage) {
 }
 
 export async function getCriticalRolls(actor, weapon, doctrineCritRangeBonus, attackRoll,
-  weaponSkillCritDmg, weaponSkillCritPen, damageTotal, penetration
+  weaponSkillCritDmg, weaponSkillCritPen, damageTotal, penetration, doctrineCritDmg, doctrineSkillCritPen
 ) {
 
     // CRITICAL SCORE ROLL (only in flavor text)
@@ -242,8 +330,8 @@ export async function getCriticalRolls(actor, weapon, doctrineCritRangeBonus, at
     const critPenetrationMapping = [5, 5, 10, 10, 15];
     const critBonusDamage = critDamageMapping[critScore] + weaponSkillCritDmg || 0;
     const actorCritBonus = Number(actor.system.critDamage) || 0;
-    const critBonusPenetration = critPenetrationMapping[critScore] + perBonus + actorCritBonus + penetration + weaponSkillCritPen || 0;
-    let critDamageTotal = critBonusDamage + perBonus + actorCritBonus + damageTotal;
+    const critBonusPenetration = critPenetrationMapping[critScore] + perBonus + actorCritBonus + penetration + weaponSkillCritPen + doctrineSkillCritPen || 0;
+    let critDamageTotal = critBonusDamage + perBonus + actorCritBonus + damageTotal + doctrineCritDmg;
 
     return {
       critScore,
