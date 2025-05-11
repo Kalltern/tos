@@ -120,7 +120,18 @@ Handlebars.registerHelper("hasValue", function(value) {
 Handlebars.registerHelper('array-lookup', function(array, index) {
   return array && array[index] !== undefined ? array[index] : false;
 });
-
+Handlebars.registerHelper("math", function(left, operator, right) {
+  left = parseFloat(left);
+  right = parseFloat(right);
+  switch (operator) {
+    case "+": return left + right;
+    case "-": return left - right;
+    case "*": return left * right;
+    case "/": return right !== 0 ? left / right : 0;
+    case "%": return left % right;
+    default: return 0;
+  }
+});
 Handlebars.registerHelper("groupSpellsBySchool", function (spells) {
   const grouped = {};
 

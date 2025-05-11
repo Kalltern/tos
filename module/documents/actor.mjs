@@ -122,6 +122,8 @@ export class ToSActor extends Actor {
     const hasFinesse = systemData.finesse;
     const rangeddef = systemData.combatSkills.rangedDefense;
     const stat = systemData.stats;
+    const visage = systemData.secondaryAttributes.vis.total;
+    const sin = systemData.secondaryAttributes.sin.total;
     const graveWounds = ((5 * stat.graveWounds.value)-(3*stat.graveWounds.treated));
     const archery = systemData.combatSkills.archery;
     const combat = systemData.combatSkills.combat;
@@ -147,7 +149,11 @@ export class ToSActor extends Actor {
       } else if (skill.type === 5) {
         skill.rating = skillset5[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       } else if (skill.type === 6) {
-        skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 6 + skill.bonus - graveWounds;
+        if(key === "deception"){skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 5 + (attributeScore[3].total) * 3 + visage + skill.bonus - graveWounds;}
+        if(key === "intimidation"){skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 5 + (attributeScore[0].total) * 3 + (-Math.min(0, visage*2)) + skill.bonus - graveWounds;}
+        if(key === "persuasion"){skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 5 + (attributeScore[4].total) * 3 + visage + skill.bonus - graveWounds;}
+        if(key === "seduction"){skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 5 + (Math.max(attributeScore[6].total, visage)) * 3 + sin + skill.bonus - graveWounds;}
+        if(key === "insight"){skill.rating = skillset6[skill.value] + (attributeScore[skill.id].total ) * 5 + (attributeScore[5].total) * 4 + skill.bonus - graveWounds;}
       } else if (skill.type === 7) {
         skill.rating = skillset7[skill.value] + (attributeScore[skill.id].total ) * 3 + skill.bonus - graveWounds;
       }

@@ -493,7 +493,7 @@
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 5,
+          "id": 6,
           "type": 1,
           "visible":true,
           "bonus": 0
@@ -997,7 +997,7 @@
       "effectOptions": ["and","or"],
       "classOptions": ["support","lesser","greater"],
       "spellTypes": ["fire","water","air","earth","spirit","body","darkness","blood","gnosis"],
-      "dmgTypes": ["fire", "frost", "lightning", "acid", "poison", "magic", "dark", "physical", "psychic","blunt", "piercing", "slash"],
+      "dmgTypes": ["fire", "frost", "lightning", "acid", "poison", "magic", "dark", "physical", "psychic", "blunt", "piercing", "slash"],
       "difficulty": 0,
       "cost": 0,
       "perRound": 0
