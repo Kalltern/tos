@@ -28,6 +28,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       viewDoc: this._viewDoc,
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
+      addConsumable: this._addConsumable,
+      subtractConsumable: this._subtractConsumable,
       toggleEffect: this._toggleEffect,
       roll: this._onRoll,
       toggleDay: this._toggleDay,
@@ -501,6 +503,31 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     await doc.delete();
   }
 
+  /**
+   * Handles item add and subtract
+   *
+   * @this ToSActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @protected
+   */
+  static async _addConsumable(event, target) {
+    const doc = this._getEmbeddedDocument(target);
+    const currentQty = doc.system.quantity;
+    await doc.update({ "system.quantity": currentQty + 1 });
+   }
+
+   static async _subtractConsumable(event, target) {
+    const doc = this._getEmbeddedDocument(target);
+    const currentQty = doc.system.quantity;
+      if (currentQty <= 1) {
+    await doc.delete();
+  } else {
+    await doc.update({ "system.quantity": currentQty - 1 });
+  }
+
+  }
+
 
   /**
    * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
@@ -638,6 +665,9 @@ let label = dataset.label
             skillData.criticalSuccessThreshold, // Use the skill-specific threshold
             skillData.criticalFailureThreshold // Use the skill-specific threshold
           );
+          console.log("Rolled:", d100Result,
+            "Crit chance:", skillData.criticalSuccessThreshold, // Use the skill-specific threshold
+            "Crit fail chance:",skillData.criticalFailureThreshold);
 
           // Modify the label to include critical success/failure indication
           if (criticalMessage) {

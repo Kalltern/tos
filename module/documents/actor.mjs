@@ -41,7 +41,6 @@ export class ToSActor extends Actor {
 
 
 
-    systemData.armorTotal = 0;
     systemData.initiativeBonus = 0; 
     systemData.rerolls = {};
    
@@ -52,8 +51,10 @@ export class ToSActor extends Actor {
             let skill = systemData.skills;
             let combatSkill = systemData.combatSkills;
             
-
-            systemData.armorTotal += item.system.armor.value;
+            if (actorData.type === "character"){
+              systemData.armorTotal += item.system.armor.value;
+            }
+            
             combatSkill.meleeDefense.critbonus += item.system.critDefense ?? 0;
             combatSkill.rangedDefense.critbonus += item.system.rangedCritDefense ?? 0;
             combatSkill.dodge.rating += item.system.dodgePenalty ?? 0;
@@ -407,7 +408,7 @@ export class ToSActor extends Actor {
     systemData.stats.mana.value = Math.min(systemData.stats.mana.value, systemData.stats.mana.max);   
 
    // Define critical thresholds influenced by luck
-    const luck = secAttribute.lck.value;
+    const luck = secAttribute.lck.total;
     const baseCriticalSuccess = 5; // Base critical success threshold
     const baseCriticalFailure = 96 - stat.fatigue.value; // Base critical failure threshold
 
@@ -463,8 +464,15 @@ export class ToSActor extends Actor {
     if (actorData.type !== "npc") return;
 
     // Make modifications to data here. For example:
+    
     const systemData = actorData.system;
     systemData.xp = systemData.cr * systemData.cr * 100;
+    systemData.armorTotal = systemData.armor.value;
+    console.log("Armor value",systemData.armor.value)
+    console.log("Armor",systemData.armor)
+    console.log("ArmorTotal",systemData.armorTotal)
+    
+
   }
 
   /**

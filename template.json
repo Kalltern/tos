@@ -892,7 +892,6 @@
         }
       },
       "armor":{"value": 0,
-      "total": 0,
       "acidArmor": 0,
       "fireArmor": 0,
       "frostArmor": 0,
