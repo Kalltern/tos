@@ -23,7 +23,6 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       createDoc: this._createEffect,
       deleteDoc: this._deleteEffect,
       toggleEffect: this._toggleEffect,
-      
     },
     form: {
       submitOnChange: true,
@@ -31,7 +30,6 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
   };
-
 
   /* -------------------------------------------- */
 
@@ -90,17 +88,16 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         break;
       case "gear":
         options.parts.push("attributesGear", "effects");
-        break;  
+        break;
       case "race":
         options.parts.push("attributesRace", "effects");
-        break;  
+        break;
       case "weapon":
         options.parts.push("attributesWeapon", "doctrines");
         break;
       case "spell":
         options.parts.push("attributesSpell");
         break;
-      
     }
   }
 
@@ -138,7 +135,6 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       case "doctrines":
       case "attributesWeapon":
       case "attributesSpell":
-
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         break;
@@ -211,10 +207,10 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
           tab.id = "effects";
           tab.label += "Effects";
           break;
-          case "doctrines":
-            tab.id = "doctrines";
-            tab.label += "Doctrines";
-            break;
+        case "doctrines":
+          tab.id = "doctrines";
+          tab.label += "Doctrines";
+          break;
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;

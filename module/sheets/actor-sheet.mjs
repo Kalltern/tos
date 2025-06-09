@@ -15,7 +15,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     this.#dragDrop = this.#createDragDropHandlers();
   }
 
-  
   /** @override */
   static DEFAULT_OPTIONS = {
     classes: ["tos", "actor"],
@@ -35,7 +34,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       toggleDay: this._toggleDay,
       toggleEquipped: this._toggleEquipped,
       myAction: this._myAction,
-      toggleReroll: this._toggleReroll
+      toggleReroll: this._toggleReroll,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -47,109 +46,119 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   static _toggleReroll(event) {
     // Ensure we get the element with the correct data attributes
     const target = event.target.closest("[data-action='toggleReroll']");
-    
+
     if (!target) {
       console.debug("Click did not occur on a valid reroll icon.");
       return;
     }
-  
+
     console.debug("Event Target:", target);
-  
-    const itemId = target.dataset.itemId;  // Get item ID
-    const index = parseInt(target.dataset.index);  // Get icon index
-    const actor = this.actor; 
-  
+
+    const itemId = target.dataset.itemId; // Get item ID
+    const index = parseInt(target.dataset.index); // Get icon index
+    const actor = this.actor;
+
     console.debug("Item ID:", itemId);
     console.debug("Index:", index);
-  
+
     if (!itemId || isNaN(index)) {
       console.debug("Invalid itemId or index.");
       return;
     }
-  
+
     // Find the item by its ID
     const item = actor.items.get(itemId);
     if (!item) {
       console.debug("Item not found for ID:", itemId);
       return;
     }
-  
+
     console.debug("Item found:", item);
-  
+
     // Toggle the active state for the reroll
     const rerollActive = item.system.reroll.active || [];
     console.debug("Current rerollActive state:", rerollActive);
-    
-    rerollActive[index] = !rerollActive[index];  // Toggle state
+
+    rerollActive[index] = !rerollActive[index]; // Toggle state
     console.debug("Updated rerollActive state:", rerollActive);
-  
+
     // Save the updated reroll state to the item
-    item.update({
-      'system.reroll.active': rerollActive
-    }).then(() => {
-      console.debug("Reroll state saved for item:", itemId);
-    }).catch(error => {
-      console.error("Failed to update reroll state:", error);
-    });
-  
+    item
+      .update({
+        "system.reroll.active": rerollActive,
+      })
+      .then(() => {
+        console.debug("Reroll state saved for item:", itemId);
+      })
+      .catch((error) => {
+        console.error("Failed to update reroll state:", error);
+      });
+
     // Update the icon's visual state
-    target.classList.toggle('active', rerollActive[index]);
-    console.debug("Icon class toggled:", rerollActive[index] ? "active" : "inactive");
+    target.classList.toggle("active", rerollActive[index]);
+    console.debug(
+      "Icon class toggled:",
+      rerollActive[index] ? "active" : "inactive"
+    );
   }
-  
-  
 
   static _myAction(event) {
     const isChecked = event.target.checked; // Get the state of the checkbox
-    console.log(`My custom action triggered, checkbox is ${isChecked ? 'checked' : 'unchecked'}`);
-    
+    console.log(
+      `My custom action triggered, checkbox is ${
+        isChecked ? "checked" : "unchecked"
+      }`
+    );
   }
-    
+
   static _toggleDay(event) {
     const isChecked = event.target.checked;
-       // Update the actor's day status based on the checkbox state
-    this.actor.update({ 'system.day': isChecked });
-  
-    console.log(`Day is now ${isChecked ? 'active' : 'inactive'}`);
+    // Update the actor's day status based on the checkbox state
+    this.actor.update({ "system.day": isChecked });
+
+    console.log(`Day is now ${isChecked ? "active" : "inactive"}`);
   }
 
   static _toggleEquipped(event) {
     const target = event.target;
     const isChecked = target.checked;
-    const itemId = target.dataset.itemId;  // Get the item ID from the data attribute
-    const actor = this.actor; 
-  
-    console.log("Item ID:", itemId);  // Log the item ID
-  
+    const itemId = target.dataset.itemId; // Get the item ID from the data attribute
+    const actor = this.actor;
+
+    console.log("Item ID:", itemId); // Log the item ID
+
     // Fetch the item using the ID
-    const item = actor.items.get(itemId);  // Use the ID to fetch the actual item object
-  
+    const item = actor.items.get(itemId); // Use the ID to fetch the actual item object
+
     if (item) {
       // Update the item's 'equipped' status
-      item.update({ 'system.equipped': isChecked });
-  
-      console.log(`Item is now ${isChecked ? 'equipped' : 'unequipped'}`);
+      item.update({ "system.equipped": isChecked });
 
-    // Handle the item's effects (enable/disable based on equip status)
-    if (item.effects) {
-      // Loop through each individual effect
-      for (let effect of item.effects) {
-        // Disable effect if unequipped, enable it if equipped
-        effect.disabled = !isChecked; // Set disabled state based on equip status
-        
-        // Update the individual effect
-        effect.update({ 'disabled': effect.disabled });
-        console.log(`Effect ${effect.name} updated: ${isChecked ? 'equipped' : 'unequipped'}`);
+      console.log(`Item is now ${isChecked ? "equipped" : "unequipped"}`);
+
+      // Handle the item's effects (enable/disable based on equip status)
+      if (item.effects) {
+        // Loop through each individual effect
+        for (let effect of item.effects) {
+          // Disable effect if unequipped, enable it if equipped
+          effect.disabled = !isChecked; // Set disabled state based on equip status
+
+          // Update the individual effect
+          effect.update({ disabled: effect.disabled });
+          console.log(
+            `Effect ${effect.name} updated: ${
+              isChecked ? "equipped" : "unequipped"
+            }`
+          );
+        }
       }
-    }
     } else {
       console.log("Item not found!");
     }
   }
 
-
-   /** @override */
-   static PARTS = {
+  /** @override */
+  static PARTS = {
     header: {
       template: "systems/tos/templates/actor/header.hbs",
     },
@@ -196,7 +205,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case "character":
-        options.parts.push("features", "inventory", "spells", "miracles", "effects", "config");
+        options.parts.push(
+          "features",
+          "inventory",
+          "spells",
+          "miracles",
+          "effects",
+          "config"
+        );
         break;
       case "npc":
         options.parts.push("effects");
@@ -204,8 +220,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
 
-
-  
   /* -------------------------------------------- */
 
   /** @override */
@@ -233,8 +247,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   /** @override */
-     async _preparePartContext(partId, context) {
-     switch (partId) {
+  async _preparePartContext(partId, context) {
+    switch (partId) {
       case "features":
       case "testtab":
       case "skills":
@@ -244,7 +258,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       case "config":
         context.tab = context.tabs[partId];
         break;
-         case "biography":
+      case "biography":
         context.tab = context.tabs[partId];
         // Enrich biography info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
@@ -260,7 +274,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           }
         );
         break;
-       case "effects":
+      case "effects":
         context.tab = context.tabs[partId];
         // Prepare active effects
         context.effects = prepareActiveEffectCategories(
@@ -269,12 +283,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           this.actor.allApplicableEffects()
         );
         break;
-        
-      }
+    }
     return context;
   }
-
-  
 
   /**
    * Generates the data for the generic tab navigation template
@@ -329,33 +340,33 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         case "spells":
           tab.id = "spells";
           tab.label += "Spells";
-          
-  // Check if magicPotential exists and is greater than 0
-  if (!this.actor.system.magicPotential || this.actor.system.magicPotential <= 0) {
-    tab.cssClass += " hidden"; // Add 'hidden' class to tab
-  }
-  break;
-  case "miracles":
-    tab.id = "miracles";
-    tab.label += "Miracles";
-  // Check if Priest exists and is greater than 0
-  if (!this.actor.system.priest || this.actor.system.priest <= 0) {
-  tab.cssClass += " hidden"; // Add 'hidden' class to tab
-  }
-        break;
+
+          // Check if magicPotential exists and is greater than 0
+          if (
+            !this.actor.system.magicPotential ||
+            this.actor.system.magicPotential <= 0
+          ) {
+            tab.cssClass += " hidden"; // Add 'hidden' class to tab
+          }
+          break;
+        case "miracles":
+          tab.id = "miracles";
+          tab.label += "Miracles";
+          // Check if Priest exists and is greater than 0
+          if (!this.actor.system.priest || this.actor.system.priest <= 0) {
+            tab.cssClass += " hidden"; // Add 'hidden' class to tab
+          }
+          break;
         case "effects":
           tab.id = "effects";
           tab.label += "Effects";
           break;
-
       }
       if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;
       return tabs;
     }, {});
   }
-
-
 
   /**
    * Organize and classify Items for Actor sheets.
@@ -385,41 +396,39 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       else if (i.type === "feature") {
         features.push(i);
       }
-     // Append to gear.
-     else if (i.type === "gear") {
+      // Append to gear.
+      else if (i.type === "gear") {
         gear.push(i);
-        }
-     // Append to consumable.
-     else if (i.type === "consumable") {
-      consumables.push(i);
       }
-     // Append to item.
-     else if (i.type === "item") {
-      items.push(i);
-    }                  
-    // Append to spells.
-    else if (i.type === "spell") {
-      spells.push(i);
-      
-    }
-    // Append to race.
-     else if (i.type === "race") {
+      // Append to consumable.
+      else if (i.type === "consumable") {
+        consumables.push(i);
+      }
+      // Append to item.
+      else if (i.type === "item") {
+        items.push(i);
+      }
+      // Append to spells.
+      else if (i.type === "spell") {
+        spells.push(i);
+      }
+      // Append to race.
+      else if (i.type === "race") {
         race.push(i);
-         
-          }
+      }
     }
 
     // Sort then assign
     context.weapon = weapon.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    context.consumables = consumables.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.consumables = consumables.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0)
+    );
     context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.race = race.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   }
-
-
 
   /**
    * Actions performed after any render of the Application.
@@ -436,10 +445,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
     // That you may want to implement yourself.
     // Use standard DOM method to select input elements
-    
   }
-
-
 
   /**************
    *
@@ -488,8 +494,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     doc.sheet.render(true);
   }
 
-  
-
   /**
    * Handles item deletion
    *
@@ -515,19 +519,17 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const doc = this._getEmbeddedDocument(target);
     const currentQty = doc.system.quantity;
     await doc.update({ "system.quantity": currentQty + 1 });
-   }
+  }
 
-   static async _subtractConsumable(event, target) {
+  static async _subtractConsumable(event, target) {
     const doc = this._getEmbeddedDocument(target);
     const currentQty = doc.system.quantity;
-      if (currentQty <= 1) {
-    await doc.delete();
-  } else {
-    await doc.update({ "system.quantity": currentQty - 1 });
+    if (currentQty <= 1) {
+      await doc.delete();
+    } else {
+      await doc.update({ "system.quantity": currentQty - 1 });
+    }
   }
-
-  }
-
 
   /**
    * Handle creating a new Owned Item or ActiveEffect for the actor using initial data defined in the HTML dataset
@@ -562,9 +564,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     await docCls.create(docData, { parent: this.actor });
   }
 
-
-  
-
   /**
    * Determines effect parent to pass to helper
    *
@@ -577,9 +576,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const effect = this._getEmbeddedDocument(target);
     await effect.update({ disabled: !effect.disabled });
   }
-
-
-
 
   /**
    * Handle clickable rolls.
@@ -599,7 +595,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         const item = this._getEmbeddedDocument(target);
         if (item) return item.roll();
     }
-    
+
     if (dataset.roll) {
       const attributeMap = {
         Strength: "Str",
@@ -617,33 +613,43 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         Visage: "Vis",
         Initiative: "Ini",
       };
-// Determine if this is a skill or attribute. Combat skills unrollable without macro, left here in case of change
-const isSkillRoll =
-  dataset.rollType === "skill" || dataset.rollType === "combat-skill" || dataset.rollType === "attribute" || dataset.rollType === "secondaryAttribute";
+      // Determine if this is a skill or attribute. Combat skills unrollable without macro, left here in case of change
+      const isSkillRoll =
+        dataset.rollType === "skill" ||
+        dataset.rollType === "combat-skill" ||
+        dataset.rollType === "attribute" ||
+        dataset.rollType === "secondaryAttribute";
 
-  const skillKey = dataset.label;
-// Use dataset.label directly as the key for localization
-const mappedKey = dataset.rollType === "attribute" || "secondaryAttribute" ? attributeMap[skillKey] || skillKey : skillKey;
+      const skillKey = dataset.label;
+      // Use dataset.label directly as the key for localization
+      const mappedKey =
+        dataset.rollType === "attribute" || "secondaryAttribute"
+          ? attributeMap[skillKey] || skillKey
+          : skillKey;
 
-// Use game.i18n to get the localized label for the skill, looking under the correct path in your structure
-let label = dataset.label
-? ` ${game.i18n.localize(
-  dataset.rollType === "combat-skill"
-    ? `TOS.Actor.Character.skills.${skillKey}.label`
-    : dataset.rollType === "attribute"
-    ? `TOS.Actor.Character.Attribute.${skillKey.charAt(0).toUpperCase() + skillKey.slice(1)}.long`
-    : dataset.rollType === "secondaryAttribute"
-    ? `TOS.Actor.Character.SecondaryAttribute.${skillKey.charAt(0).toUpperCase() + skillKey.slice(1)}.long`
-    : `TOS.Actor.Character.skills.${skillKey}.label`
-)}`
-  : "";
+      // Use game.i18n to get the localized label for the skill, looking under the correct path in your structure
+      let label = dataset.label
+        ? ` ${game.i18n.localize(
+            dataset.rollType === "combat-skill"
+              ? `TOS.Actor.Character.skills.${skillKey}.label`
+              : dataset.rollType === "attribute"
+              ? `TOS.Actor.Character.Attribute.${
+                  skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                }.long`
+              : dataset.rollType === "secondaryAttribute"
+              ? `TOS.Actor.Character.SecondaryAttribute.${
+                  skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                }.long`
+              : `TOS.Actor.Character.skills.${skillKey}.label`
+          )}`
+        : "";
       const rollName = label;
 
       const roll = new Roll(dataset.roll, this.actor.getRollData());
       await roll.evaluate();
 
       const d100Result = roll.dice[0]?.total; // Extract the d100 result
-      let skillData = null; 
+      let skillData = null;
       // Only evaluate critical status if it's a skill or combat skill roll
       if (isSkillRoll) {
         // Retrieve the skill data based on the roll type
@@ -651,23 +657,28 @@ let label = dataset.label
         console.log("Roll Type:", dataset.rollType);
         console.log("Skill Key:", skillKey);
         skillData =
-        dataset.rollType === "skill"
-          ? this.actor.system.skills[skillKey]
-          : dataset.rollType === "combat-skill"
-          ? this.actor.system.combatSkills[skillKey] 
-          :  dataset.rollType === "attribute"
-          ? this.actor.system.attributes[skillKey] // Handle attributes
-          : dataset.rollType === "secondaryAttribute";
-   
+          dataset.rollType === "skill"
+            ? this.actor.system.skills[skillKey]
+            : dataset.rollType === "combat-skill"
+            ? this.actor.system.combatSkills[skillKey]
+            : dataset.rollType === "attribute"
+            ? this.actor.system.attributes[skillKey] // Handle attributes
+            : dataset.rollType === "secondaryAttribute";
+
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
             d100Result,
             skillData.criticalSuccessThreshold, // Use the skill-specific threshold
             skillData.criticalFailureThreshold // Use the skill-specific threshold
           );
-          console.log("Rolled:", d100Result,
-            "Crit chance:", skillData.criticalSuccessThreshold, // Use the skill-specific threshold
-            "Crit fail chance:",skillData.criticalFailureThreshold);
+          console.log(
+            "Rolled:",
+            d100Result,
+            "Crit chance:",
+            skillData.criticalSuccessThreshold, // Use the skill-specific threshold
+            "Crit fail chance:",
+            skillData.criticalFailureThreshold
+          );
 
           // Modify the label to include critical success/failure indication
           if (criticalMessage) {
@@ -679,29 +690,27 @@ let label = dataset.label
         }
       }
 
+      if (skillData) {
+        // Deconstruct the critical thresholds from skillData
+        const { criticalSuccessThreshold, criticalFailureThreshold } =
+          skillData;
 
-if (skillData) {
-  // Deconstruct the critical thresholds from skillData
-  const { criticalSuccessThreshold, criticalFailureThreshold } = skillData;
-
-  // Now, pass only the deconstructed values in the flags
-  await roll.toMessage({
-    flavor: `<p style="text-align: center; font-size: 20px;"><b>${label}</b></p>`,
-    rollMode: game.settings.get("core", "rollMode"),
-    flags: {
-      rollName,
-      criticalSuccessThreshold, // Store critical success threshold
-      criticalFailureThreshold, // Store critical failure threshold
-      },
-  });
-} else {
-  console.error("No skill data found for:", skillKey);
-}
+        // Now, pass only the deconstructed values in the flags
+        await roll.toMessage({
+          flavor: `<p style="text-align: center; font-size: 20px;"><b>${label}</b></p>`,
+          rollMode: game.settings.get("core", "rollMode"),
+          flags: {
+            rollName,
+            criticalSuccessThreshold, // Store critical success threshold
+            criticalFailureThreshold, // Store critical failure threshold
+          },
+        });
+      } else {
+        console.error("No skill data found for:", skillKey);
+      }
       return roll;
     }
   }
-
-
 
   evaluateCriticalSuccess(d100Result, successThreshold, failureThreshold) {
     if (d100Result <= successThreshold) {
@@ -908,29 +917,32 @@ if (skillData) {
   async _onDropItem(event, data) {
     if (!this.actor.isOwner) return false;
     const item = await Item.implementation.fromDropData(data);
-    
-  // Prevent adding multiple races
-  if (item.type === "race") {
-    let existingRace = this.actor.items.find(i => i.type === "race");
-    if (existingRace) {
-      ui.notifications.warn("This character already has a race!");
-      return false; // Stop item from being added
+
+    // Prevent adding multiple races
+    if (item.type === "race") {
+      let existingRace = this.actor.items.find((i) => i.type === "race");
+      if (existingRace) {
+        ui.notifications.warn("This character already has a race!");
+        return false; // Stop item from being added
+      }
     }
-  }
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid)
       return this._onSortItem(event, item);
-        // Check if the item is a consumable
-        if (item.type === "consumable") {
-          // Look for an existing stackable consumable with the same name
-          let existingItem = this.actor.items.find(i => i.name === item.name && i.type === "consumable");
-  
-          if (existingItem) {
-              // Increase the quantity instead of creating a new item
-              let newQuantity = (existingItem.system.quantity || 1) + (item.system.quantity || 1);
-              return existingItem.update({ "system.quantity": newQuantity });
-          }
+    // Check if the item is a consumable
+    if (item.type === "consumable") {
+      // Look for an existing stackable consumable with the same name
+      let existingItem = this.actor.items.find(
+        (i) => i.name === item.name && i.type === "consumable"
+      );
+
+      if (existingItem) {
+        // Increase the quantity instead of creating a new item
+        let newQuantity =
+          (existingItem.system.quantity || 1) + (item.system.quantity || 1);
+        return existingItem.update({ "system.quantity": newQuantity });
       }
+    }
 
     // Create the owned item
     return this._onDropItemCreate(item, event);
@@ -1076,8 +1088,4 @@ if (skillData) {
       }
     }
   }
-
-  
-
-
 }

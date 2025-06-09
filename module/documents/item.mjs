@@ -8,68 +8,78 @@ export class ToSItem extends Item {
    */
   prepareData() {
     super.prepareData();
-  
+
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;
-    
+
       let formula = "";
-    
+
       if (this.type === "consumable" || this.type === "spell") {
         // Define a unique formula for consumables
-        formula = `${diceNum}d${diceSize} ${diceBonus ? `+${diceBonus}` : ''}`;
+        formula = `${diceNum}d${diceSize} ${diceBonus ? `+${diceBonus}` : ""}`;
       } else {
         // Default to Strength
         let attr = "str";
-        
-    
+
         if (this.actor) {
           let str = this.actor.system.attributes.str.total;
           let dex = this.actor.system.attributes.dex.total;
           let per = this.actor.system.attributes.per.total;
-          let giant = this.actor.system.giant;
-    
+
           // Check if the actor owns an item named "Finesse"
-          const hasFinesse = this.actor.items.some(item => item.name.toLowerCase() === "finesse");
+          const hasFinesse = this.actor.items.some(
+            (item) => item.name.toLowerCase() === "finesse"
+          );
           // Check if the actor owns an item named "Finesse"
-          const hasGiant = this.actor.items.some(item => item.name.toLowerCase() === "giant");
-    
+          const hasGiant = this.actor.items.some(
+            (item) => item.name.toLowerCase() === "giant"
+          );
+
           // Check if *this* weapon has finesse
           if (this.system.finesse === true && hasFinesse && str <= dex) {
-            attr = "dex";  // Use Dexterity if all conditions are met
+            attr = "dex"; // Use Dexterity if all conditions are met
           }
-    
+
           // Check if *this* weapon is bow or crossbow
           if (this.system.class === "crossbow" || this.system.class === "bow") {
-            attr = "per";  // Use Perception if ranged weapon
+            attr = "per"; // Use Perception if ranged weapon
           }
-          
-         // Check if *this* weapon is throwing and compare str with per
-         if (this.system.thrown && str <= per) {
-            attr = "per"; 
-              // Check if *this* weapon has finesse
-            if (this.system.finesse === true && hasFinesse && str <= dex && str <= per)  {
-              attr = "dex";  // Use Dexterity if all conditions are met
+
+          // Check if *this* weapon is throwing and compare str with per
+          if (this.system.thrown && str <= per) {
+            attr = "per";
+            // Check if *this* weapon has finesse
+            if (
+              this.system.finesse === true &&
+              hasFinesse &&
+              str <= dex &&
+              str <= per
+            ) {
+              attr = "dex"; // Use Dexterity if all conditions are met
             }
-            }
-            if (hasGiant && this.system.class !== "crossbow" && this.system.class !== "bow") {
-              formula = `${diceNum}d${diceSize} + 1d4 + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+          }
+          if (
+            hasGiant &&
+            this.system.class !== "crossbow" &&
+            this.system.class !== "bow"
+          ) {
+            formula = `${diceNum}d${diceSize} + 1d4 + @${attr} ${
+              diceBonus ? `+${diceBonus}` : ""
+            }`;
           } else {
-              formula = `${diceNum}d${diceSize} + @${attr} ${diceBonus ? `+${diceBonus}` : ''}`;
+            formula = `${diceNum}d${diceSize} + @${attr} ${
+              diceBonus ? `+${diceBonus}` : ""
+            }`;
           }
+        }
       }
-      }
-    
+
       // Store the formula in system.formula
       this.system.formula = formula;
 
       // Potentially possible to add roll.total and roll.toMessage
     }
-    
-    
   }
-  
-  
-  
 
   /**
    * Prepare a data object which defines the data schema used by dice roll commands against this Item
@@ -86,12 +96,12 @@ export class ToSItem extends Item {
 
     // Check if the item is owned by an actor
     if (this.actor) {
-    rollData.actor = this.actor.getRollData();
+      rollData.actor = this.actor.getRollData();
 
-    // Include specific actor attributes in rollData
-    rollData.str = this.actor.system.attributes.str.total;
-    rollData.dex = this.actor.system.attributes.dex.total;
-  }
+      // Include specific actor attributes in rollData
+      rollData.str = this.actor.system.attributes.str.total;
+      rollData.dex = this.actor.system.attributes.dex.total;
+    }
 
     return rollData;
   }
