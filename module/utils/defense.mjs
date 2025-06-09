@@ -65,7 +65,7 @@
     deflectChance = criticalSuccessThreshold * 2
   }
   const deflect = !critSuccess && rollResult <= deflectChance || 0;
-  const armor = actor.system.armorTotal;
+  const armor = actor.system.armor.total;
   const acidArmor = actor.system.acidArmor;
   const fireArmor = actor.system.fireArmor;
   const frostArmor = actor.system.frostArmor;

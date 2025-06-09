@@ -19,7 +19,10 @@
         "shepherdOptions": ["persuasion","deception","seduction","intimidation","insight"]
               },
        "day":false,
-       "armorTotal":0,
+       "armor":{
+        "total":0,
+        "natural":0
+              },
        "healthBonus":0,
        "critDamage":0,
        "critRangeMelee":0,

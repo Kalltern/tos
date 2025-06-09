@@ -95,21 +95,21 @@ export async function getDoctrineBonuses(actor, weapon) {
                 doctrineCritDmg = 10;
                 }                          
         }
-        if(doctrineName === "crossbowman" && doctrine.crossbowman.value >= 1){
+        if(doctrineName === "arbalest" && doctrine.arbalest.value >= 1){
           doctrineBonus = 10;
-          if(doctrine.crossbowman.value >= 4){
+          if(doctrine.arbalest.value >= 4){
             doctrineSkillCritPen = 5;
             doctrineCritDmg = 5;
             }
-            if(doctrine.crossbowman.value >= 6){
+            if(doctrine.arbalest.value >= 6){
               doctrineBleedBonus = 10;
               doctrineBonus = 15;
               }
-              if(doctrine.crossbowman.value >= 7){
+              if(doctrine.arbalest.value >= 7){
                 doctrineSkillCritPen = 10;
                 doctrineCritDmg = 10;
                 }                       
-                if(doctrine.crossbowman.value >= 8){
+                if(doctrine.arbalest.value >= 8){
                   doctrineCritBonus = 5;
                   }                                       
         }
