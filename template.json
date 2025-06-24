@@ -7,28 +7,35 @@
         "biography": ""
       }
     },
-    
+
     "character": {
-      "skillvisibility":true,
-       "finesse": false,
-       "steelGrip":false,
-       "predatorySenses":false,
-       "defenseDeflect":false,
-       "dodgeDeflect":false,
-       "shepherdsWill":{
-        "shepherdOptions": ["persuasion","deception","seduction","intimidation","insight"]
-              },
-       "day":false,
-       "armor":{
-        "total":0,
-        "natural":0
-              },
-       "healthBonus":0,
-       "critDamage":0,
-       "critRangeMelee":0,
-       "critRangeRanged":0,
-       "critRangeCast":0,
-       "templates": ["base"],
+      "skillvisibility": true,
+      "finesse": false,
+      "steelGrip": false,
+      "predatorySenses": false,
+      "defenseDeflect": false,
+      "dodgeDeflect": false,
+      "shepherdsWill": {
+        "shepherdOptions": [
+          "persuasion",
+          "deception",
+          "seduction",
+          "intimidation",
+          "insight"
+        ]
+      },
+      "day": false,
+      "armor": {
+        "total": 0,
+        "natural": 0
+      },
+      "healthBonus": 0,
+      "sneakDamageBonus": 0,
+      "critDamage": 0,
+      "critRangeMelee": 0,
+      "critRangeRanged": 0,
+      "critRangeCast": 0,
+      "templates": ["base"],
       "stats": {
         "health": {
           "value": 20,
@@ -102,7 +109,6 @@
           "bonus": 0,
           "cast": 0,
           "power": 0
-
         }
       },
       "effects": {
@@ -111,9 +117,8 @@
         "extra1": 0,
         "extra2": 0,
         "extra3": 0
-    },
-    
-    
+      },
+
       "attributes": {
         "str": {
           "value": 1,
@@ -123,7 +128,6 @@
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         },
         "dex": {
           "value": 1,
@@ -133,7 +137,6 @@
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         },
         "end": {
           "value": 1,
@@ -144,7 +147,6 @@
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         },
         "int": {
           "value": 1,
@@ -154,7 +156,6 @@
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         },
         "wil": {
           "value": 1,
@@ -164,7 +165,6 @@
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         },
         "cha": {
           "value": 1,
@@ -174,17 +174,15 @@
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         },
         "per": {
-          "value": 1, 
+          "value": 1,
           "total": 1,
           "id": 6,
           "critbonus": 0,
           "critfailpenalty": 0,
           "bonus": 0,
           "modBonus": 0
-
         }
       },
       "secondaryAttributes": {
@@ -235,7 +233,7 @@
           "critfailpenalty": 0,
           "id": 0,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "muscles": {
@@ -245,7 +243,7 @@
           "critfailpenalty": 0,
           "id": 0,
           "type": 2,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "smithing": {
@@ -255,7 +253,7 @@
           "critfailpenalty": 0,
           "id": 0,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "acrobacy": {
@@ -265,7 +263,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "craft": {
@@ -275,7 +273,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "dancing": {
@@ -285,7 +283,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 4,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "lockpicking": {
@@ -295,7 +293,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "nimbleness": {
@@ -305,7 +303,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 2,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "pickpocketing": {
@@ -315,7 +313,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "riding": {
@@ -325,7 +323,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 3,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
 
@@ -336,7 +334,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 3,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
 
@@ -347,7 +345,7 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
 
@@ -358,7 +356,7 @@
           "critfailpenalty": 0,
           "id": 2,
           "type": 5,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "alchemy": {
@@ -368,7 +366,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "arcana": {
@@ -378,7 +376,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "art": {
@@ -388,7 +386,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "engineering": {
@@ -398,7 +396,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "firstAid": {
@@ -408,7 +406,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "logic": {
@@ -418,7 +416,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "research": {
@@ -428,7 +426,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "tactics": {
@@ -438,7 +436,7 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "augury": {
@@ -448,7 +446,7 @@
           "critfailpenalty": 0,
           "id": 4,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "dreamwalker": {
@@ -458,7 +456,7 @@
           "critfailpenalty": 0,
           "id": 4,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "meditation": {
@@ -468,7 +466,7 @@
           "critfailpenalty": 0,
           "id": 4,
           "type": 4,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "rituals": {
@@ -478,7 +476,7 @@
           "critfailpenalty": 0,
           "id": 4,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "acting": {
@@ -488,7 +486,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "animalHandling": {
@@ -498,7 +496,7 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "deception": {
@@ -508,7 +506,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 6,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "intimidation": {
@@ -518,7 +516,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 6,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "leadership": {
@@ -528,7 +526,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "music": {
@@ -538,7 +536,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "painting": {
@@ -548,7 +546,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "persuasion": {
@@ -558,7 +556,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 6,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "seduction": {
@@ -568,7 +566,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 6,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
 
@@ -579,7 +577,7 @@
           "critfailpenalty": 0,
           "id": 5,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "herbalism": {
@@ -588,8 +586,8 @@
           "critbonus": 0,
           "critfailpenalty": 0,
           "id": 6,
-          "type": 1,
-          "visible":true,
+          "type": 3,
+          "visible": true,
           "bonus": 0
         },
         "insight": {
@@ -599,7 +597,7 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 6,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "traps": {
@@ -609,7 +607,7 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 1,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         },
         "survival": {
@@ -619,7 +617,7 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 7,
-          "visible":true,
+          "visible": true,
           "bonus": 0
         }
       },
@@ -630,7 +628,7 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 2,
-          "visible":true,
+          "visible": true,
           "finesseRating": 0,
           "bonus": 0,
           "isSkill": 0
@@ -641,10 +639,9 @@
           "critfailpenalty": 0,
           "id": 1,
           "type": 0,
-          "visible":true,
+          "visible": true,
           "bonus": 0,
           "isSkill": 0
-
         },
         "rangedDefense": {
           "rating": 0,
@@ -652,10 +649,9 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 0,
-          "visible":true,
+          "visible": true,
           "bonus": 0,
           "isSkill": 0
-
         },
         "dodge": {
           "rating": 0,
@@ -664,10 +660,9 @@
           "id": 1,
           "type": 1,
           "bonus": 0,
-          "visible":true,
+          "visible": true,
           "isSkill": 0
-
-        },        
+        },
         "combat": {
           "value": 0,
           "rating": 0,
@@ -676,7 +671,7 @@
           "critfailpenalty": 0,
           "id": 0,
           "type": 0,
-          "visible":true,
+          "visible": true,
           "bonus": 0,
           "isSkill": 1
         },
@@ -687,7 +682,7 @@
           "critfailpenalty": 0,
           "id": 6,
           "type": 0,
-          "visible":true,
+          "visible": true,
           "bonus": 0,
           "isSkill": 1
         },
@@ -698,8 +693,8 @@
           "critfailpenalty": 0,
           "id": 3,
           "type": 3,
-          "visible":false,
-          "lindar":false,
+          "visible": false,
+          "lindar": false,
           "bonus": 0,
           "attack": 0,
           "defense": 0,
@@ -712,115 +707,91 @@
           "critfailpenalty": 0,
           "id": 0,
           "type": 5,
-          "visible":false,
+          "visible": false,
           "isSkill": 1
         }
-
       },
       "doctrines": {
-        "swordsman": { "value": 0,
-        "visible":false },       
-        "shieldbearer": { "value": 0,
-        "visible":false },
-        "reaver": { "value": 0,
-        "visible":false },
-        "pikeman": { "value": 0,
-        "visible":false },
-        "dimakerus": { "value": 0,
-        "visible":false },
-        "duelist": { "value": 0,
-        "visible":false },
-        "monk": { "value": 0,
-        "visible":false },
-        "rogue": { "value": 0,
-        "visible":false },
-        "rider": { "value": 0,
-        "visible":false },
-        "archer": { "value": 0,
-        "visible":false },
-        "arbalest": { "value": 0,
-        "visible":false },
-        "peltast": { "value": 0,
-        "visible":false },
-        "juggler": { "value": 0,
-        "visible":false },
-        "musketeer": { "value": 0,
-        "visible":false },
-        "cordinas": { "value": 0,
-        "visible":false },
-        "elymas": { "value": 0,
-        "visible":false },
-        "incantator": { "value": 0,
-        "visible":false },
-        "veneficus": { "value": 0,
-        "visible":false },
-        "elementalist": { "value": 0,
-        "visible":false }
+        "swordsman": { "value": 0, "visible": false },
+        "shieldbearer": { "value": 0, "visible": false },
+        "reaver": { "value": 0, "visible": false },
+        "pikeman": { "value": 0, "visible": false },
+        "dimakerus": { "value": 0, "visible": false },
+        "duelist": { "value": 0, "visible": false },
+        "monk": { "value": 0, "visible": false },
+        "rogue": { "value": 0, "visible": false },
+        "rider": { "value": 0, "visible": false },
+        "archer": { "value": 0, "visible": false },
+        "arbalest": { "value": 0, "visible": false },
+        "peltast": { "value": 0, "visible": false },
+        "juggler": { "value": 0, "visible": false },
+        "musketeer": { "value": 0, "visible": false },
+        "cordinas": { "value": 0, "visible": false },
+        "elymas": { "value": 0, "visible": false },
+        "incantator": { "value": 0, "visible": false },
+        "veneficus": { "value": 0, "visible": false },
+        "elementalist": { "value": 0, "visible": false }
       },
       "weaponSkills": {
-        "swords": { "value": 0,
-        "visible":false },
-        "axes": { "value": 0,
-        "visible":false },
-        "blunt": { "value": 0,
-        "visible":false },
-        "polearms": { "value": 0,
-        "visible":false }
+        "swords": { "value": 0, "visible": false },
+        "axes": { "value": 0, "visible": false },
+        "blunt": { "value": 0, "visible": false },
+        "polearms": { "value": 0, "visible": false }
       },
       "schools": {
         "fire": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "water": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "earth": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "air": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "spirit": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "body": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "darkness": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "blood": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         },
         "gnosis": {
           "value": 0,
-          "visible":false,
-          "spellPower":0,
-          "bonus":0
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
         }
       }
     },
@@ -855,35 +826,29 @@
           "base": 0,
           "max": 10,
           "bonus": 0
-        } 
+        }
       },
       "attributes": {
         "str": {
           "value": 50
-
         },
         "dex": {
-         "value": 50
-
+          "value": 50
         },
         "end": {
           "value": 50
-
         },
         "int": {
-         "value": 50
-
+          "value": 50
         },
         "wil": {
-         "value": 50
-
+          "value": 50
         },
         "cha": {
-         "value": 50
-
+          "value": 50
         },
         "per": {
-         "value": 50
+          "value": 50
         }
       },
       "secondaryAttributes": {
@@ -894,16 +859,77 @@
           "value": 0
         }
       },
-      "armor":{"value": 0,
-      "acidArmor": 0,
-      "fireArmor": 0,
-      "frostArmor": 0,
-      "lightningArmor": 0,
-      "durability": 0}
+      "combatSkills": {
+        "throwing": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        },
+        "meleeDefense": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        },
+        "rangedDefense": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        },
+        "dodge": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        },
+        "combat": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        },
+        "archery": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        },
+        "channeling": {
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "value": 0,
+          "bonus": 0
+        }
+      },
+      "armor": {
+        "value": 0,
+        "acidArmor": 0,
+        "fireArmor": 0,
+        "frostArmor": 0,
+        "lightningArmor": 0,
+        "durability": 0
+      }
     }
   },
   "Item": {
-    "types": ["gear", "feature", "spell", "race", "weapon","item","consumable"],
+    "types": [
+      "gear",
+      "feature",
+      "spell",
+      "race",
+      "weapon",
+      "item",
+      "consumable"
+    ],
     "htmlFields": ["description"],
     "templates": {
       "base": {
@@ -913,8 +939,16 @@
 
     "weapon": {
       "templates": ["base"],
-      "class":"",
-      "classOptions": ["axe", "blunt", "sword", "polearm", "bow", "crossbow","firearm"],
+      "class": "",
+      "classOptions": [
+        "axe",
+        "blunt",
+        "sword",
+        "polearm",
+        "bow",
+        "crossbow",
+        "firearm"
+      ],
       "type": ["light", "medium", "heavy"],
       "weight": 0,
       "attack": 0,
@@ -935,26 +969,28 @@
         "rogue": false,
         "shieldbearer": false,
         "swordsman": false
-    },
+      },
       "effects": {
         "stun": 0,
         "bleed": 0,
         "extra1": 0,
         "extra2": 0,
         "extra3": 0
-    }
-      },
-      "gear": {
+      }
+    },
+    "gear": {
       "templates": ["base"],
       "equipped": false,
       "layerOptions": ["Not Armor", "Bottom", "Middle", "Top"],
-      "armor":{"value": 0,
-      "acidArmor": 0,
-      "fireArmor": 0,
-      "frostArmor": 0,
-      "lightningArmor": 0,
-      "durability": 0},
-      "weight":0,
+      "armor": {
+        "value": 0,
+        "acidArmor": 0,
+        "fireArmor": 0,
+        "frostArmor": 0,
+        "lightningArmor": 0,
+        "durability": 0
+      },
+      "weight": 0,
       "helmet": false,
       "shield": false,
       "swimPenalty": 0,
@@ -971,16 +1007,15 @@
       "rangedCritDefense": 0,
       "archeryPenalty": 0,
       "perPenalty": 0
-
     },
     "feature": {
       "templates": ["base"],
-      "options": ["feature","trait","priest"],
+      "options": ["feature", "trait", "priest"],
       "reroll": {
         "name": "",
         "active": [false, false],
         "value": 0
-    }
+      }
     },
     "race": {
       "templates": ["base"]
@@ -993,17 +1028,39 @@
     },
     "spell": {
       "templates": ["base"],
-      "options": ["divine","magic"],
-      "spellRanks": ["wild","apprentice","expert","master","grandmaster"],
-      "miracleRanks": ["novice","acolyte","cleric"],
-      "effectOptions": ["and","or"],
-      "classOptions": ["support","lesser","greater"],
-      "spellTypes": ["fire","water","air","earth","spirit","body","darkness","blood","gnosis"],
-      "dmgTypes": ["fire", "frost", "lightning", "acid", "poison", "magic", "dark", "physical", "psychic", "blunt", "piercing", "slash"],
+      "options": ["divine", "magic"],
+      "spellRanks": ["wild", "apprentice", "expert", "master", "grandmaster"],
+      "miracleRanks": ["novice", "acolyte", "cleric"],
+      "effectOptions": ["and", "or"],
+      "classOptions": ["support", "lesser", "greater"],
+      "spellTypes": [
+        "fire",
+        "water",
+        "air",
+        "earth",
+        "spirit",
+        "body",
+        "darkness",
+        "blood",
+        "gnosis"
+      ],
+      "dmgTypes": [
+        "fire",
+        "frost",
+        "lightning",
+        "acid",
+        "poison",
+        "magic",
+        "dark",
+        "physical",
+        "psychic",
+        "blunt",
+        "piercing",
+        "slash"
+      ],
       "difficulty": 0,
       "cost": 0,
       "perRound": 0
-
     }
   }
 }

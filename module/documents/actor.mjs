@@ -107,7 +107,7 @@ export class ToSActor extends Actor {
     //Loop through skill groups and add their ratings depending on their level and attribute score
     const skillset1 = [0, 15, 25, 30, 35, 45, 50, 55, 65, 75, 85];
     const skillset2 = [0, 5, 10, 15, 20, 30]; // muscles, nimbleness
-    const skillset3 = [0, 25, 40, 55, 70, 85]; //riding and sailing
+    const skillset3 = [0, 25, 40, 55, 70, 85]; //riding and sailing and herbalism
     const skillset4 = [0, 40, 65, 90]; //dancing, meditation
     const skillset5 = [0, 10, 20, 30, 40, 50]; //drinking
     const skillset6 = [0, 5, 10, 15, 20, 25]; //social
@@ -415,6 +415,11 @@ export class ToSActor extends Actor {
     const per = attribute.per.total;
     const cha = attribute.cha.total;
 
+    // Calculate sneak damage
+    const calcRogueSneakDamage = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4];
+    systemData.sneakDamage =
+      calcRogueSneakDamage[systemData.doctrines.rogue.value] +
+      systemData.sneakDamageBonus;
     // Calculate initiative
     const calcIni = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5];
     secAttribute.ini.total =
@@ -429,6 +434,7 @@ export class ToSActor extends Actor {
           secAttribute.spd.value +
           secAttribute.spd.bonus -
           (stat.fatigue.value >= 3 ? 1 : 0);
+
     // Calculate resolve from endurance and will
     const calcResEnd = [0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3];
     const calcResWill = [0, 0, 0, 1, 2, 2, 3, 3, 3, 3, 3];
@@ -437,15 +443,18 @@ export class ToSActor extends Actor {
       calcResWill[wil] +
       secAttribute.res.value +
       secAttribute.res.bonus;
+
     // Calculate wounds
     const calcWounds = [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2];
     stat.graveWounds.max =
       calcWounds[end] + stat.graveWounds.base + stat.graveWounds.bonus;
+
     // Calculate critRanges
     const calcCritRange = [0, 0, 0, 0, 1, 1, 2, 3, 3, 3, 3];
     systemData.critRangeMelee = calcCritRange[str] + calcCritRange[per];
     systemData.critRangeRanged = calcCritRange[per];
     systemData.critRangeCast = calcCritRange[int];
+
     // Calculate misc
     secAttribute.lck.total = secAttribute.lck.value + secAttribute.lck.bonus;
     secAttribute.vis.total = secAttribute.vis.value + secAttribute.vis.bonus;
@@ -453,6 +462,7 @@ export class ToSActor extends Actor {
     secAttribute.fth.total = secAttribute.fth.value + secAttribute.fth.bonus;
     stat.corruption.max = stat.corruption.base + stat.corruption.bonus;
     stat.fatigue.max = stat.fatigue.base + stat.fatigue.bonus;
+
     // persuasion seduction deception intimidation insight ; shepherds will
     if (systemData.priest) {
       stat.holyEnergy.max =
@@ -462,10 +472,10 @@ export class ToSActor extends Actor {
       stat.holyEnergy.power =
         secAttribute.fth.total + (stat.holyEnergy.power.bonus || 0);
       let chosenSkill = systemData.shepherdsWill.skill;
+
       // Check if the chosen skill is valid
       if (systemData.shepherdsWill.shepherdOptions.includes(chosenSkill)) {
-        let skill = systemData.skills[chosenSkill]; // Get the skill dynamically
-
+        let skill = systemData.skills[chosenSkill];
         if (skill.id === 5) {
           // Replace its core attribute with Willpower (Wil)
           skill.rating += (-cha + wil) * 6;
@@ -487,6 +497,7 @@ export class ToSActor extends Actor {
       stat.health.bonus +
       str +
       (systemData.healthBonus || 0);
+
     // Calculate toxicity
     systemData.stats.toxicity.max =
       end * 2 + stat.toxicity.bonus + stat.toxicity.base;
@@ -606,7 +617,7 @@ export class ToSActor extends Actor {
       );
     }
 
-    // Prevent current health exceed max
+    // Prevent current stat exceed max
     systemData.stats.health.value = Math.min(
       systemData.stats.health.value,
       systemData.stats.health.max
@@ -622,6 +633,10 @@ export class ToSActor extends Actor {
     systemData.stats.mana.value = Math.min(
       systemData.stats.mana.value,
       systemData.stats.mana.max
+    );
+    systemData.stats.mind.value = Math.min(
+      systemData.stats.mind.value,
+      systemData.stats.mind.max
     );
 
     // Define critical thresholds influenced by luck
@@ -685,6 +700,8 @@ export class ToSActor extends Actor {
     console.log("Armor value", systemData.armor.value);
     console.log("Armor", systemData.armor);
     console.log("ArmorTotal", systemData.armor.total);
+
+    combatSkill.rating = combatSkill.bonus + combatSkill.value;
   }
 
   /**

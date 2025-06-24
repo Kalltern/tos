@@ -4,7 +4,7 @@
       "Actor": "ToS Actor Sheet",
       "Item": "ToS Item Sheet"
     },
-      "Actor": {
+    "Actor": {
       "Tabs": {
         "Biography": "Biography",
         "TestTab": "TestTab",
@@ -85,7 +85,7 @@
           "Ini": { "long": "Initiative", "abbr": "ini" }
         },
         "skills": {
-          "athletics": { "label": "Athletics"},
+          "athletics": { "label": "Athletics" },
           "muscles": { "label": "Muscles" },
           "smithing": { "label": "Smithing" },
           "acrobacy": { "label": "Acrobacy" },
@@ -124,8 +124,6 @@
           "insight": { "label": "Insight" },
           "traps": { "label": "Traps" },
           "survival": { "label": "Survival" }
-
-
         },
         "combatSkills": {
           "throwing": { "label": "Throwing" },
@@ -136,7 +134,6 @@
           "archery": { "label": "Archery" },
           "channeling": { "label": "Channeling" },
           "ranger": { "label": "Ranger" }
-
         },
         "doctrines": {
           "swordsman": { "label": "Swordsman" },
@@ -166,7 +163,7 @@
           "polearms": { "label": "Polearms" }
         },
         "schools": {
-          "fire": { "label": "Fire"},
+          "fire": { "label": "Fire" },
           "water": { "label": "Water" },
           "earth": { "label": "Earth" },
           "air": { "label": "Air" },
@@ -176,10 +173,7 @@
           "blood": { "label": "Blood" },
           "gnosis": { "label": "Gnosis" },
           "spellPower": { "label": "Spell Power" }
-
-
         }
-
       },
       "NPC": {
         "FIELDS": {
@@ -218,6 +212,7 @@
           "weight": { "label": "Weight" },
           "penetration": { "label": "Penetration" },
           "breakthrough": { "label": "Breakthrough" },
+          "sneakDamage": { "label": "Sneak Damage" },
           "extra1": { "label": "Extra Effect" },
           "extra2": { "label": "Extra Effect" },
           "extra3": { "label": "Extra Effect" }
