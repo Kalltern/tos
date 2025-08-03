@@ -199,13 +199,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
     // Not all parts always render, add "testtab" for testing
-    options.parts = ["header", "tabs", "biography", "skills"];
+    options.parts = ["header", "tabs", "biography"];
     // Don't show the other tabs if only limited view
     if (this.document.limited) return;
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case "character":
         options.parts.push(
+          "skills",
           "features",
           "inventory",
           "spells",
@@ -215,7 +216,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         );
         break;
       case "npc":
-        options.parts.push("effects");
+        options.parts.push("features", "inventory", "effects");
         break;
     }
   }

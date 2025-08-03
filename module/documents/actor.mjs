@@ -32,43 +32,42 @@ export class ToSActor extends Actor {
     const systemData = actorData.system;
     const flags = actorData.flags.tos || {};
 
-    // Make separate methods for each Actor type (character, npc, etc.) to keep
-    // things organized.
-    this._prepareCharacterData(actorData);
-    this._prepareNpcData(actorData);
-
     systemData.rerolls = {};
     let skill = systemData.skills;
     let combatSkill = systemData.combatSkills;
     let secondaryAttribute = systemData.secondaryAttributes;
-
     // Iterate through gear
-    let totalArmor = systemData.armor.natural;
+    let totalArmor = 0;
     for (const item of this.items) {
       if (item.type === "gear" && item.system.equipped) {
         if (actorData.type === "character") {
-          totalArmor += item.system.armor.value;
+          skill.acrobacy.bonus += item.system.acroPenalty ?? 0;
+          skill.athletics.swimming += item.system.swimPenalty ?? 0;
+          skill.stealth.bonus += item.system.stealthPenalty ?? 0;
+          secondaryAttribute.ini.bonus += item.system.iniPenalty ?? 0;
+          secondaryAttribute.spd.max += item.system.maxSpeed ?? 0;
         }
-
+        totalArmor += item.system.armor.value;
         combatSkill.meleeDefense.critbonus += item.system.critDefense ?? 0;
         combatSkill.rangedDefense.critbonus +=
           item.system.rangedCritDefense ?? 0;
-        combatSkill.dodge.rating += item.system.dodgePenalty ?? 0;
-        combatSkill.channeling.rating += item.system.castPenalty ?? 0;
-        combatSkill.rangedDefense.rating += item.system.rangedDefense ?? 0;
-        combatSkill.meleeDefense.rating += item.system.defense ?? 0;
-        skill.acrobacy.rating += item.system.acroPenalty ?? 0;
-        skill.athletics.swimming += item.system.swimPenalty ?? 0; // note : add swimming calculation to the skills
-        skill.stealth.rating += item.system.stealthPenalty ?? 0;
+        combatSkill.dodge.bonus += item.system.dodgePenalty ?? 0;
+        console.log("Actor type", this.type);
+        combatSkill.channeling.bonus += item.system.castPenalty ?? 0;
+        console.log("Channeling after equipping", combatSkill.channeling.bonus);
+        combatSkill.rangedDefense.bonus += item.system.rangedDefense ?? 0;
+        combatSkill.meleeDefense.bonus += item.system.defense ?? 0;
 
-        secondaryAttribute.ini.bonus += item.system.iniPenalty ?? 0;
-        secondaryAttribute.spd.max += item.system.maxSpeed ?? 0;
-        systemData.healthBonus += item.system.healthBonus ?? 0; // has to be fixed, healthBonus is not applied to actor
+        systemData.stats.health.bonus += item.system.healthBonus ?? 0;
       }
-
-      if (actorData.type === "character") {
-        systemData.armor.total = totalArmor;
-      }
+    }
+    if (actorData.type === "character") {
+      systemData.armor.total = totalArmor + systemData.armor.natural;
+      console.log("totalArmor PC", totalArmor);
+    }
+    if (actorData.type === "npc") {
+      systemData.armor.total = totalArmor + systemData.armor.natural;
+      console.log("totalArmor NPC", totalArmor);
     }
 
     // Iterate through gear (only helmets)
@@ -79,6 +78,10 @@ export class ToSActor extends Actor {
         systemData.dodgePenalty += item.system.perPenalty ?? 0;
       }
     }
+    // Make separate methods for each Actor type (character, npc, etc.) to keep
+    // things organized.
+    this._prepareCharacterData(actorData);
+    this._prepareNpcData(actorData);
   }
 
   /**
@@ -492,11 +495,7 @@ export class ToSActor extends Actor {
 
     // Calculate Health, systemData.healthBonus comes from Armor
     systemData.stats.health.max =
-      end * attribute.end.rank +
-      stat.health.base +
-      stat.health.bonus +
-      str +
-      (systemData.healthBonus || 0);
+      end * attribute.end.rank + stat.health.base + stat.health.bonus + str;
 
     // Calculate toxicity
     systemData.stats.toxicity.max =
@@ -691,17 +690,16 @@ export class ToSActor extends Actor {
    */
   _prepareNpcData(actorData) {
     if (actorData.type !== "npc") return;
-
-    // Make modifications to data here. For example:
-
     const systemData = actorData.system;
+    // Make modifications to data here. For example:
+    for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
+      combatSkill.rating = combatSkill.value + combatSkill.bonus;
+    }
+
     systemData.xp = systemData.cr * systemData.cr * 100;
-    systemData.armor.total = systemData.armor.value;
-    console.log("Armor value", systemData.armor.value);
+    console.log("Armor natural", systemData.armor.natural);
     console.log("Armor", systemData.armor);
     console.log("ArmorTotal", systemData.armor.total);
-
-    combatSkill.rating = combatSkill.bonus + combatSkill.value;
   }
 
   /**

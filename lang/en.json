@@ -220,13 +220,13 @@
       },
       "Gear": {
         "FIELDS": {
-          "armor": { "label": "Armor value" },
+          "armor": { "label": "Armor" },
           "armorTotal": { "label": "Armor total" },
           "weight": { "label": "Weight" },
-          "acidArmor": { "label": "Acid armor value" },
-          "fireArmor": { "label": "Fire armor value" },
-          "frostArmor": { "label": "Frost armor value" },
-          "lightningArmor": { "label": "Lightning armor value" },
+          "acidArmor": { "label": "Acid armor" },
+          "fireArmor": { "label": "Fire armor" },
+          "frostArmor": { "label": "Frost armor" },
+          "lightningArmor": { "label": "Lightning armor" },
           "equipped": { "label": "Equipped" },
           "layer": { "label": "Armor layer" },
           "helmet": { "label": "Has head" },

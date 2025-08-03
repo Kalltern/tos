@@ -46,7 +46,20 @@ export async function getDoctrineBonuses(actor, weapon) {
   let doctrineRangedDefenseBonus = 0;
   let doctrineCritDmg = 0;
   let doctrineSkillCritPen = 0;
-
+  if (actor.type === "npc") {
+    return {
+      doctrineBonus: 0,
+      doctrineCritBonus: 0,
+      doctrineCritRangeBonus: 0,
+      doctrineStunBonus: 0,
+      doctrineBleedBonus: 0,
+      doctrineCritDefenseBonus: 0,
+      doctrineDefenseBonus: 0,
+      doctrineRangedDefenseBonus: 0,
+      doctrineCritDmg: 0,
+      doctrineSkillCritPen: 0,
+    };
+  }
   for (const [doctrineName, doctrineValue] of Object.entries(
     weapon.system.doctrines
   )) {
@@ -211,6 +224,14 @@ export async function getWeaponSkillBonuses(actor, weapon) {
   let weaponSkillCritDmg = 0;
   let weaponSkillCritPen = 0;
 
+  if (actor.type === "npc") {
+    return {
+      weaponSkillEffect: 0,
+      weaponSkillCrit: 0,
+      weaponSkillCritDmg: 0,
+      weaponSkillCritPen: 0,
+    };
+  }
   for (const [skillName, skillValue] of Object.entries(weaponSkill)) {
     // Match singular weapon class to plural skill name
     const className = weapon.system.class;

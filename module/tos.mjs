@@ -1,22 +1,21 @@
 // Import document classes.
 import { ToSActor } from "./documents/actor.mjs";
 import { ToSItem } from "./documents/item.mjs";
+import { ToSCombat } from "./documents/combat.mjs";
 // Import sheet classes.
 import { ToSActorSheet } from "./sheets/actor-sheet.mjs";
 import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { TOS } from "./helpers/config.mjs";
 import { usePotion } from "./utils/usePotion.mjs";
-import { getDoctrineBonuses, 
+import {
+  getDoctrineBonuses,
   getWeaponSkillBonuses,
   getAttackRolls,
   getDamageRolls,
   getEffectRolls,
-  getCriticalRolls
-
- } from "./utils/combatSkillBonuses.mjs";
-
-
+  getCriticalRolls,
+} from "./utils/combatSkillBonuses.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -25,10 +24,10 @@ import { getDoctrineBonuses,
 // Add key classes to the global scope so they can be more easily used
 // by downstream developers
 globalThis.tos = {
-  
   documents: {
     ToSActor,
     ToSItem,
+    ToSCombat,
   },
   applications: {
     ToSActorSheet,
@@ -56,14 +55,17 @@ Hooks.once("init", function () {
    * Set an initiative formula for the system
    * @type {String}
    */
+
   CONFIG.Combat.initiative = {
-    formula: "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total",
+    formula:
+      "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total",
     decimals: 0,
   };
 
   // Define custom Document classes
   CONFIG.Actor.documentClass = ToSActor;
   CONFIG.Item.documentClass = ToSItem;
+  CONFIG.Combat.documentClass = ToSCombat;
 
   // Active Effects are never copied to the Actor,
   // but will still apply to the Actor from within the Item
@@ -114,22 +116,28 @@ Handlebars.registerHelper("gt", function (a, b) {
   return a > b;
 });
 
-Handlebars.registerHelper("hasValue", function(value) {
+Handlebars.registerHelper("hasValue", function (value) {
   return value !== null && value !== undefined && value !== "";
 });
-Handlebars.registerHelper('array-lookup', function(array, index) {
+Handlebars.registerHelper("array-lookup", function (array, index) {
   return array && array[index] !== undefined ? array[index] : false;
 });
-Handlebars.registerHelper("math", function(left, operator, right) {
+Handlebars.registerHelper("math", function (left, operator, right) {
   left = parseFloat(left);
   right = parseFloat(right);
   switch (operator) {
-    case "+": return left + right;
-    case "-": return left - right;
-    case "*": return left * right;
-    case "/": return right !== 0 ? left / right : 0;
-    case "%": return left % right;
-    default: return 0;
+    case "+":
+      return left + right;
+    case "-":
+      return left - right;
+    case "*":
+      return left * right;
+    case "/":
+      return right !== 0 ? left / right : 0;
+    case "%":
+      return left % right;
+    default:
+      return 0;
   }
 });
 Handlebars.registerHelper("groupSpellsBySchool", function (spells) {
@@ -147,22 +155,24 @@ Handlebars.registerHelper("groupSpellsBySchool", function (spells) {
         }
 
         grouped[school].push(spell);
-      } 
-    } 
+      }
+    }
   }
 
   console.log("Final grouped spells:", grouped);
 
   // Return grouped spells as an array of objects with school and spells
-  return Object.entries(grouped).map(([school, spells]) => ({ school, spells }));
+  return Object.entries(grouped).map(([school, spells]) => ({
+    school,
+    spells,
+  }));
 });
-
 
 Handlebars.registerHelper("groupBySchool", function (spells, options) {
   const schools = {};
 
   // Group spells by school type
-  spells.forEach(spell => {
+  spells.forEach((spell) => {
     const school = spell.system.type; // Assuming `type` is the school field
     if (!schools[school]) {
       schools[school] = [];
@@ -173,16 +183,14 @@ Handlebars.registerHelper("groupBySchool", function (spells, options) {
   // Convert into an array to loop over in Handlebars
   return Object.entries(schools).map(([school, spells]) => ({
     school,
-    spells
+    spells,
   }));
 });
 
-Handlebars.registerHelper('healthPercentage', function(current, max) {
+Handlebars.registerHelper("healthPercentage", function (current, max) {
   if (max === 0) return 0; // Avoid division by zero
   return (current / max) * 100;
 });
-
-
 
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
@@ -260,13 +268,14 @@ function rollItemMacro(itemUuid) {
 }
 
 Hooks.on("renderChatMessage", (message, html, data) => {
-  
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
     // Add logic to check if the message is a roll message
     if (message.content.includes("rolled") || message.rolls.length > 0) {
       // Create a reroll button element
-      const rerollButton = $('<button class="d100-reroll-button">Re-Roll</button>');
+      const rerollButton = $(
+        '<button class="d100-reroll-button">Re-Roll</button>'
+      );
 
       // Check if a button container already exists, if not, create one
       let buttonContainer = html.find(".button-container");
@@ -294,20 +303,19 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         const deflectChance = message.flags.deflectChance;
         const critSuccess = d100Result <= criticalSuccessThreshold;
         const rollName = message.flags.rollName;
-        
 
-        let flavorText = ""
+        let flavorText = "";
 
         if (critSuccess) {
           flavorText = "Critical Success!";
         } else if (d100Result >= criticalFailureThreshold) {
           flavorText = "Critical Failure!";
-        } else if (!critSuccess && d100Result <= deflectChance){
-          flavorText = "Deflect!"
+        } else if (!critSuccess && d100Result <= deflectChance) {
+          flavorText = "Deflect!";
         } else {
           flavorText = "";
         }
-        
+
         // Send the new roll to chat or update the message as needed
         roll.toMessage({
           speaker: ChatMessage.getSpeaker({ user: game.user }),
@@ -319,13 +327,11 @@ Hooks.on("renderChatMessage", (message, html, data) => {
             criticalSuccessThreshold, // Store critical success threshold
             criticalFailureThreshold, // Store critical failure threshold
           },
-          
         });
       });
     }
   }
 });
-
 
 Hooks.once("ready", () => {
   // Listen for checkbox changes to update skill visibility
@@ -333,11 +339,12 @@ Hooks.once("ready", () => {
     let skillKey = $(this).attr("data-skill");
     let isChecked = $(this).prop("checked");
 
-    console.log(`Toggling visibility for skill: ${skillKey}, Checked: ${isChecked}`);
+    console.log(
+      `Toggling visibility for skill: ${skillKey}, Checked: ${isChecked}`
+    );
 
-   // Target the specific skill entry
-   let skillEntry = $(`.skill-entry[data-skill="${skillKey}"]`);  // Ensure uniqueness with section-based targeting
-
+    // Target the specific skill entry
+    let skillEntry = $(`.skill-entry[data-skill="${skillKey}"]`); // Ensure uniqueness with section-based targeting
 
     // Reverse the logic: if checked, hide the skill, else show the skill
     if (isChecked) {
@@ -345,11 +352,5 @@ Hooks.once("ready", () => {
     } else {
       skillEntry.removeClass("hidden-skill");
     }
-  
-
   });
- 
-  
-  
-  
 });
