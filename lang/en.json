@@ -133,7 +133,8 @@
           "combat": { "label": "Combat" },
           "archery": { "label": "Archery" },
           "channeling": { "label": "Channeling" },
-          "ranger": { "label": "Ranger" }
+          "ranger": { "label": "Ranger" },
+          "damageBonus": { "label": "Damage Bonus" }
         },
         "doctrines": {
           "swordsman": { "label": "Swordsman" },
@@ -271,7 +272,8 @@
           "holyPower": { "label": "Holy power" },
           "domain": { "label": "Domain" },
           "shepherdsWill": { "label": "Shepherd's will" },
-          "headerType": { "label": "Type" }
+          "headerType": { "label": "Type" },
+          "isOffensive": { "label": "Offensive" }
         }
       }
     },

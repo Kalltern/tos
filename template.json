@@ -915,6 +915,9 @@
           "critfailpenalty": 0,
           "value": 0,
           "bonus": 0
+        },
+        "damageBonus": {
+          "value": 0
         }
       },
       "armor": {
@@ -925,6 +928,62 @@
         "frostArmor": 0,
         "lightningArmor": 0,
         "durability": 0
+      },
+      "schools": {
+        "fire": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "water": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "earth": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "air": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "spirit": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "body": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "darkness": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "blood": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        },
+        "gnosis": {
+          "value": 0,
+          "visible": false,
+          "spellPower": 0,
+          "bonus": 0
+        }
       }
     }
   },
@@ -957,7 +1016,8 @@
         "crossbow",
         "firearm"
       ],
-      "type": ["light", "medium", "heavy"],
+      "type": "",
+      "typeOptions": ["light", "medium", "heavy"],
       "weight": 0,
       "attack": 0,
       "defense": 0,
@@ -1084,6 +1144,7 @@
         "piercing",
         "slash"
       ],
+      "isOffensive": true,
       "difficulty": 0,
       "cost": 0,
       "perRound": 0
