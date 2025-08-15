@@ -74,8 +74,7 @@ export class ToSItem extends Item {
           if (this.actor.type === "npc") {
             formula = `${diceNum}d${diceSize}  ${
               diceBonus ? `+${diceBonus}` : ""
-            }
-          + ${this.actor.system.combatSkills.damageBonus.value}`;
+            } + ${this.actor.system.combatSkills.damageBonus.value}`;
           }
         }
       }

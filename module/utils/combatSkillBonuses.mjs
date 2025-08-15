@@ -372,7 +372,6 @@ export async function getDamageRolls(actor, weapon, customDamage) {
   damageFormula = damageFormula.replace(/@([\w.]+)/g, (_, key) => {
     return foundry.utils.getProperty(rollData, key) ?? 0;
   });
-
   const damageRoll = new Roll(damageFormula, actor.system);
   await damageRoll.evaluate();
   const damageTotal = damageRoll.total;
