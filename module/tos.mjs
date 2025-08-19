@@ -16,6 +16,12 @@ import {
   getEffectRolls,
   getCriticalRolls,
 } from "./utils/combatSkillBonuses.mjs";
+import {
+  handleManaCost,
+  getMagicAttackRolls,
+  getMagicDamageRolls,
+  handleSpellSelection,
+} from "./utils/magicSkillBonuses.mjs";
 
 /* -------------------------------------------- */
 /*  Init Hook                                   */
@@ -50,7 +56,10 @@ Hooks.once("init", function () {
   game.tos.getDamageRolls = getDamageRolls;
   game.tos.getEffectRolls = getEffectRolls;
   game.tos.getCriticalRolls = getCriticalRolls;
-
+  game.tos.handleManaCost = handleManaCost;
+  game.tos.getMagicAttackRolls = getMagicAttackRolls;
+  game.tos.getMagicDamageRolls = getMagicDamageRolls;
+  game.tos.handleSpellSelection = handleSpellSelection;
   /**
    * Set an initiative formula for the system
    * @type {String}
