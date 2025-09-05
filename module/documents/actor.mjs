@@ -129,9 +129,7 @@ export class ToSActor extends Actor {
     const visage = systemData.secondaryAttributes.vis.total;
     const sin = systemData.secondaryAttributes.sin.total;
     const graveWounds =
-      5 * stat.graveWounds.value +
-      stat.graveWounds.bonus -
-      3 * stat.graveWounds.treated;
+      5 * stat.graveWounds.value - 3 * stat.graveWounds.treated;
     const archery = systemData.combatSkills.archery;
     const combat = systemData.combatSkills.combat;
     const melee = systemData.combatSkills.combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
