@@ -1,4 +1,4 @@
-export async function getSneakDamageFormula(actor, weapon) {
+async function getSneakDamageFormula(actor, weapon) {
   const useSneak = (await actor.getFlag("tos", "useSneakAttack")) || false;
   if (!useSneak) return { sneakDamage: "", sneakEffect: 0, sneakCritRange: 0 };
 
@@ -31,6 +31,70 @@ export async function getSneakDamageFormula(actor, weapon) {
     sneakEffect,
     sneakCritRange,
   };
+}
+
+export async function getNonWeaponAbility(actor, ability) {
+  const abilityAttributeTestName = ability.system.attributeTest || 0;
+  const abilityTestModifier = ability.system.testModifier || 0;
+  const attributeMap = {
+    strength: "str",
+    endurance: "end",
+    dexterity: "dex",
+    intelligence: "int",
+    wisdom: "wis",
+    charisma: "cha",
+  };
+
+  const shortKey =
+    attributeMap[abilityAttributeTestName.toLowerCase()] ??
+    abilityAttributeTestName;
+  const selectedAttributeModifier = actor.system.attributes[shortKey]?.mod ?? 0;
+
+  let attributeRollTotal = 0;
+  let attributeString = "";
+  if (abilityAttributeTestName) {
+    const attributeRoll = new Roll(
+      `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`
+    );
+    await attributeRoll.evaluate({ async: true });
+    attributeRollTotal = attributeRoll.total;
+    attributeString = `
+  |${abilityAttributeTestName} Test ${
+      selectedAttributeModifier + abilityTestModifier
+    }%|<br>
+   Margin of Success: ${attributeRollTotal}<br>
+`;
+  }
+
+  // Get the roll data from the actor
+  const rollData = actor.getRollData();
+  // Calculate the drinking roll formula
+  let testRollFormula = `(${
+    selectedAttributeModifier + abilityTestModifier
+  }) - 1d100`;
+
+  const attributeTestRoll = new Roll(testRollFormula, rollData);
+  await attributeTestRoll.evaluate();
+
+  // DAMAGE ROLL
+  let damageRoll;
+  if (ability.system.roll.diceBonus) {
+    damageRoll = new Roll(ability.system.roll.diceBonus, rollData);
+    await damageRoll.evaluate();
+  }
+
+  // Send the combined chat message
+  await ChatMessage.create({
+    speaker: ChatMessage.getSpeaker(),
+    rolls: [attributeTestRoll, damageRoll].filter((r) => r),
+    flavor: `
+          <h2>
+            <img src="${ability.img}" title="${ability.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
+            ${ability.name}
+          </h2>
+      ${ability.system.description}
+      `,
+  });
 }
 
 export async function getDoctrineBonuses(actor, weapon) {
@@ -271,7 +335,8 @@ export async function getAttackRolls(
   doctrineBonus,
   doctrineCritBonus,
   weaponSkillCrit,
-  customAttack
+  customAttack,
+  customCritFail = 0
 ) {
   let criticalSuccessThreshold = 0;
   let criticalFailureThreshold = 0;
@@ -298,7 +363,8 @@ export async function getAttackRolls(
       (weapon.system.critChance || 0);
     criticalFailureThreshold =
       actor.system.combatSkills.archery.criticalFailureThreshold -
-      (weapon.system.critFail || 0);
+      (weapon.system.critFail || 0) -
+      customCritFail;
     // ATTACK ROLL
     console.log("Aim value", aimValue, customAttack);
     attackRollFormula = `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
@@ -311,7 +377,8 @@ export async function getAttackRolls(
       (weapon.system.critChance + doctrineCritBonus + weaponSkillCrit || 0);
     criticalFailureThreshold =
       actor.system.combatSkills.combat.criticalFailureThreshold -
-      (weapon.system.critFail || 0);
+      (weapon.system.critFail || 0) -
+      customCritFail;
     // ATTACK ROLL
     console.log("Aim value", aimValue);
     attackRollFormula =
@@ -359,6 +426,10 @@ export async function getDamageRolls(actor, weapon, customDamage) {
     weaponAttack: weapon.system.attack || 0,
     str: actor.system.attributes.str.total,
     dex: actor.system.attributes.dex.total,
+    end: actor.system.attributes.end.total,
+    int: actor.system.attributes.int.total,
+    wil: actor.system.attributes.wil.total,
+    cha: actor.system.attributes.cha.total,
     per: actor.system.attributes.per.total,
   };
 
@@ -528,7 +599,7 @@ export async function getEffectRolls(
         // Check if the d100 roll was lower or equal than the modified chance.
         const successText =
           d100Roll.total <= roundedModifiedValue ? " SUCCESS" : "";
-        let effectResultText = `<p><b>${effectName}:</b> ${d100Roll.total}<${roundedModifiedValue}${successText}</p>`;
+        let effectResultText = `<p><b>${effectName}:</b> ${roundedModifiedValue}>${d100Roll.total}${successText}</p>`;
         effectsRollResults += effectResultText;
       }
 
@@ -560,6 +631,7 @@ export async function getEffectRolls(
     const modifiedBleedValue =
       weaponEffects.bleed +
       modifier +
+      customBleed +
       weaponSkillEffect +
       doctrineBleedBonus +
       sneakEffect;

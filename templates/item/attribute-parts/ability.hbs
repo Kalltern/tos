@@ -14,56 +14,12 @@
         
         <input
           type="text"
-          placeholder="e.g. 5 | C"
+          placeholder="e.g. 2 | R"
           name="system.actionCost"
           value="{{system.actionCost}}"
           data-dtype="String"
         />
          </div>
-
-                <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Spell.FIELDS.headerRange.label"
-          }}</label>
-        
-        <input
-          type="text"
-          placeholder="6/Caster/Touch"
-          name="system.range"
-          value="{{system.range}}"
-          data-dtype="String"
-        />
-         </div>
-{{#if (eq item.system.option "magic")}}
-        <div class="grid-span-1">
-          <label for="spell-class">Class:</label>
-          <select name="system.spellClass" id="spell-class">
-  <option value="1"></option>
-  {{#each system.classOptions as |spellClass|}}
-    <option value="{{spellClass}}" {{#if (eq ../system.spellClass spellClass)}}selected{{/if}}>
-      {{spellClass}}
-    </option>
-  {{/each}}
-</select>
-</div>
-{{/if}}
-
-{{#if (eq item.system.option "divine")}}
-                <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Spell.FIELDS.domain.label"
-          }}</label>
-        
-        <input
-          type="text"
-          name="system.domain"
-          value="{{system.domain}}"
-          data-dtype="String"
-        />
-         </div>
-{{/if}}
-
-
 
                 <div class="grid-span-1">
         <label class="resource-label">{{localize
@@ -78,7 +34,44 @@
         />
          </div>
 
-           <div class="grid-span-1">
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.stun.label"
+          }}</label>
+        <input
+          type="number"
+          name="system.effects.stun"
+          value="{{system.effects.stun}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.bleed.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.effects.bleed"
+          value="{{system.effects.bleed}}"
+          data-dtype="Number"
+        />
+      </div>
+
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.breakthrough.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.breakthrough"
+          value="{{system.breakthrough}}"
+          data-dtype="String"
+          placeholder="e.g. 2d6"
+        />
+      </div>
+
+        <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Weapon.FIELDS.extra1.label"
           }}</label>
@@ -87,7 +80,7 @@
           name="system.effects.effect1"
           value="{{system.effects.effect1}}"
           data-dtype="Number"
-             placeholder="0"
+         placeholder="0"
         />
       </div>
 
@@ -113,20 +106,66 @@
           name="system.effects.effect3"
           value="{{system.effects.effect3}}"
           data-dtype="Number"
-         placeholder="0"
+             placeholder="0"
         />
-      </div>
+      </div>      
 
-              <div class="grid-span-1">
+        <div class="grid-span-1">
         <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.extra1.label"
+            "TOS.Item.Weapon.FIELDS.attack.label"
           }}</label>
         <input
           type="text"
-          name="system.effects.effect4"
-          value="{{system.effects.effect4}}"
+          name="system.attack"
+          value="{{system.attack}}"
           data-dtype="Number"
-             placeholder="0"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.defense"
+          value="{{system.defense}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critRange.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critRange"
+          value="{{system.critRange}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critChance.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critChance"
+          value="{{system.critChance}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critFail.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critFail"
+          value="{{system.critFail}}"
+          data-dtype="Number"
         />
       </div>
 
@@ -175,24 +214,6 @@
   <option value="">-- Select a type --</option>
   {{#each system.dmgTypes as |dmgType|}}
     <option value="{{dmgType}}" {{#if (eq ../system.dmgType3 dmgType)}}selected{{/if}}>
-      {{dmgType}}
-    </option>
-  {{/each}}
-</select>
-
-<select name="system.bool4" id="effect-bool-4">
-  <option value="">-- Select a type --</option>
-  {{#each system.effectOptions as |bool|}}
-    <option value="{{bool}}" {{#if (eq ../system.bool4 bool)}}selected{{/if}}>
-      {{bool}}
-    </option>
-  {{/each}}
-</select>
-
-<select name="system.dmgType4" id="dmg-type-4">
-  <option value="">-- Select a type --</option>
-  {{#each system.dmgTypes as |dmgType|}}
-    <option value="{{dmgType}}" {{#if (eq ../system.dmgType4 dmgType)}}selected{{/if}}>
       {{dmgType}}
     </option>
   {{/each}}

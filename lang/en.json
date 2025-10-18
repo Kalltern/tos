@@ -13,6 +13,7 @@
         "Inventory": "Inventory",
         "Spells": "Spells",
         "Miracles": "Miracles",
+        "Abilities": "Abilities",
         "Effects": "Effects",
         "Config": "Config"
       },
@@ -260,6 +261,16 @@
           "quantity": { "label": "Quantity" }
         }
       },
+      "Ability": {
+        "FIELDS": {
+          "modifier": { "label": "Modifier" },
+          "costType": { "label": "Cost type" },
+          "actionCost": { "label": "Action Cost" },
+          "damage": { "label": "Damage" },
+          "attributeTest": { "label": "Test" },
+          "weaponAbility": { "label": "Weapon required" }
+        }
+      },
       "Spell": {
         "FIELDS": {
           "difficulty": { "label": "Difficulty" },
@@ -296,6 +307,7 @@
       "gear": "Gear",
       "race": "Race",
       "consumable": "Consumable",
+      "ability": "Ability",
       "feature": "Feature",
       "spell": "Spell"
     }

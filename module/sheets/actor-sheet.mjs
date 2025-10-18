@@ -181,6 +181,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     inventory: {
       template: "systems/tos/templates/actor/inventory.hbs",
     },
+    abilities: {
+      template: "systems/tos/templates/actor/abilities.hbs",
+    },
     spells: {
       template: "systems/tos/templates/actor/spells.hbs",
     },
@@ -209,6 +212,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           "skills",
           "features",
           "inventory",
+          "abilities",
           "spells",
           "miracles",
           "effects",
@@ -219,6 +223,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         options.parts.push(
           "features",
           "inventory",
+          "abilities",
           "spells",
           "miracles",
           "effects"
@@ -259,6 +264,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       case "features":
       case "testtab":
       case "skills":
+      case "abilities":
       case "spells":
       case "miracles":
       case "inventory":
@@ -340,6 +346,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = "features";
           tab.label += "Features";
           break;
+        case "abilities":
+          tab.id = "abilities";
+          tab.label += "Abilities";
+          break;
         case "inventory":
           tab.id = "inventory";
           tab.label += "Inventory";
@@ -389,6 +399,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const weapon = [];
     const race = [];
     const gear = [];
+    const ability = [];
     const consumables = [];
     const items = [];
     const spells = [];
@@ -415,6 +426,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       else if (i.type === "item") {
         items.push(i);
       }
+      // Append to abilities.
+      else if (i.type === "ability") {
+        ability.push(i);
+      }
       // Append to spells.
       else if (i.type === "spell") {
         spells.push(i);
@@ -433,6 +448,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       (a, b) => (a.sort || 0) - (b.sort || 0)
     );
     context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.ability = ability.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.race = race.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   }

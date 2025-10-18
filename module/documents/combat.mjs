@@ -7,6 +7,15 @@ export class ToSCombat extends Combat {
     ids,
     { formula = null, updateTurn = true, messageOptions = {} } = {}
   ) {
+    console.log("Rolling initiative for IDs:", ids);
+    console.log("Formula being used:", formula);
+
+    const result = await super.rollInitiative(ids, {
+      formula,
+      updateTurn,
+      messageOptions,
+    });
+    console.log("Initiative result:", result);
     // Structure input data
     ids = typeof ids === "string" ? [ids] : ids;
     const currentId = this.combatant?.id;

@@ -9,6 +9,7 @@ import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 import { TOS } from "./helpers/config.mjs";
 import { usePotion } from "./utils/usePotion.mjs";
 import {
+  getNonWeaponAbility,
   getDoctrineBonuses,
   getWeaponSkillBonuses,
   getAttackRolls,
@@ -50,6 +51,7 @@ Hooks.once("init", function () {
 
   game.tos = game.tos || {};
   game.tos.usePotion = usePotion;
+  game.tos.getNonWeaponAbility = getNonWeaponAbility;
   game.tos.getDoctrineBonuses = getDoctrineBonuses;
   game.tos.getWeaponSkillBonuses = getWeaponSkillBonuses;
   game.tos.getAttackRolls = getAttackRolls;
@@ -279,9 +281,8 @@ function rollItemMacro(itemUuid) {
 Hooks.on("renderChatMessage", (message, html, data) => {
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
-    // Add logic to check if the message is a roll message
+    // Add logic to check if the message is a roll message and create a reroll button
     if (message.content.includes("rolled") || message.rolls.length > 0) {
-      // Create a reroll button element
       const rerollButton = $(
         '<button class="d100-reroll-button">Re-Roll</button>'
       );
@@ -325,7 +326,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
           flavorText = "";
         }
 
-        // Send the new roll to chat or update the message as needed
         roll.toMessage({
           speaker: ChatMessage.getSpeaker({ user: game.user }),
           flavor: `<p style="text-align: center; font-size: 20px;"><b><i class="fa-light fa-dice-d20"></i> ${rollName} <i class="fa-light fa-dice-d20"></i><hr></b></p>

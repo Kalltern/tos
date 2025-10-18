@@ -10,7 +10,9 @@
     <div class="document-name">
       <input name="name" type="text" value="{{item.name}}" placeholder="Name" />
        </div>
-    {{! You may prefer to have a separate header file instead of this if statement}}
+    {{! I might change this to have a separate header file instead of this if statement}}
+
+      {{! -------------------   Feature  ----------------------------------}}
         {{#if (eq item.type "feature")}}
           <div class="grid-span-1">
     <label for="feature-option">Option:</label>
@@ -25,59 +27,71 @@
     </div>
 
         {{/if}}
-    {{#if (eq item.type "weapon")}}
 
- <div class="grid grid-2col">
-    <div class="item-details">
-        <label for="damage-dice">{{localize
-            "TOS.Item.Weapon.FIELDS.diceNum.label"
-          }}:</label>
-        <input
-          type="text"
-          name="system.roll.diceNum"
-          value="{{system.roll.diceNum}}"
-          data-dtype="Number"
-        />
-      </div>
+
+      {{! -------------------   Weapon and Ability  ----------------------------------}}        
+   {{#if (or (eq item.type "weapon") (eq item.type "ability"))}}
+  <div class="grid grid-2col">
+
+    <!-- Common Fields for Weapon & Ability -->
+    {{#if (eq item.type "weapon")}}
+    <div class="grid-span-1">
+      <label for="damage-dice">
+        {{localize "TOS.Item.Weapon.FIELDS.diceNum.label"}}:
+      </label>
+      <input
+        type="text"
+        name="system.roll.diceNum"
+        value="{{system.roll.diceNum}}"
+        data-dtype="Number"
+      />
+    </div>
+    
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.dieSize.label"}}
+      </label>
+      <input
+        type="text"
+        name="system.roll.diceSize"
+        value="{{system.roll.diceSize}}"
+        data-dtype="String"
+      />
+    </div>
+ {{/if}}
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.rollMod.label"}}
+      </label>
+      <input
+        type="text"
+        name="system.roll.diceBonus"
+        value="{{system.roll.diceBonus}}"
+        data-dtype="String"
+        placeholder="e.g. 5+2d6"
+      />
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.penetration.label"}}
+      </label>
+      <input
+        type="text"
+        name="system.penetration"
+        value="{{system.penetration}}"
+        data-dtype="Number"
+      />
+    </div>
+
+    {{!-- =======================
+         WEAPON-ONLY FIELDS
+    ======================== --}}
+    {{#if (eq item.type "weapon")}}
       <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.dieSize.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.roll.diceSize"
-          value="{{system.roll.diceSize}}"
-          data-dtype="String"
-        />
-      </div>
-     
-      <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.rollMod.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.roll.diceBonus"
-          value="{{system.roll.diceBonus}}"
-          data-dtype="String"
-          placeholder="e.g. 5+2d6"
-        />
-      </div>
-   <div class="grid-span-1">
-          <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.penetration.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.penetration"
-          value="{{system.penetration}}"
-          data-dtype="Number"
-        />
-      </div>
-      <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.weight.label"
-          }}</label>
+        <label class="resource-label">
+          {{localize "TOS.Item.Weapon.FIELDS.weight.label"}}
+        </label>
         <input
           type="text"
           name="system.weight"
@@ -86,32 +100,121 @@
         />
       </div>
 
-<div class="grid-span-1">
-     <label for="weapon-class">Weapon Class:</label>
-<select name="system.class" id="weapon-class">
-  <option value="">-- Select a Class --</option> <!-- Empty option for initial state -->
-  {{#each system.classOptions as |classOption|}}
-    <option value="{{classOption}}" {{#if (eq ../system.class classOption)}}selected{{/if}}>
-      {{classOption}}
-    </option>
-  {{/each}}
-  </select>
-   </div>
+      <div class="grid-span-1">
+        <label for="weapon-class">Weapon Class:</label>
+        <select name="system.class" id="weapon-class">
+          <option value="">-- Select a Class --</option>
+          {{#each system.classOptions as |classOption|}}
+            <option value="{{classOption}}" {{#if (eq ../system.class classOption)}}selected{{/if}}>
+              {{classOption}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
 
-<div class="grid-span-1">
-     <label for="weapon-type">Weapon Type:</label>
-<select name="system.type" id="weapon-type">
-  <option value="">-- Select a Type --</option> <!-- Empty option for initial state -->
-  {{#each system.typeOptions as |typeOption|}}
-    <option value="{{typeOption}}" {{#if (eq ../system.type typeOption)}}selected{{/if}}>
-      {{typeOption}}
-    </option>
-  {{/each}}
-  </select>
-    </div>    
+      <div class="grid-span-1">
+        <label for="weapon-type">Weapon Type:</label>
+        <select name="system.type" id="weapon-type">
+          <option value="">-- Select a Type --</option>
+          {{#each system.typeOptions as |typeOption|}}
+            <option value="{{typeOption}}" {{#if (eq ../system.type typeOption)}}selected{{/if}}>
+              {{typeOption}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+    {{/if}}
+
+
+    {{!-- =======================
+         ABILITY-ONLY FIELDS
+    ======================== --}}
+    {{#if (eq item.type "ability")}}
+      <div class="grid-span-1">
+        <label for="ability-class">Ability Class:</label>
+        <select name="system.class" id="ability-class">
+          <option value="">-- Select a Class --</option>
+          {{#each system.classOptions as |classOption|}}
+            <option value="{{classOption}}" {{#if (eq ../system.class classOption)}}selected{{/if}}>
+              {{classOption}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="grid-span-1">
+        <label for="ability-type">Ability Type:</label>
+        <select name="system.type" id="ability-type">
+          <option value="">-- Select a Type --</option>
+          {{#each system.typeOptions as |typeOption|}}
+            <option value="{{typeOption}}" {{#if (eq ../system.type typeOption)}}selected{{/if}}>
+              {{typeOption}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="grid-span-1">
+        <label for="cost-type">Cost Type:</label>
+        <select name="system.costType" id="cost-type">
+          <option value="">-- Select a Type --</option>
+          {{#each system.costOptions as |costOption|}}
+            <option value="{{costOption}}" {{#if (eq ../system.costType costOption)}}selected{{/if}}>
+              {{costOption}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="grid-span-1">
+        <label for="test-type">Test Type:</label>
+        <select name="system.attributeTest" id="test-type">
+          <option value="">-- Select a Type --</option>
+          {{#each system.testOptions as |testOption|}}
+            <option value="{{testOption}}" {{#if (eq ../system.attributeTest testOption)}}selected{{/if}}>
+              {{testOption}}
+            </option>
+          {{/each}}
+        </select>
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">
+          {{localize "TOS.Item.Spell.FIELDS.cost.label"}}
+        </label>
+        <input
+          type="text"
+          name="system.cost"
+          value="{{system.cost}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">Test Modifier</label>
+        <input
+          type="text"
+          name="system.testModifier"
+          value="{{system.testModifier}}"
+          data-dtype="Number"
+        />
+      </div>
+    
+     <div class="grid-span-1">
+     <label class="resource-label">{{localize
+     "TOS.Item.Ability.FIELDS.weaponAbility.label"
+       }}</label>
+     <input type="checkbox" name="system.weaponAbility" {{#if system.weaponAbility}}checked{{/if}} />
  </div>
 
     {{/if}}
+
+  </div> 
+{{/if}}
+
+
+
+ {{! -------------------   Gear ----------------------------------}}
 
 
  {{#if (eq item.type "gear")}}
@@ -187,6 +290,7 @@
   
   {{/if}}
     
+ {{! -------------------   Consumable  ----------------------------------}}
 
 
 {{#if (eq item.type "consumable")}}
@@ -243,6 +347,9 @@
          </div>     
 
 {{/if}}
+
+ {{! -------------------   Explosive ----------------------------------}}
+
 
 {{#if (eq item.system.option "explosive")}}
   
@@ -305,6 +412,7 @@
       </div>
 {{/if}}
 
+
 <div class="grid-span-1">
   <label for="damage-dice">{{localize "TOS.Item.Weapon.FIELDS.diceNum.label"}}:</label>
   <input
@@ -348,7 +456,8 @@
     {{/if}}
 
 
-    
+  {{! -------------------   Magic and Divine  ----------------------------------}}
+   
 
 {{#if (eq item.type "spell")}}
 <div class="grid grid-2col">
