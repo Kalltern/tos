@@ -36,6 +36,7 @@ async function getSneakDamageFormula(actor, weapon) {
 export async function getNonWeaponAbility(actor, ability) {
   const abilityAttributeTestName = ability.system.attributeTest || 0;
   const abilityTestModifier = ability.system.testModifier || 0;
+
   const attributeMap = {
     strength: "str",
     endurance: "end",
@@ -45,42 +46,44 @@ export async function getNonWeaponAbility(actor, ability) {
     charisma: "cha",
   };
 
-  const shortKey =
-    attributeMap[abilityAttributeTestName.toLowerCase()] ??
-    abilityAttributeTestName;
-  const selectedAttributeModifier = actor.system.attributes[shortKey]?.mod ?? 0;
+  let concatRollAndDescription = ability.system.description;
+  let attributeTestRoll = null;
 
-  let attributeRollTotal = 0;
-  let attributeString = "";
-  if (abilityAttributeTestName) {
-    const attributeRoll = new Roll(
-      `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`
-    );
+  if (
+    abilityAttributeTestName &&
+    abilityAttributeTestName !== "-- Select a Type --"
+  ) {
+    const shortKey =
+      attributeMap[abilityAttributeTestName.toLowerCase()] ??
+      abilityAttributeTestName;
+
+    let selectedAttributeModifier = actor.system.attributes[shortKey]?.mod ?? 0;
+    if (actor.type === "npc")
+      selectedAttributeModifier = actor.system.attributes[shortKey]?.value ?? 0;
+
+    const totalModifier =
+      Number(selectedAttributeModifier) + Number(abilityTestModifier);
+
+    // Create the Roll
+    const attributeRoll = new Roll(`(${totalModifier}) - 1d100`);
     await attributeRoll.evaluate({ async: true });
-    attributeRollTotal = attributeRoll.total;
-    attributeString = `
-  |${abilityAttributeTestName} Test ${
-      selectedAttributeModifier + abilityTestModifier
-    }%|<br>
-   Margin of Success: ${attributeRollTotal}<br>
-`;
+
+    const attributeRollTotal = attributeRoll.total;
+    const attributeString = `
+      |${abilityAttributeTestName} Test ${totalModifier}%|<br>
+      Margin of Success: ${attributeRollTotal}<br>
+    `;
+
+    concatRollAndDescription += attributeString;
+    attributeTestRoll = attributeRoll; // store for chat message
   }
 
-  // Get the roll data from the actor
-  const rollData = actor.getRollData();
-  // Calculate the drinking roll formula
-  let testRollFormula = `(${
-    selectedAttributeModifier + abilityTestModifier
-  }) - 1d100`;
-
-  const attributeTestRoll = new Roll(testRollFormula, rollData);
-  await attributeTestRoll.evaluate();
-
   // DAMAGE ROLL
-  let damageRoll;
+  let damageRoll = null;
+  const rollData = actor.getRollData();
   if (ability.system.roll.diceBonus) {
     damageRoll = new Roll(ability.system.roll.diceBonus, rollData);
-    await damageRoll.evaluate();
+    await damageRoll.evaluate({ async: true });
   }
 
   // Send the combined chat message
@@ -88,12 +91,17 @@ export async function getNonWeaponAbility(actor, ability) {
     speaker: ChatMessage.getSpeaker(),
     rolls: [attributeTestRoll, damageRoll].filter((r) => r),
     flavor: `
-          <h2>
-            <img src="${ability.img}" title="${ability.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
-            ${ability.name}
-          </h2>
-      ${ability.system.description}
-      `,
+      <h2>
+        <img src="${ability.img}" title="${ability.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
+        ${ability.name}
+      </h2>
+      <table style="width: 100%; text-align: center;font-size: 15px;">
+    <tr>
+      <th>Description:</th>
+    </tr>
+    <td>${concatRollAndDescription}</td>
+    </table>
+    `,
   });
 }
 
@@ -435,9 +443,10 @@ export async function getDamageRolls(actor, weapon, customDamage) {
 
   // DAMAGE ROLL
   const { sneakDamage } = await getSneakDamageFormula(actor, weapon);
-  let damageFormula = `${weapon.system.formula}`;
-  if (customDamage) damageFormula += ` + ${customDamage}`;
+  let damageFormula = `(${weapon.system.formula}`;
   if (sneakDamage) damageFormula += sneakDamage;
+  damageFormula += ")";
+  if (customDamage) damageFormula += `${customDamage}`;
 
   damageFormula = damageFormula.replace(/\s*\+\s*$/, "");
   damageFormula = damageFormula.replace(/@([\w.]+)/g, (_, key) => {
@@ -445,7 +454,7 @@ export async function getDamageRolls(actor, weapon, customDamage) {
   });
   const damageRoll = new Roll(damageFormula, actor.system);
   await damageRoll.evaluate();
-  const damageTotal = damageRoll.total;
+  const damageTotal = Math.floor(damageRoll.total);
 
   // If the weapon has breakthrough, roll it
   let breakthroughRollResult = "";

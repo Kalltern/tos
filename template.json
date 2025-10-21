@@ -797,10 +797,10 @@
           "bonus": 0
         },
         "stamina": {
-          "value": 0,
+          "value": 900,
           "min": 0,
           "base": 0,
-          "max": 5,
+          "max": 900,
           "bonus": 0
         },
         "toxicity": {
@@ -811,10 +811,10 @@
           "bonus": 0
         },
         "mana": {
-          "value": 0,
+          "value": 900,
           "min": 0,
           "base": 0,
-          "max": 10,
+          "max": 900,
           "bonus": 0
         }
       },
@@ -911,8 +911,6 @@
         }
       },
       "armor": {
-        "natural": 0,
-        "total": 0,
         "acidArmor": 0,
         "fireArmor": 0,
         "frostArmor": 0,

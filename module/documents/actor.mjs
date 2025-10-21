@@ -52,9 +52,7 @@ export class ToSActor extends Actor {
         combatSkill.rangedDefense.critbonus +=
           item.system.rangedCritDefense ?? 0;
         combatSkill.dodge.bonus += item.system.dodgePenalty ?? 0;
-        console.log("Actor type", this.type);
         combatSkill.channeling.bonus += item.system.castPenalty ?? 0;
-        console.log("Channeling after equipping", combatSkill.channeling.bonus);
         combatSkill.rangedDefense.bonus += item.system.rangedDefense ?? 0;
         combatSkill.meleeDefense.bonus += item.system.defense ?? 0;
 
