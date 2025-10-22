@@ -788,6 +788,9 @@
     "npc": {
       "templates": ["base", "armor"],
       "cr": 0,
+      "critRangeMelee": 0,
+      "critRangeRanged": 0,
+      "critRangeCast": 0,
       "stats": {
         "health": {
           "value": 20,

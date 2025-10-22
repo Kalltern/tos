@@ -454,8 +454,7 @@ export class ToSActor extends Actor {
     const calcCritRange = [0, 0, 0, 0, 1, 1, 2, 3, 3, 3, 3];
     systemData.critRangeMelee = calcCritRange[str] + calcCritRange[per];
     systemData.critRangeRanged = calcCritRange[per];
-    systemData.critRangeCast = calcCritRange[int];
-
+    systemData.critRangeCast = calcCritRange[int] ?? 0;
     // Calculate misc
     secAttribute.lck.total = secAttribute.lck.value + secAttribute.lck.bonus;
     secAttribute.vis.total = secAttribute.vis.value + secAttribute.vis.bonus;
