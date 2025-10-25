@@ -221,7 +221,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         break;
       case "npc":
         options.parts.push(
-          "features",
           "inventory",
           "abilities",
           "spells",

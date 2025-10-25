@@ -4,7 +4,11 @@
     "htmlFields": ["biography"],
     "templates": {
       "base": {
-        "biography": ""
+        "biography": "",
+        "armor": {
+          "total": 0,
+          "natural": 0
+        }
       }
     },
 
@@ -24,10 +28,7 @@
           "insight"
         ]
       },
-      "armor": {
-        "total": 0,
-        "natural": 0
-      },
+
       "day": false,
       "healthBonus": 0,
       "sneakDamageBonus": 0,

@@ -180,7 +180,9 @@
       "NPC": {
         "FIELDS": {
           "cr": { "label": "CR" },
-          "mov": { "label": "Movement" }
+          "mov": { "label": "Movement" },
+          "mage": { "label": "Mage" },
+          "priest": { "label": "Priest" }
         },
         "xp": { "label": "XP" }
       }

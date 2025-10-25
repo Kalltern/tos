@@ -44,23 +44,23 @@
   background-color: #131121;
 }
 
-
-.chat-message img{
+.chat-message img {
   border: 1.5px solid #b5b3a487;
   border-radius: 20px;
   margin-bottom: 1px;
 }
 
-.chat-message .message-header .flavor-text , .chat-message .message-header, .chat-message .message-header .whisper-to{
+.chat-message .message-header .flavor-text,
+.chat-message .message-header,
+.chat-message .message-header .whisper-to {
   color: var(--color-text-light-primary);
-  
 }
 
-.dice-roll .dice-formula, .dice-roll .dice-total{
+.dice-roll .dice-formula,
+.dice-roll .dice-total {
   border: #201b1b;
   box-shadow: 0 0 2px #ffffff inset;
-
-  }
+}
 
 #chat-form textarea {
   width: 100%;
@@ -131,7 +131,6 @@ table tr td:nth-child(3) {
 .grid-7col {
   grid-column: span 7 / span 7;
   grid-template-columns: repeat(7, minmax(0, 1fr));
-  
 }
 
 .grid-8col {
@@ -256,12 +255,15 @@ table tr td:nth-child(3) {
   grid-column-end: span 12;
 }
 .grid-skills {
-  display: grid ;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Collapsing empty spaces */
-  margin: 10px 0 ;
-  padding: 0 ;  
-  width: 100% ;
-  max-width: 100px ; /* Adjust if necessary */
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(200px, 1fr)
+  ); /* Collapsing empty spaces */
+  margin: 10px 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100px; /* Adjust if necessary */
 }
 
 .flex-group-center,
@@ -289,7 +291,6 @@ table tr td:nth-child(3) {
 .flex-between {
   justify-content: space-between;
 }
-
 
 .flexlarge {
   flex: 2;
@@ -323,7 +324,7 @@ table tr td:nth-child(3) {
   font-family: "Roboto", sans-serif;
 }
 .tos .sheet-header {
-  height: 365px; /* Adjust the height as needed */
+  height: 370px; /* Adjust the height as needed */
   overflow: hidden; /* Ensures content does not exceed the height */
   flex: 0 auto;
   overflow: hidden;
@@ -369,26 +370,26 @@ table tr td:nth-child(3) {
   font-weight: bold;
 }
 .skill-label.rollable {
-  flex: 1 0 auto;  /* Allow label to grow without shrinking */
-  max-width: 140px;  /* Optional: Keep the max-width */
+  flex: 1 0 auto; /* Allow label to grow without shrinking */
+  max-width: 140px; /* Optional: Keep the max-width */
   width: 100%;
-  padding: 0.4rem;  /* Optional: Adjust padding */
-  text-align: center;  /* Ensure text is left-aligned */
-  }
+  padding: 0.4rem; /* Optional: Adjust padding */
+  text-align: center; /* Ensure text is left-aligned */
+}
 
-  .skill-label {
- margin-right: 10px;
-    }
+.skill-label {
+  margin-right: 10px;
+}
 
-    .tos .attribute-armor{
-      display: flex;
-      flex-direction: column; /* Stack label above input and modifier */
-      align-items: center; /* Center items horizontally */
-      margin: 0 2px; /* Reduced horizontal spacing between attributes */
-      flex: 1 1 0; /* Allow attributes to grow and shrink */
-      max-width: 45px; /* Set a max width to keep them compact */
-      text-align: center;
-    }
+.tos .attribute-armor {
+  display: flex;
+  flex-direction: column; /* Stack label above input and modifier */
+  align-items: center; /* Center items horizontally */
+  margin: 0 2px; /* Reduced horizontal spacing between attributes */
+  flex: 1 1 0; /* Allow attributes to grow and shrink */
+  max-width: 45px; /* Set a max width to keep them compact */
+  text-align: center;
+}
 
 .tos .attributes {
   display: flex; /* Align attributes in a row */
@@ -407,7 +408,7 @@ table tr td:nth-child(3) {
   text-align: center;
 }
 
-.tos .attribute-armor{
+.tos .attribute-armor {
   display: flex;
   flex-direction: column; /* Stack label above input and modifier */
   align-items: center; /* Center items horizontally */
@@ -416,7 +417,6 @@ table tr td:nth-child(3) {
   max-width: 45px; /* Set a max width to keep them compact */
   text-align: center;
 }
-
 
 .tos .attribute-score,
 .tos .attribute-mod {
@@ -520,7 +520,7 @@ table tr td:nth-child(3) {
   font-size: 12px;
   padding: 2px 5px;
   text-align: center;
-  min-width: 15px;  /* Set a minimum width to prevent overflow */
+  min-width: 15px; /* Set a minimum width to prevent overflow */
 }
 
 /* Remove left border from all except the first one */
@@ -686,13 +686,12 @@ table tr td:nth-child(3) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  }
+}
 
 .skill-entry {
   display: flex;
   align-items: left;
   margin-bottom: 0.5rem;
-  
 }
 .skill-value {
   width: 4rem; /* Adjust the width as needed */
@@ -757,7 +756,6 @@ table tr td:nth-child(3) {
 }
 .config-checkbox {
   display: block !important;
-  
 }
 .tab.config {
   display: flex;
@@ -778,7 +776,7 @@ table tr td:nth-child(3) {
   min-width: 50px; /* Ensures buttons don't get too small */
   max-width: 100px; /* Prevents them from getting too large */
   padding: 4px 8px;
-  margin-top: 10px; 
+  margin-top: 10px;
   border: 1px solid #616164;
   color: var(--color-text-light-primary);
   background: url(../ui/parchment_dark.jpg) repeat;
@@ -795,7 +793,7 @@ table tr td:nth-child(3) {
 .checkbox-row {
   display: flex;
   align-items: center;
-  gap: 10px;  /* Adjust gap between items as needed */
+  gap: 10px; /* Adjust gap between items as needed */
 }
 
 .checkbox-row label {
@@ -809,7 +807,7 @@ table tr td:nth-child(3) {
   align-items: center; /* Center align the items vertically */
   width: 100%; /* Ensure the row takes full available width */
   flex-wrap: wrap; /* Allow wrapping when there are more than 7 items */
-  }
+}
 
 /* Each stat block (Health, Stamina, etc.) */
 .attribute {
@@ -874,11 +872,11 @@ label {
 }
 /* Active (shining) state */
 .reroll-icon.active {
-  color: rgb(243, 195, 92);  /* Icon color changes to white for contrast */
+  color: rgb(243, 195, 92); /* Icon color changes to white for contrast */
 }
 
 /* Inactive state */
 .reroll-icon:not(.active) {
   background-color: transparent; /* Transparent when inactive */
-  color: inherit;  /* Default color */
+  color: inherit; /* Default color */
 }

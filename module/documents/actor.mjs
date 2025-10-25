@@ -59,14 +59,8 @@ export class ToSActor extends Actor {
         systemData.stats.health.bonus += item.system.healthBonus ?? 0;
       }
     }
-    if (actorData.type === "character") {
-      systemData.armor.total = totalArmor + systemData.armor.natural;
-      console.log("totalArmor PC", totalArmor);
-    }
-    if (actorData.type === "npc") {
-      systemData.armor.total = totalArmor + systemData.armor.natural;
-      console.log("totalArmor NPC", totalArmor);
-    }
+
+    systemData.armor.total = totalArmor + systemData.armor.natural;
 
     // Iterate through gear (only helmets)
     for (const item of this.items) {
