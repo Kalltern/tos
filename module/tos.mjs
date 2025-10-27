@@ -67,12 +67,12 @@ Hooks.once("init", function () {
    * @type {String}
    */
 
-  CONFIG.Combat.initiative = {
+  /*CONFIG.Combat.initiative = {
     formula:
       "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total",
     decimals: 0,
   };
-
+*/
   // Define custom Document classes
   CONFIG.Actor.documentClass = ToSActor;
   CONFIG.Item.documentClass = ToSItem;

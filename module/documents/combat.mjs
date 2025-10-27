@@ -1,5 +1,5 @@
 /**
- * Extend the basic Item with some very simple modifications.
+ * Extend the basic Combat with custom initiative handling.
  * @extends {Combat}
  */
 export class ToSCombat extends Combat {
@@ -8,42 +8,34 @@ export class ToSCombat extends Combat {
     { formula = null, updateTurn = true, messageOptions = {} } = {}
   ) {
     console.log("Rolling initiative for IDs:", ids);
-    console.log("Formula being used:", formula);
 
-    const result = await super.rollInitiative(ids, {
-      formula,
-      updateTurn,
-      messageOptions,
-    });
-    console.log("Initiative result:", result);
-    // Structure input data
     ids = typeof ids === "string" ? [ids] : ids;
     const currentId = this.combatant?.id;
     const chatRollMode = game.settings.get("core", "rollMode");
 
-    // Iterate over Combatants, performing an initiative roll for each
     const updates = [];
     const messages = [];
+
     for (let [i, id] of ids.entries()) {
-      // Get Combatant data (non-strictly)
       const combatant = this.combatants.get(id);
-      const actor = combatant.actor;
-      if (!combatant?.isOwner) continue;
-      if (actor.type === "npc") {
-        formula = "1d12 + @secondaryAttributes.ini.value";
-      }
+      const actor = combatant?.actor;
+      if (!combatant?.isOwner || !actor) continue;
 
-      // Produce an initiative roll for the Combatant
-      const roll = combatant.getInitiativeRoll(formula);
+      // Custom formula per actor type
+      const rollFormula =
+        actor.type === "npc"
+          ? "1d12 + @secondaryAttributes.ini.value"
+          : "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total";
 
+      const roll = new Roll(rollFormula, actor.getRollData());
       await roll.evaluate();
+
       updates.push({ _id: id, initiative: roll.total });
 
-      // Construct chat message data
-      let messageData = foundry.utils.mergeObject(
+      const messageData = foundry.utils.mergeObject(
         {
           speaker: ChatMessage.getSpeaker({
-            actor: combatant.actor,
+            actor,
             token: combatant.token,
             alias: combatant.name,
           }),
@@ -54,9 +46,8 @@ export class ToSCombat extends Combat {
         },
         messageOptions
       );
-      const chatData = await roll.toMessage(messageData, { create: false });
 
-      // If the combatant is hidden, use a private roll unless an alternative rollMode was explicitly requested
+      const chatData = await roll.toMessage(messageData, { create: false });
       chatData.rollMode =
         "rollMode" in messageOptions
           ? messageOptions.rollMode
@@ -64,23 +55,20 @@ export class ToSCombat extends Combat {
           ? CONST.DICE_ROLL_MODES.PRIVATE
           : chatRollMode;
 
-      // Play 1 sound for the whole rolled set
       if (i > 0) chatData.sound = null;
       messages.push(chatData);
     }
+
     if (!updates.length) return this;
 
-    // Update multiple combatants
     await this.updateEmbeddedDocuments("Combatant", updates);
 
-    // Ensure the turn order remains with the same combatant
     if (updateTurn && currentId) {
       await this.update({
         turn: this.turns.findIndex((t) => t.id === currentId),
       });
     }
 
-    // Create multiple chat messages
     await ChatMessage.implementation.create(messages);
     return this;
   }
