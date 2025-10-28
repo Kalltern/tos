@@ -29,7 +29,7 @@
   "version": "0.5.6i",
   "compatibility": {
     "minimum": "12.331",
-    "verified": "12.331"
+    "verified": "13.350"
   },
   "esmodules": ["module/tos.mjs"],
   "styles": ["css/tos.css"],

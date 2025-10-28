@@ -3,10 +3,22 @@
   data-group="primary"
   data-tab="skills"
 >
-<h3>Combat</h3>
-<section class="combat-skills grid-skills"> 
+<div class="scrollable-tab">
 
-{{#each system.combatSkills as |skill key|}}
+<section class=" grid-skills"> 
+  
+
+
+
+</section>
+
+  <section class="skills-container ">
+
+    {{! Left Column }}
+    <div class="skills-column skills-checkbox-container">
+      <div class="combat-skills">
+      <h5>Combat</h5>
+      {{#each system.combatSkills as |skill key|}}
   {{#if (eq skill.isSkill 1)}}
   
     <label class="toggle-label hidden">
@@ -71,7 +83,7 @@
             type="text"
             name="system.weaponSkills.{{key}}.value"
             value="{{skill.value}}"
-            class="skill-value align-left"
+            class="skill-value"
             data-dtype="Number"
           />
            </div>
@@ -99,7 +111,7 @@
             type="text"
             name="system.doctrines.{{key}}.value"
             value="{{skill.value}}"
-            class="skill-value align-left"
+            class="skill-value"
             data-dtype="Number"
           />
            </div>
@@ -127,7 +139,7 @@
             type="text"
             name="system.schools.{{key}}.value"
             value="{{skill.value}}"
-            class="skill-value align-left"
+            class="skill-value"
             data-dtype="Number"
           />
            </div>
@@ -163,14 +175,8 @@
     
   {{/if}}
   {{/each}}
-
-</section>
-
-  <section class="skills-container">
-
-    {{! Left Column }}
-    <div class="skills-column skills-checkbox-container">
-      <h3>{{localize "TOS.Actor.Character.Attribute.Str.long"}}</h3>
+  </div>
+      <h5>{{localize "TOS.Actor.Character.Attribute.Str.long"}}</h5>
      
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 0)}}
@@ -215,7 +221,7 @@
   {{/each}}
 
 
-      <h3>{{localize "TOS.Actor.Character.Attribute.Dex.long"}}</h3>
+      <h5>{{localize "TOS.Actor.Character.Attribute.Dex.long"}}</h5>
       
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 1)}}
@@ -258,7 +264,7 @@
       {{/each}}
       
 
-      <h3>{{localize "TOS.Actor.Character.Attribute.End.long"}}</h3>
+      <h5>{{localize "TOS.Actor.Character.Attribute.End.long"}}</h5>
       
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 2)}}
@@ -299,9 +305,12 @@
           </div>
         {{/if}}
       {{/each}}
-      
+            
+    </div>
+    {{! Right Column }}
+    <div class="skills-column">
 
-      <h3>{{localize "TOS.Actor.Character.Attribute.Int.long"}}</h3>
+      <h5>{{localize "TOS.Actor.Character.Attribute.Int.long"}}</h5>
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 3)}}
                   <div class="skill-toggle-wrapper">
@@ -341,10 +350,8 @@
           </div>
         {{/if}}
       {{/each}}
-    </div>
-    {{! Right Column }}
-    <div class="skills-column">
-      <h3>{{localize "TOS.Actor.Character.Attribute.Wil.long"}}</h3>
+      
+      <h5>{{localize "TOS.Actor.Character.Attribute.Wil.long"}}</h5>
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 4)}}
                  <div class="skill-toggle-wrapper">
@@ -385,7 +392,7 @@
         {{/if}}
       {{/each}}
 
-      <h3>{{localize "TOS.Actor.Character.Attribute.Cha.long"}}</h3>
+      <h5>{{localize "TOS.Actor.Character.Attribute.Cha.long"}}</h5>
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 5)}}
                  <div class="skill-toggle-wrapper">
@@ -427,7 +434,7 @@
         {{/if}}
       {{/each}}
 
-      <h3>{{localize "TOS.Actor.Character.Attribute.Per.long"}}</h3>
+      <h5>{{localize "TOS.Actor.Character.Attribute.Per.long"}}</h5>
       {{#each system.skills as |skill key|}}
         {{#if (eq skill.id 6)}}
                   <div class="skill-toggle-wrapper">
@@ -470,4 +477,5 @@
     </div>
   
   </section>
+  </div>
 </section>

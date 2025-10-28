@@ -29,7 +29,7 @@
   padding: 5px;
   font-size: var(--font-size-14);
   color: var(--color-text-light-primary);
-  background: url(../ui/parchment_dark.jpg) repeat;
+  background: #0b0a13fa;
   border: 2px solid #6c6c6782;
   border-radius: 5px;
 }
@@ -40,7 +40,6 @@
 }
 
 .message.whisper table tr td {
-  padding-left: 2px;
   background-color: #131121;
 }
 
@@ -73,21 +72,14 @@
 
 hr {
   border: none;
-  border-top: 1px solid #28292e;
-  border-bottom: 1px solid #2d2d2d;
+  border-top: 1px solid #c2b096;
+  border-bottom: 1px solid #c2b096;
 }
 
-table tr td:first-child {
-  padding-left: 2px;
-  background-color: #212226d4;
-}
-table tr td:nth-child(2) {
-  padding-left: 2px;
-  background-color: #212226d4;
-}
+table tr td:first-child,
+table tr td:nth-child(2),
 table tr td:nth-child(3) {
-  padding-left: 2px;
-  background-color: #212226d4;
+  background-color: #1412238a;
 }
 
 .rollable:hover,
@@ -369,6 +361,7 @@ table tr td:nth-child(3) {
 .tos .resource-label {
   font-weight: bold;
 }
+.skill-name,
 .skill-label.rollable {
   flex: 1 0 auto; /* Allow label to grow without shrinking */
   max-width: 140px; /* Optional: Keep the max-width */
@@ -382,7 +375,6 @@ table tr td:nth-child(3) {
 }
 
 .tos .attribute-armor {
-  display: flex;
   flex-direction: column; /* Stack label above input and modifier */
   align-items: center; /* Center items horizontally */
   margin: 0 2px; /* Reduced horizontal spacing between attributes */
@@ -392,14 +384,12 @@ table tr td:nth-child(3) {
 }
 
 .tos .attributes {
-  display: flex; /* Align attributes in a row */
   justify-content: flex-start; /* Adjust as necessary */
   flex-wrap: wrap; /* Allow wrapping if needed */
   margin-top: 10px; /* Space above attributes */
 }
 
 .tos .attribute {
-  display: flex;
   flex-direction: column; /* Stack label above input and modifier */
   align-items: center; /* Center items horizontally */
   margin: 0 2px; /* Reduced horizontal spacing between attributes */
@@ -409,7 +399,6 @@ table tr td:nth-child(3) {
 }
 
 .tos .attribute-armor {
-  display: flex;
   flex-direction: column; /* Stack label above input and modifier */
   align-items: center; /* Center items horizontally */
   margin: 0 2px; /* Reduced horizontal spacing between attributes */
@@ -690,11 +679,12 @@ table tr td:nth-child(3) {
 
 .skill-entry {
   display: flex;
-  align-items: left;
-  margin-bottom: 0.5rem;
+  align-items: center;
+  margin-bottom: -5px;
 }
 .skill-value {
   width: 4rem; /* Adjust the width as needed */
+  margin-right: 5px;
   max-width: 38px; /* Optional: Set a maximum width */
   padding: 0.4rem; /* Adjust padding for a more compact input */
   text-align: center; /* Center the text for better appearance */
@@ -708,38 +698,28 @@ table tr td:nth-child(3) {
   padding: 2px; /* Small padding for cleaner look */
 }
 .skill-rating {
-  margin-left: 15px; /* Adds a small space between the input value and the skill rating */
   max-width: 40px;
   max-height: 20px;
   text-align: center;
 }
 .tab.skills {
-  display: flex;
   flex-direction: column;
   flex-grow: 1;
   overflow-y: auto; /* Scrollbar for long content */
   text-align: center;
 }
 @media (max-height: 1080px) {
+  .tab.spells,
+  .tab.config,
   .tab.skills {
     max-height: 420px; /* Height for 1920x1080 resolution */
   }
 }
 
 @media (min-height: 1081px) {
+  .tab.spells,
+  .tab.config,
   .tab.skills {
-    max-height: 700px; /* Height for higher resolutions */
-  }
-}
-
-@media (max-height: 1080px) {
-  .tab.config {
-    max-height: 420px; /* Height for 1920x1080 resolution */
-  }
-}
-
-@media (min-height: 1081px) {
-  .tab.config {
     max-height: 700px; /* Height for higher resolutions */
   }
 }
@@ -757,8 +737,8 @@ table tr td:nth-child(3) {
 .config-checkbox {
   display: block !important;
 }
+.tab.spells,
 .tab.config {
-  display: flex;
   flex-direction: column;
   flex-grow: 1;
   overflow-y: auto; /* Scrollbar for long content */
