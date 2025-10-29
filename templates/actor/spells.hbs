@@ -53,8 +53,9 @@ Spells
 {{#each (groupBySchool spells) as |group|}}
    {{#unless (eq item.system.option "divine")}}
 
+
     <ol class='items-list' data-school='{{group.school}}'>
-    <li class='item flexrow items-header'>
+    <li class='item flexrow items-header' data-action='toggleSchool'>
       <div class="item-name">  {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}</div>
             <div class='item-name'>
       {{localize "TOS.Item.Spell.FIELDS.difficulty.label"}}

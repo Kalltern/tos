@@ -31,10 +31,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       subtractConsumable: this._subtractConsumable,
       toggleEffect: this._toggleEffect,
       roll: this._onRoll,
-      toggleDay: this._toggleDay,
       toggleEquipped: this._toggleEquipped,
       myAction: this._myAction,
       toggleReroll: this._toggleReroll,
+      toggleSchool: this._toggleSchool,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -111,12 +111,12 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     );
   }
 
-  static _toggleDay(event) {
-    const isChecked = event.target.checked;
-    // Update the actor's day status based on the checkbox state
-    this.actor.update({ "system.day": isChecked });
+  static _toggleSchool(event) {
+    console.log(this);
 
-    console.log(`Day is now ${isChecked ? "active" : "inactive"}`);
+    const header = event.currentTarget;
+    const list = header.closest(".items-list");
+    list.classList.toggle("collapsed");
   }
 
   static _toggleEquipped(event) {

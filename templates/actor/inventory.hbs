@@ -1,16 +1,16 @@
 {{! Inventory Tab }}
 <section
-  class="tab {{tab.cssClass}}"
+  class="tab inventory{{tab.cssClass}}"
   data-group="primary"
   data-tab="inventory"
 >
 
-  <ol class="items-list">
+  <ol class="items-list inventory-gear">
     <li class="item flexrow items-header">
       <div class="item-name">{{localize "Gear"}}</div>
-      <div class="item-formula">{{localize "TOS.Item.Gear.FIELDS.equipped.label"}}</div>
-      <div class="item-formula">{{localize "TOS.Item.Gear.FIELDS.layer.label"}}</div>
-      <div class="item-formula">{{localize "TOS.Item.Gear.FIELDS.armor.label"}}</div>
+      <div class="gear-equipped">{{localize "TOS.Item.Gear.FIELDS.equipped.label"}}</div>
+      <div class="armor-layer">{{localize "TOS.Item.Gear.FIELDS.layer.label"}}</div>
+      <div class="armor-value">{{localize "TOS.Item.Gear.FIELDS.armor.label"}}</div>
       <div class="item-controls">
         {{#if @root.editable}}
           <a class="item-control item-create"
@@ -38,13 +38,13 @@
           </div>
           <div>{{item.name}}</div>
         </div>
-<!-- Equipped Checkbox (Editable) -->
-<div class="item-formula item-prop">
-  <input type="checkbox" class="item-toggle-equipped"
-  data-action="toggleEquipped"
-         data-item-id="{{item._id}}"
-         {{#if item.system.equipped}}checked{{/if}} />
-</div>
+          <!-- Equipped Checkbox (Editable) -->
+          <div class="item-formula item-prop">
+            <input type="checkbox" class="item-toggle-equipped"
+            data-action="toggleEquipped"
+                   data-item-id="{{item._id}}"
+                   {{#if item.system.equipped}}checked{{/if}} />
+          </div>
 
 
         <!-- Layer Value -->
@@ -77,7 +77,7 @@
 
  <br>
 
-  <ol class="items-list">
+  <ol class="items-list inventory-weapons">
     <li class="item flexrow items-header">
       <div class="item-name">{{localize "Weapon"}}</div>
       <div class="item-formula">{{localize
@@ -144,14 +144,14 @@
 
  <br>
 
-   <ol class="items-list">
+   <ol class="items-list inventory-consumable">
     <li class="item flexrow items-header">
       <div class="item-name">{{localize "Consumable"}}</div>
 
       <div class="item-formula">{{localize
           "TOS.Item.Weapon.FIELDS.rollFormula.label"
         }}</div>
-      <div class="item-formula">{{localize "TOS.Item.Consumable.FIELDS.quantity.label"}}</div>
+      <div class="item-quantity">{{localize "TOS.Item.Consumable.FIELDS.quantity.label"}}</div>
       <div class="item-controls">
         {{#if @root.editable}}
           <a
@@ -232,7 +232,7 @@
 
  <br>
 
-   <ol class="items-list">
+   <ol class="items-list inventory-items">
     <li class="item flexrow items-header">
       <div class="item-name">{{localize "Items"}}</div>
       <div class="item-formula">{{localize

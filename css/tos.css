@@ -414,31 +414,100 @@ table tr td:nth-child(3) {
   text-align: center; /* Center text in input and span */
 }
 .tos .items-header {
+  display: flex;
   height: 28px;
   margin: 2px 0;
-  padding: 0;
+  padding: 0 4px;
   align-items: center;
   background: rgba(0, 0, 0, 0.05);
   border: 2px groove var(--tos-c-groove);
   font-weight: bold;
 }
+
 .tos .items-header > * {
-  font-size: 14px;
+  font-size: 13px;
   text-align: center;
-}
-.tos .items-header .item-name {
-  font-weight: bold;
-  padding-left: 5px;
-  text-align: left;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.tos .inventory-weapons .item-formula {
+  flex: 3;
+}
+
+.tos .inventory-gear .item {
+  display: flex;
+  align-items: center;
+}
+
+.tos .inventory-gear .armor-layer {
+  flex: 1;
+  text-align: left;
+}
+
+.tos .inventory-gear .gear-equipped {
+  flex: 1;
+  padding-right: 9px;
+}
+
+.tos .inventory-gear .armor-value {
+  flex: 1;
+  margin-right: 55px;
+}
+
+.tos .inventory-consumable .item-formula {
+  flex: 1;
+}
+
+.tos .inventory-consumable .item-quantity {
+  flex: 1;
+  margin-right: 80px;
+}
+
+.tos .items-header .item-name {
+  flex: 4;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+
+.tos .items-header .ability-name {
+  width: 260px;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 6px;
+  flex: 0 0 auto;
+}
+
+.tos .items-header .ability-type,
+.tos .items-header .ability-cost,
+.tos .items-header .ability-damage,
+.tos .items-header .ability-test {
+  width: 113.73px;
+  flex: 0 0 auto;
+}
+
+.tos .items-header .item-prop {
+  flex: 1;
+}
+
+.tos .items-header .item-controls {
+  flex: 0 0 auto; /* fixed width for icons */
+  justify-content: flex-end;
+}
+
 .tos .items-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
   color: var(--tos-c-tan);
+  transition: max-height 0.25s ease-out, opacity 0.25s ease-out; /* smooth animation */
+}
+.tos .items-list.collapsed > li:not(.items-header) {
+  display: none !important;
 }
 .tos .items-list .item-list {
   list-style: none;
@@ -470,19 +539,23 @@ table tr td:nth-child(3) {
   margin: 0 6px;
 }
 .tos .items-list .item {
+  display: flex;
   align-items: center;
-  padding: 0 2px;
+  padding: 2px 4px;
   border-bottom: 1px solid var(--tos-c-faint);
 }
 .tos .items-list .item:last-child {
   border-bottom: none;
 }
 .tos .items-list .item .item-name {
-  color: var(--tos-c-dark);
-  max-width: 150px; /* Adjust as needed */
+  flex: 2.5; /* increased from 2 */
+  max-width: none; /* remove artificial cap */
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap; /* Prevent text from wrapping */
+  white-space: nowrap;
+  color: var(--tos-c-dark);
+  display: flex;
+  align-items: center;
 }
 .tos .items-list .item .item-name .item-image {
   flex: 0 0 30px;
@@ -492,10 +565,12 @@ table tr td:nth-child(3) {
   margin-right: 5px;
 }
 .tos .items-list .item-prop {
+  flex: 1; /* or even 0.5 for tighter columns */
   text-align: center;
-  border-right: 1px solid #c9c7b8;
-  border-left: 1px solid #c9c7b8;
   font-size: 12px;
+  border-left: 1px solid #c9c7b8;
+  border-right: 1px solid #c9c7b8;
+  padding: 0 4px;
 }
 
 .tos .item-prop-difficulty {
@@ -703,24 +778,29 @@ table tr td:nth-child(3) {
   text-align: center;
 }
 .tab.skills {
-  flex-direction: column;
-  flex-grow: 1;
-  overflow-y: auto; /* Scrollbar for long content */
   text-align: center;
 }
 @media (max-height: 1080px) {
+  .tab.features,
+  .tab.abilities,
+  .tab.inventory,
+  .tab.skills,
+  .tab.miracles,
   .tab.spells,
-  .tab.config,
-  .tab.skills {
-    max-height: 420px; /* Height for 1920x1080 resolution */
+  .tab.config {
+    max-height: 420px !important; /* Height for 1920x1080 resolution */
   }
 }
 
 @media (min-height: 1081px) {
+  .tab.features,
+  .tab.abilities,
+  .tab.inventory,
+  .tab.skills,
+  .tab.miracles,
   .tab.spells,
-  .tab.config,
-  .tab.skills {
-    max-height: 700px; /* Height for higher resolutions */
+  .tab.config {
+    max-height: 700px !important; /* Height for higher resolutions */
   }
 }
 
@@ -737,6 +817,12 @@ table tr td:nth-child(3) {
 .config-checkbox {
   display: block !important;
 }
+
+.tab.features,
+.tab.abilities,
+.tab.inventory,
+.tab.skills,
+.tab.miracles,
 .tab.spells,
 .tab.config {
   flex-direction: column;
