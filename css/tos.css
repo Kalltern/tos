@@ -504,11 +504,18 @@ table tr td:nth-child(3) {
   overflow-y: hidden;
   scrollbar-width: thin;
   color: var(--tos-c-tan);
+  opacity: 1;
   transition: max-height 0.25s ease-out, opacity 0.25s ease-out; /* smooth animation */
 }
-.tos .items-list.collapsed > li:not(.items-header) {
-  display: none !important;
+.tos .items-list.collapsed {
+  max-height: 30px;
+  opacity: 1;
 }
+
+.tos .items-list.collapsed > .items-header {
+  opacity: 1;
+}
+
 .tos .items-list .item-list {
   list-style: none;
   margin: 0;

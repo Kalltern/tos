@@ -14,14 +14,14 @@ async function getSneakDamageFormula(actor, weapon) {
     console.log(`Sneak used by ${counter}/3 systems`);
   }
 
-  const doctrineRogueLevel = actor.system.doctrines.rogue.value;
-
   let sneakEffect = 0;
   let sneakCritRange = 0;
-  if (doctrineRogueLevel >= 3) sneakEffect = 50;
-  if (doctrineRogueLevel >= 4) sneakCritRange = 2;
-
-  let sneakDamage = `${actor.system.sneakDamage}d6`;
+  if (actor.type !== "npc") {
+    const doctrineRogueLevel = actor.system.doctrines.rogue.value;
+    if (doctrineRogueLevel >= 3) sneakEffect = 50;
+    if (doctrineRogueLevel >= 4) sneakCritRange = 2;
+  }
+  let sneakDamage = `${actor.system.sneakDamage ?? 1}d6`;
   if (weapon.system.sneakDamage) {
     sneakDamage = `(${sneakDamage} + ${weapon.system.sneakDamage})`;
   }

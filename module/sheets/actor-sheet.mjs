@@ -112,11 +112,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   }
 
   static _toggleSchool(event) {
-    console.log(this);
-
-    const header = event.currentTarget;
+    const header = event.target;
     const list = header.closest(".items-list");
     list.classList.toggle("collapsed");
+    header.classList.toggle("collapsed");
   }
 
   static _toggleEquipped(event) {
