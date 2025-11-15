@@ -505,7 +505,7 @@ table tr td:nth-child(3) {
   scrollbar-width: thin;
   color: var(--tos-c-tan);
   opacity: 1;
-  transition: max-height 0.25s ease-out, opacity 0.25s ease-out; /* smooth animation */
+  transition: max-height 0.25s ease-out, opacity 0.25s ease-out;
 }
 .tos .items-list.collapsed {
   max-height: 30px;
@@ -555,8 +555,8 @@ table tr td:nth-child(3) {
   border-bottom: none;
 }
 .tos .items-list .item .item-name {
-  flex: 2.5; /* increased from 2 */
-  max-width: none; /* remove artificial cap */
+  flex: 2.5;
+  max-width: none;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -572,7 +572,7 @@ table tr td:nth-child(3) {
   margin-right: 5px;
 }
 .tos .items-list .item-prop {
-  flex: 1; /* or even 0.5 for tighter columns */
+  flex: 1;
   text-align: center;
   font-size: 12px;
   border-left: 1px solid #c9c7b8;
@@ -624,8 +624,10 @@ table tr td:nth-child(3) {
   text-align: center;
 }
 .tos .items-list .items-header .item-name {
-  padding-left: 5px;
   text-align: left;
+}
+.tos .spellDifficulty {
+  text-align: center;
 }
 .tos .item-formula {
   display: flex;
@@ -911,6 +913,9 @@ label {
   width: 50px; /* Set input box width */
   text-align: center; /* Center the text inside the input */
   padding: 0; /* Remove padding for better alignment */
+}
+input[data-class="stat-input"] {
+  text-align: center;
 }
 
 .reroll-container {

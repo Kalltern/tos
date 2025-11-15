@@ -198,6 +198,16 @@ Handlebars.registerHelper("groupBySchool", function (spells, options) {
   }));
 });
 
+Handlebars.registerHelper("groupByRank", function (spells, options) {
+  if (!Array.isArray(spells)) spells = []; // safeguard
+  const ranks = ["wild", "apprentice", "expert", "master", "grandmaster"];
+  // Map each rank to an object containing the spells of that rank
+  return ranks.map((rank) => ({
+    rank,
+    spells: spells.filter((s) => s.system?.rank === rank),
+  }));
+});
+
 Handlebars.registerHelper("healthPercentage", function (current, max) {
   if (max === 0) return 0; // Avoid division by zero
   return (current / max) * 100;

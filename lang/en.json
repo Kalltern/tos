@@ -216,9 +216,9 @@
           "penetration": { "label": "Penetration" },
           "breakthrough": { "label": "Breakthrough" },
           "sneakDamage": { "label": "Sneak Damage" },
-          "extra1": { "label": "Extra Effect" },
-          "extra2": { "label": "Extra Effect" },
-          "extra3": { "label": "Extra Effect" }
+          "extra1": { "label": "Extra Effect 1" },
+          "extra2": { "label": "Extra Effect 2" },
+          "extra3": { "label": "Extra Effect 3" }
         }
       },
       "Gear": {
@@ -285,7 +285,11 @@
           "domain": { "label": "Domain" },
           "shepherdsWill": { "label": "Shepherd's will" },
           "headerType": { "label": "Type" },
-          "isOffensive": { "label": "Offensive" }
+          "wild": { "label": "Wild" },
+          "apprentice": { "label": "Apprentice" },
+          "expert": { "label": "Expert" },
+          "master": { "label": "Master" },
+          "grandmaster": { "label": "Grandmaster" }
         }
       }
     },
@@ -294,7 +298,12 @@
       "Toggle": "Toggle Effect",
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
-      "Inactive": "Inactive Effects"
+      "Inactive": "Inactive Effects",
+      "Custom": {
+        "name1": "Effect 1 Name",
+        "name2": "Effect 2 Name",
+        "name3": "Effect 3 Name"
+      }
     }
   },
   "TYPES": {

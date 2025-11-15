@@ -1,137 +1,116 @@
-{{! Spells Tab }}
 <section
-  class='tab spells {{tab.cssClass}}'
-  data-group='primary'
-  data-tab='spells'
+  class="tab spells {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="spells"
 >
-<h2 class="flex-group-center">
-{{localize "TOS.Actor.Character.schools.spellPower.label"}}
-</h2>
+  <h2 class="flex-group-center">
+    {{localize "TOS.Actor.Character.schools.spellPower.label"}}
+  </h2>
 
-<div class='grid grid-9col'>
-  {{#if (eq actor.type "character")}}
-  {{#each system.schools as |school key|}}
-      <div class="grid-span-1-spell">
-        <label class="resource-label">
-    {{localize (concat "TOS.Actor.Character.schools." key ".label")}}
+  <div class="grid grid-9col">
+    {{#if (eq actor.type "character")}}
+      {{#each system.schools as |school key|}}
+        <div class="grid-span-1-spell">
+          <label class="resource-label">
+            {{localize (concat "TOS.Actor.Character.schools." key ".label")}}
           </label>
-        <input
-          class="spell-value"
-          type="text"
-          name="system.schools.{{key}}.spellPower"
-          value="{{school.spellPower}}"
-          data-dtype="Number"
-          readonly
-        />
-      </div>
-  {{/each}}
-  {{/if}}
+          <input
+            class="spell-value"
+            type="text"
+            name="system.schools.{{key}}.spellPower"
+            value="{{school.spellPower}}"
+            data-dtype="Number"
+            readonly
+          />
+        </div>
+      {{/each}}
+    {{/if}}
 
-{{#if (eq actor.type "npc")}}
-  {{#each system.schools as |school key|}}
-      <div class="grid-span-1-spell">
-        <label class="resource-label">
-    {{localize (concat "TOS.Actor.Character.schools." key ".label")}}
+    {{#if (eq actor.type "npc")}}
+      {{#each system.schools as |school key|}}
+        <div class="grid-span-1-spell">
+          <label class="resource-label">
+            {{localize (concat "TOS.Actor.Character.schools." key ".label")}}
           </label>
-        <input
-          class="spell-value"
-          type="text"
-          name="system.schools.{{key}}.spellPower"
-          value="{{school.spellPower}}"
-          data-dtype="Number"
-          
-        />
-      </div>
-  {{/each}}
-{{/if}}
-</div>
-<h2
-class="flex-group-center">
-Spells
-</h2>
+          <input
+            class="spell-value"
+            type="text"
+            name="system.schools.{{key}}.spellPower"
+            value="{{school.spellPower}}"
+            data-dtype="Number"
+          />
+        </div>
+      {{/each}}
+    {{/if}}
+  </div>
 
-{{#each (groupBySchool spells) as |group|}}
-   {{#unless (eq item.system.option "divine")}}
-
-
-    <ol class='items-list' data-school='{{group.school}}'>
-    <li class='item flexrow items-header' data-action='toggleSchool'>
-      <div class="item-name">  {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}</div>
-            <div class='item-name'>
-      {{localize "TOS.Item.Spell.FIELDS.difficulty.label"}}
-      </div>
-            <div class='item-name'>
-        {{localize "TOS.Item.Spell.FIELDS.headerCost.label"}}
-      </div>
-            <div class='item-name'>
-        {{localize "TOS.Item.Spell.FIELDS.headerActions.label"}}
-      </div>
-            <div class='item-name'>
-        {{localize "TOS.Item.Spell.FIELDS.headerRange.label"}}
-      </div>
-
-    </li>
-  {{/unless}}
-
-  
-    {{#each group.spells as |item|}}
-       {{#unless (eq item.system.option "divine")}}
-      <li
-        class='item flexrow'
-        data-item-id='{{item._id}}'
-        data-drag='true'
-        data-document-class='Item'
+  <!-- Sub-tab navigation -->
+  <nav class="tabs" data-group="spells-subtabs">
+    {{#each (groupBySchool spells) as |group|}}
+      <a
+        class="item {{#if @first}}active{{/if}}"
+        data-group="spells-subtabs"
+        data-tab="{{group.school}}"
+        data-action="tab"
       >
-        <div class='item-name flexrow'>
-          <div class='item-image'>
-            <a class='rollable' data-roll-type='item' data-action='roll'>
-              <img
-                src='{{item.img}}'
-                title='{{item.name}}'
-                width='24'
-                height='24'
-              />
-            </a>
-          </div>
-          <div>{{item.name}}</div>
-        </div>
+        {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}
+      </a>
+    {{/each}}
+  </nav>
 
-          <div class="item-formula item-prop-dificulty">{{item.system.difficulty}}</div>
-          <div class="item-formula item-prop-spell">{{item.system.cost}}{{#if item.system.perRound}} / {{item.system.perRound}} {{/if}}</div>
-          <div class="item-formula item-prop-spell">{{item.system.actionCost}}</div>
-          <div class="item-formula item-prop-spell">{{item.system.range}}</div>
+ {{#each (groupBySchool spells) as |group index|}}
+  <section
+    class="tab {{group.school}} {{#if (eq index 0)}}active{{/if}}"
+    data-group="spells-subtabs"
+    data-tab="{{group.school}}"
+  >
 
+    {{!-- Group spells by rank within this school --}}
+    {{#each (groupByRank group.spells) as |rankGroup|}}
+      {{!-- Skip empty rank groups --}}
+      {{#if rankGroup.spells.length}}
+        <ol class="items-list" data-rank="{{rankGroup.rank}}">
+          <li class="item flexrow items-header" data-action="toggleSchool">
+            <div class="item-name">{{localize (concat "TOS.Item.Spell.FIELDS." rankGroup.rank ".label")}}</div>
+            <div class="item-name spellDifficulty">{{localize "TOS.Item.Spell.FIELDS.difficulty.label"}}</div>
+            <div class="item-name">{{localize "TOS.Item.Spell.FIELDS.headerCost.label"}}</div>
+            <div class="item-name">{{localize "TOS.Item.Spell.FIELDS.headerActions.label"}}</div>
+            <div class="item-name">{{localize "TOS.Item.Spell.FIELDS.headerRange.label"}}</div>
+          </li>
 
-        <div class='item-controls'>
-          <a
-            class='item-control item-edit'
-            title='{{localize "DOCUMENT.Update" type='spell'}}'
-            data-action='viewDoc'
-          >
-            <i class='fas fa-edit'></i>
-          </a>
-          {{#if @root.editable}}
-            <a
-              class='item-control item-delete'
-              title='{{localize "DOCUMENT.Delete" type='spell'}}'
-              data-action='deleteDoc'
-            >
-              <i class='fas fa-trash'></i>
-            </a>
-          {{/if}}
-        </div>
-      </li>
-    {{/unless}}
-    {{/each}}    
-  </ol>
+          {{#each rankGroup.spells as |item|}}
+            <li class="item flexrow" data-item-id="{{item._id}}" data-drag="true" data-document-class="Item">
+              <div class="item-name flexrow">
+                <div class="item-image">
+                  <a class="rollable" data-roll-type="item" data-action="roll">
+                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                  </a>
+                </div>
+                <div>{{item.name}}</div>
+              </div>
 
+              <div class="item-formula item-prop-dificulty">{{item.system.difficulty}}</div>
+              <div class="item-formula item-prop-spell">
+                {{item.system.cost}}{{#if item.system.perRound}} / {{item.system.perRound}}{{/if}}
+              </div>
+              <div class="item-formula item-prop-spell">{{item.system.actionCost}}</div>
+              <div class="item-formula item-prop-spell">{{item.system.range}}</div>
+
+              <div class="item-controls">
+                <a class="item-control item-edit" title="{{localize 'DOCUMENT.Update' type="spell"}}" data-action="viewDoc">
+                  <i class="fas fa-edit"></i>
+                </a>
+                {{#if @root.editable}}
+                  <a class="item-control item-delete" title="{{localize 'DOCUMENT.Delete' type="spell"}}" data-action="deleteDoc">
+                    <i class="fas fa-trash"></i>
+                  </a>
+                {{/if}}
+              </div>
+            </li>
+          {{/each}}
+        </ol>
+      {{/if}}
+    {{/each}}
+
+  </section>
 {{/each}}
-
-
-
-
-
-
-
-
-</section>

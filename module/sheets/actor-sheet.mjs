@@ -307,8 +307,11 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   _getTabs(parts) {
     // If you have sub-tabs this is necessary to change
     const tabGroup = "primary";
+    const tabSpellGroup = "spells-subtabs";
+
     // Default tab for first time it's rendered this session
     if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = "biography";
+    if (!this.tabGroups[tabSpellGroup]) this.tabGroups[tabSpellGroup] = "fire";
     return parts.reduce((tabs, partId) => {
       const tab = {
         cssClass: "",
@@ -376,8 +379,50 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = "effects";
           tab.label += "Effects";
           break;
+
+        case "fire":
+          tab.id = "fire";
+          tab.label += "Fire";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "earth":
+          tab.id = "earth";
+          tab.label += "Earth";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "water":
+          tab.id = "water";
+          tab.label += "Water";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "air":
+          tab.id = "air";
+          tab.label += "Air";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "spirit":
+          tab.id = "spirit";
+          tab.label += "Spirit";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "body":
+          tab.id = "body";
+          tab.label += "Body";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "dark":
+          tab.id = "dark";
+          tab.label += "Dark";
+          tab.group = tabSpellGroup;
+          break;
       }
-      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
+      if (this.tabGroups[tab.group] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;
       return tabs;
     }, {});

@@ -1,0 +1,181 @@
+{{! combatEffects Tab }}
+<section
+  class="tab combatEffects {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="combatEffects"
+>
+
+  <div class="grid grid-3col">
+
+    {{!-- -------------------------
+         Built-in effects
+    -------------------------- --}}
+
+    <div class="grid-span-1 effect-row">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.stun.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.effects.stun"
+        value="{{system.effects.stun}}"
+        data-dtype="Number"
+      />
+    </div>
+
+    <div class="grid-span-1 effect-row">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.bleed.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.effects.bleed"
+        value="{{system.effects.bleed}}"
+        data-dtype="Number"
+      />
+    </div>
+
+    <div class="grid-span-1 effect-row">
+    </div>
+    {{!-- -------------------------
+         Customizable effect slot #1
+    -------------------------- --}}
+    <div class="grid-span-1">
+      <label class="resource-label">Effect Type 1</label>
+      <select name="system.effectType1">
+        <option value="">-- Select a type --</option>
+        {{#each system.effectTypes as |effectType|}}
+          <option value="{{effectType}}"
+            {{#if (eq ../system.effectType1 effectType)}}selected{{/if}}>
+            {{effectType}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.extra1.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.effects.extra1"
+        value="{{system.effects.extra1}}"
+        data-dtype="Number"
+      />
+    </div>
+
+ {{#if (eq system.effectType1 "custom")}}
+     <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Effect.Custom.name1"}}
+      </label>
+      <input
+        type="text"
+        name="system.effects.extra1.name"
+        value="{{system.effects.extra1.name}}"
+        data-dtype="text"
+      />
+    </div>
+{{/if}}
+
+{{#unless (eq system.effectType1 "custom")}}
+    <div class="grid-span-1 effect-row">
+    </div>
+{{/unless}}
+    {{!-- -------------------------
+         Customizable effect slot #2
+    -------------------------- --}}
+    <div class="grid-span-1">
+      <label class="resource-label">Effect Type 2</label>
+      <select name="system.effectType2">
+        <option value="">-- Select a type --</option>
+        {{#each system.effectTypes as |effectType|}}
+          <option value="{{effectType}}"
+            {{#if (eq ../system.effectType2 effectType)}}selected{{/if}}>
+            {{effectType}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.extra2.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.effects.extra2"
+        value="{{system.effects.extra2}}"
+        data-dtype="Number"
+      />
+    </div>
+
+ {{#if (eq system.effectType2 "custom")}}
+     <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Effect.Custom.name2"}}
+      </label>
+      <input
+        type="text"
+        name="system.effects.extra2.name"
+        value="{{system.effects.extra2.name}}"
+        data-dtype="text"
+      />
+    </div>
+{{/if}}
+
+{{#unless (eq system.effectType2 "custom")}}
+    <div class="grid-span-1 effect-row">
+    </div>
+{{/unless}}
+
+    {{!-- -------------------------
+         Customizable effect slot #3
+    -------------------------- --}}
+    <div class="grid-span-1">
+      <label class="resource-label">Effect Type 3</label>
+      <select name="system.effectType3">
+        <option value="">-- Select a type --</option>
+        {{#each system.effectTypes as |effectType|}}
+          <option value="{{effectType}}"
+            {{#if (eq ../system.effectType3 effectType)}}selected{{/if}}>
+            {{effectType}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.extra3.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.effects.extra3"
+        value="{{system.effects.extra3}}"
+        data-dtype="Number"
+      />
+    </div>
+
+ {{#if (eq system.effectType3 "custom")}}
+     <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Effect.Custom.name3"}}
+      </label>
+      <input
+        type="text"
+        name="system.effects.extra3.name"
+        value="{{system.effects.extra3.name}}"
+        data-dtype="text"
+      />
+    </div>
+{{/if}}
+
+{{#unless (eq system.effectType3 "custom")}}
+    <div class="grid-span-1 effect-row">
+    </div>
+{{/unless}}
+
+  </div>
+</section>

@@ -1037,7 +1037,27 @@
         "extra1": 0,
         "extra2": 0,
         "extra3": 0
-      }
+      },
+      "effectOptions": ["and", "or"],
+      "effectTypes": [
+        "bleeding",
+        "burning",
+        "chain",
+        "disorientation",
+        "dispell",
+        "flammable",
+        "frozen",
+        "concussion",
+        "paralyzed",
+        "poisoned",
+        "rooted",
+        "slowed",
+        "stun",
+        "vulnerable",
+        "weakened",
+        "custom",
+        "wet"
+      ]
     },
     "gear": {
       "templates": ["base"],
@@ -1098,7 +1118,7 @@
         "burning",
         "chain",
         "disorientation",
-        "dispel",
+        "dispell",
         "flammable",
         "frozen",
         "concussion",
@@ -1109,6 +1129,7 @@
         "stun",
         "vulnerable",
         "weakened",
+        "custom",
         "wet"
       ],
       "classOptions": ["movement", "attack", "defense"],
@@ -1168,7 +1189,7 @@
         "burning",
         "chain",
         "disorientation",
-        "dispel",
+        "dispell",
         "flammable",
         "frozen",
         "concussion",
@@ -1179,6 +1200,7 @@
         "stun",
         "vulnerable",
         "weakened",
+        "custom",
         "wet"
       ],
       "classOptions": ["support", "lesser", "greater"],
