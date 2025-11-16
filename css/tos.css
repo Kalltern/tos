@@ -338,6 +338,20 @@ table tr td:nth-child(3) {
   flex: 1;
   margin-bottom: 75px;
 }
+
+.header-fields .grid .grid-2col input {
+  text-align: center;
+}
+
+.header-fields input {
+  text-align: center;
+}
+
+/* Center the grid items inside their grid cell */
+.header-fields .grid-2col > div {
+  text-align: center;
+}
+
 .tos .sheet-tabs {
   flex: 0;
 }
