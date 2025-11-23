@@ -157,11 +157,8 @@ async function weaponSelectionFlow(actor, ability) {
 
   const handleWeaponSelection = async (weaponIndex) => {
     const weapon = weapons[weaponIndex];
-
     const abilityDamage = ability.system.roll.diceBonus || 0;
     const abilityAttack = ability.system.attack || 0;
-    const abilityBleed = ability.system.effects.bleed || 0;
-    const abilityStun = ability.system.effects.stun || 0;
     const abilityBreakthrough = ability.system.breakthrough || 0;
     const abilityPenetration = ability.system.penetration || 0;
     const abilityAttributeTestName = ability.system.attributeTest || 0;
@@ -169,9 +166,6 @@ async function weaponSelectionFlow(actor, ability) {
     const abilityCritRange = ability.system.critRange || 0;
     const abilityCritChance = ability.system.critChance || 0;
     const abilityCritFail = ability.system.critFail || 0;
-    const abilityEffect1 = ability.system.effects.effect1 || 0;
-    const abilityEffect2 = ability.system.effects.effect2 || 0;
-    const abilityEffect3 = ability.system.effects.effect3 || 0;
 
     await runAttackMacro(
       actor,
@@ -179,18 +173,13 @@ async function weaponSelectionFlow(actor, ability) {
       ability,
       abilityDamage,
       abilityAttack,
-      abilityBleed,
-      abilityStun,
       abilityBreakthrough,
       abilityPenetration,
       abilityAttributeTestName,
       abilityTestModifier,
       abilityCritRange,
       abilityCritChance,
-      abilityCritFail,
-      abilityEffect1,
-      abilityEffect2,
-      abilityEffect3
+      abilityCritFail
     );
   };
 
@@ -331,18 +320,13 @@ async function runAttackMacro(
   ability,
   abilityDamage,
   abilityAttack,
-  abilityBleed,
-  abilityStun,
   abilityBreakthrough,
   abilityPenetration,
   abilityAttributeTestName,
   abilityTestModifier,
   abilityCritRange,
   abilityCritChance,
-  abilityCritFail,
-  abilityEffect1,
-  abilityEffect2,
-  abilityEffect3
+  abilityCritFail
 ) {
   let {
     doctrineBonus,
@@ -429,13 +413,9 @@ async function runAttackMacro(
       doctrineBleedBonus,
       doctrineStunBonus,
       weaponSkillEffect,
-      abilityBleed,
-      abilityStun,
-      abilityEffect1,
-      abilityEffect2,
-      abilityEffect3,
       critScore,
-      critSuccess
+      critSuccess,
+      ability
     );
 
   console.log(
@@ -491,17 +471,18 @@ async function runAttackMacro(
     speaker: ChatMessage.getSpeaker(),
     rolls: [attackRoll, damageRoll],
     flavor: `
-  <h2><img src="${ability.img}" title="${ability.name} with ${
-      weapon.name
-    }" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">${
-      ability.name
-    } with ${weapon.name}</h2>
+    <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
+  <img src="${ability.img}" title="${ability.name}" width="36" height="36">
+  <span>${ability.name} with ${weapon.name}</span>
+</div>
 <table style="width: 100%; text-align: center;font-size: 15px;">
     <tr>
       <th>Description:</th>
     </tr>
     <td>${concatRollAndDescription}</td>
-    
+ <p style="text-align: center; font-size: 20px;"><b>
+  ${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}
+  </b></p>    
 </table>
 <table style="width: 100%; text-align: center;font-size: 15px;">
       <th>Normal</th>
@@ -511,20 +492,18 @@ async function runAttackMacro(
     <tr>
       <td>${damageTotal}</td>
       <td>${critDamageTotal}</td>
-      <td>${breakthroughRollResult}</td>
+       ${weapon.system.breakthrough ? `<td>${breakthroughRollResult}</td>` : ""}
     </tr>
 </table>
-  <p style="text-align: center; font-size: 20px;"><b>
-  ${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}
-  </b></p>
+ 
   <hr>
   <table style="width: 100%; text-align: center; font-size: 15px;">
     <tr>
-      <th>Penetration | Critical </th>
+      <th>Penetration</th>
       <th>Critical Score</th>
     </tr>
     <tr>
-      <td>${penetration} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ${critBonusPenetration}</td>
+      <td>${penetration} | ${critBonusPenetration}</td>
       <td>${critScore} (D20: ${critScoreResult})</td>
     </tr>
   </table>

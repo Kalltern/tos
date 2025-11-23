@@ -343,7 +343,7 @@ export async function getAttackRolls(
   doctrineBonus,
   doctrineCritBonus,
   weaponSkillCrit,
-  customAttack,
+  abilityAttack = 0,
   customCritFail = 0
 ) {
   let criticalSuccessThreshold = 0;
@@ -353,13 +353,13 @@ export async function getAttackRolls(
   let attackRollFormula = 0;
   const useFlanking = actor.getFlag("tos", "useFlankingAttack");
   if (useFlanking) {
-    customAttack += 10;
+    abilityAttack += 10;
     await actor.unsetFlag("tos", "useFlankingAttack");
   }
   const aimValue = actor.getFlag("tos", "aimCount");
   if (aimValue > 0) {
-    customAttack += aimValue * 10;
-    console.log("Aim value", aimValue, customAttack);
+    abilityAttack += aimValue * 10;
+    console.log("Aim value", aimValue, abilityAttack);
     await actor.unsetFlag("tos", "aimCount");
   }
 
@@ -374,10 +374,10 @@ export async function getAttackRolls(
       (weapon.system.critFail || 0) -
       customCritFail;
     // ATTACK ROLL
-    console.log("Aim value", aimValue, customAttack);
+    console.log("Aim value", aimValue, abilityAttack);
     attackRollFormula = `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
-    if (customAttack) {
-      attackRollFormula = `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`;
+    if (abilityAttack) {
+      attackRollFormula = `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} + ${abilityAttack} - 1d100`;
     }
   } else {
     criticalSuccessThreshold =
@@ -393,11 +393,11 @@ export async function getAttackRolls(
       finesse > normalCombat && weapon.system.finesse
         ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} - 1d100`
         : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
-    if (customAttack) {
+    if (abilityAttack) {
       attackRollFormula =
         finesse > normalCombat && weapon.system.finesse
-          ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`
-          : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} + ${customAttack} - 1d100`;
+          ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} + ${abilityAttack} - 1d100`
+          : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} + ${abilityAttack} - 1d100`;
     }
   }
 
@@ -428,7 +428,12 @@ export async function getAttackRolls(
   };
 }
 
-export async function getDamageRolls(actor, weapon, customDamage) {
+export async function getDamageRolls(
+  actor,
+  weapon,
+  abilityDamage = 0,
+  abilityBreakthrough = 0
+) {
   const rollData = {
     combatSkills: actor.system.combatSkills,
     weaponAttack: weapon.system.attack || 0,
@@ -446,7 +451,7 @@ export async function getDamageRolls(actor, weapon, customDamage) {
   let damageFormula = `(${weapon.system.formula}`;
   if (sneakDamage) damageFormula += sneakDamage;
   damageFormula += ")";
-  if (customDamage) damageFormula += `${customDamage}`;
+  if (abilityDamage) damageFormula += `${abilityDamage}`;
 
   damageFormula = damageFormula.replace(/\s*\+\s*$/, "");
   damageFormula = damageFormula.replace(/@([\w.]+)/g, (_, key) => {
@@ -459,7 +464,8 @@ export async function getDamageRolls(actor, weapon, customDamage) {
   // If the weapon has breakthrough, roll it
   let breakthroughRollResult = "";
   if (weapon.system.breakthrough) {
-    const breakthroughFormula = weapon.system.breakthrough; // Example: "2d6" or "3d6"
+    const breakthroughFormula =
+      weapon.system.breakthrough + abilityBreakthrough;
     const breakthroughRoll = new Roll(breakthroughFormula, actor.system);
     await breakthroughRoll.evaluate();
     breakthroughRollResult = `${breakthroughRoll.total}`; // Customize as needed
@@ -530,93 +536,91 @@ export async function getCriticalRolls(
   };
 }
 
+function getEffectName(systemMap, effectMap, index) {
+  const primaryNameKey = `effectType${index}`;
+  const customNameKey = `effectName${index}`;
+
+  // 1. Get the primary system name (e.g., "Bleed", "Stun", or "Custom")
+  const primaryName = systemMap[primaryNameKey] || "";
+
+  if (primaryName.toLowerCase() === "custom") {
+    // If it's custom, return the user-typed name from the effects data
+    return effectMap[customNameKey] || "";
+  }
+
+  // 3. Otherwise, return the primary system name
+  return primaryName;
+}
+
 export async function getEffectRolls(
   actor,
   weapon,
   doctrineBleedBonus,
   doctrineStunBonus,
   weaponSkillEffect,
-  customBleed,
-  customStun,
-  customEffect1,
-  customEffect2,
-  customEffect3,
   critScore,
-  critSuccess
+  critSuccess,
+  ability = {}
 ) {
-  // EFFECT ROLLS (Check sharpness and bleed effect)
+  // --- Initial Setup ---
   const { sneakEffect } = await getSneakDamageFormula(actor, weapon);
   console.log("sneakEffect", sneakEffect);
   let effectsRollResults = "";
   const weaponEffects = weapon.system.effects || {};
-  // Get actor effects modifiers (if any)
   const actorEffects = actor.system.effects || {};
-
-  let totalBleeds = 0; // To count the total number of bleed stacks
+  const weaponSystem = weapon.system || {};
+  let abilityEffects = {};
+  let abilitySystem = {};
+  if (ability) {
+    abilityEffects = ability.system.effects || {};
+    abilitySystem = ability.system || {};
+  }
+  let totalBleeds = 0;
   let regularBleedRolls = [];
   let sharpBleedRolls = [];
+  const usedAbilitySlots = { extra1: false, extra2: false, extra3: false };
+
   console.log("critScore", critScore);
   if (critScore > 1 && critSuccess) {
     totalBleeds += 1;
-  }
+  } // --- 1. Process Fixed Effects (STUN and BLEED) ---
 
-  const customEffects = {
-    stun: customStun,
-    bleed: customBleed,
-    extra1: customEffect1,
-    extra2: customEffect2,
-    extra3: customEffect3,
-  };
-  // Process each effect on the weapon, applying actor effect modifiers if present
-  for (const [effectName, effectValue] of Object.entries(weaponEffects)) {
-    if (effectValue > 0) {
-      // Get the modifier from actor's effects (if any)
+  const fixedEffectNames = ["stun", "bleed"];
 
-      const modifier = actorEffects[effectName] || 0;
-      const customBonus = customEffects[effectName] || 0;
-      // modifiedEffectValue is here declared first for Other effects than Stun or Bleed
-      let modifiedEffectValue = effectValue + modifier + customBonus;
+  for (const effectName of fixedEffectNames) {
+    const baseValue = weaponEffects[effectName] || 0;
+    const modifier = actorEffects[effectName] || 0;
+    let abilityBonus = 0;
+    if (ability) {
+      abilityBonus = abilityEffects[effectName];
+    }
+    let shouldProcess = baseValue > 0;
+
+    if (shouldProcess) {
+      let modifiedEffectValue = baseValue + modifier + abilityBonus;
+
       if (effectName === "stun") {
         modifiedEffectValue =
-          effectValue +
-          modifier +
-          customBonus +
+          modifiedEffectValue +
           doctrineStunBonus +
           sneakEffect +
           weaponSkillEffect +
           (critScore > 1 && critSuccess ? 100 : 0);
-      }
-      if (effectName === "bleed") {
+        const d100Roll = new Roll("1d100");
+        await d100Roll.evaluate();
+        const roundedModifiedValue = Math.floor(modifiedEffectValue);
+        const successText =
+          d100Roll.total <= roundedModifiedValue ? " SUCCESS" : "";
+        effectsRollResults += `<p><b>${effectName}:</b> ${roundedModifiedValue}>${d100Roll.total}${successText}</p>`;
+      } else if (effectName === "bleed") {
         modifiedEffectValue =
-          effectValue +
-          modifier +
-          customBonus +
+          modifiedEffectValue +
           doctrineBleedBonus +
           sneakEffect +
           weaponSkillEffect;
-      }
 
-      // Roll a separate 1d100
-      const d100Roll = new Roll("1d100");
-      await d100Roll.evaluate();
-
-      // Optionally use Math.floor if modifiedEffectValue might be non-integer
-      const roundedModifiedValue = Math.floor(modifiedEffectValue);
-
-      // For non-bleed effects, add the result text normally.
-      if (effectName.toLowerCase() !== "bleed") {
-        // Check if the d100 roll was lower or equal than the modified chance.
-        const successText =
-          d100Roll.total <= roundedModifiedValue ? " SUCCESS" : "";
-        let effectResultText = `<p><b>${effectName}:</b> ${roundedModifiedValue}>${d100Roll.total}${successText}</p>`;
-        effectsRollResults += effectResultText;
-      }
-
-      // Process bleed effect
-      if (effectName.toLowerCase() === "bleed") {
-        // Calculate bleed stacks using the modified effect value
-        const bleedBase = Math.floor(modifiedEffectValue / 100); // Guaranteed bleed stacks (0 if modifiedEffectValue < 100)
-        const bleedChance = modifiedEffectValue % 100; // Extra chance for an additional bleed stack
+        const bleedBase = Math.floor(modifiedEffectValue / 100);
+        const bleedChance = modifiedEffectValue % 100;
         const bleedRoll = new Roll("1d100");
         await bleedRoll.evaluate();
         const bleedRollResult = bleedRoll.total;
@@ -629,54 +633,97 @@ export async function getEffectRolls(
     }
   }
 
-  // Handle Sharp Bleed Logic: If sharp is true and a bleed effect exists, do the same calculation again.
-  let sharpBleedText = "";
+  // --- 2. & 3. Combined Custom Effect Logic (Single Loop) ---
+
+  const customEffectRolls = new Map(); // Map to store final merged results: Map<Effect Name, Final Value>
+
+  // 2a. Initialize Map with ALL Weapon Effects
+  for (let i = 1; i <= 3; i++) {
+    const wKey = `extra${i}`;
+    const wValue = weaponEffects[wKey] || 0;
+
+    // Use the helper to get the final name (e.g., "COLORBLIND")
+    const wName = getEffectName(weaponSystem, weaponEffects, i);
+
+    if (wValue > 0 && wName.trim() !== "") {
+      customEffectRolls.set(wName, wValue);
+    }
+  }
+
+  // 2b. Merge/Add ALL Ability Effects
+  if (ability) {
+    for (let j = 1; j <= 3; j++) {
+      const aKey = `extra${j}`;
+      const aValue = abilityEffects[aKey] || 0;
+
+      // Use the helper to get the final name (e.g., "COLORBLIND")
+      const aName = getEffectName(abilitySystem, abilityEffects, j);
+
+      if (aValue > 0 && aName.trim() !== "") {
+        if (customEffectRolls.has(aName)) {
+          // Match found: Add the ability value to the existing weapon value
+          const mergedValue = customEffectRolls.get(aName) + aValue;
+          customEffectRolls.set(aName, mergedValue);
+        } else {
+          // Unique ability effect: Use the final name, but add a label for clarity
+          customEffectRolls.set(`${aName}`, aValue);
+        }
+      }
+    }
+  }
+  // 3. Process and Display ALL Merged Effects from the Map
+  for (const [name, value] of customEffectRolls.entries()) {
+    const modifiedEffectValue = value;
+
+    const d100Roll = new Roll("1d100");
+    await d100Roll.evaluate();
+    const roundedModifiedValue = Math.floor(modifiedEffectValue);
+    const successText =
+      d100Roll.total <= roundedModifiedValue ? " SUCCESS" : "";
+
+    // The 'name' variable here will be the user-typed custom name if applicable
+    effectsRollResults += `<p><b>${name}:</b> ${d100Roll.total} < ${roundedModifiedValue}${successText}</p>`;
+  } // --- 4. Sharp Bleed Logic ---
+
   if (weapon.system.sharp && weaponEffects.bleed) {
     if (critScore > 1 && critSuccess) {
       totalBleeds += 1;
     }
-    // Get the actor's modifier for bleed if it exists
     const modifier = actorEffects["bleed"] || 0;
     const modifiedBleedValue =
       weaponEffects.bleed +
       modifier +
-      customBleed +
+      (abilityEffects["bleed"] || 0) +
       weaponSkillEffect +
       doctrineBleedBonus +
       sneakEffect;
     const bleedChance = modifiedBleedValue % 100;
     const sharpBleedRoll = new Roll("1d100");
     await sharpBleedRoll.evaluate();
-    const sharpRollResult = sharpBleedRoll.total;
-
-    let sharpStacks = Math.floor(modifiedBleedValue / 100); // Guaranteed from sharp roll
-    if (sharpRollResult <= bleedChance) sharpStacks++;
+    let sharpStacks = Math.floor(modifiedBleedValue / 100);
+    if (sharpBleedRoll.total <= bleedChance) sharpStacks++;
     totalBleeds += sharpStacks;
-    sharpBleedRolls.push(sharpRollResult);
-  }
+    sharpBleedRolls.push(sharpBleedRoll.total);
+  } // --- 5. Combine All Bleed Rolls and Final Return ---
 
-  // Combine all Bleed Rolls (regular + sharp) into one message
+  const abilityBleed = abilityEffects["bleed"] || 0;
   let bleedChanceDisplay;
   if (weaponEffects.bleed > 0) {
     bleedChanceDisplay =
       (weaponEffects.bleed || 0) +
       (actor.system.effects.bleed || 0) +
-      (customBleed || 0) +
+      (abilityBleed || 0) +
       (weaponSkillEffect || 0) +
       (sneakEffect || 0) +
       (doctrineBleedBonus || 0);
   }
-  // Only display the message if bleedChanceDisplay is greater than 0
   let allBleedRollResults = "";
-  if (
-    bleedChanceDisplay >
-    weaponSkillEffect + doctrineBleedBonus + customBleed
-  ) {
+  if (totalBleeds > 0 || bleedChanceDisplay > 0) {
     allBleedRollResults = `Bleed: ${[
       ...regularBleedRolls,
       ...sharpBleedRolls,
     ].join(" | Sharp: ")} < ${bleedChanceDisplay}% |
-    <i class="fa-regular fa-droplet fa-lg" style="color: #bd0000;"></i>  ${totalBleeds}`;
+    <i class="fa-regular fa-droplet fa-lg" style="color: #bd0000;"></i>  ${totalBleeds}`;
   }
 
   return {

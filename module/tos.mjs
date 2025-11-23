@@ -18,10 +18,11 @@ import {
   getCriticalRolls,
 } from "./utils/combatSkillBonuses.mjs";
 import {
-  handleManaCost,
-  getMagicAttackRolls,
-  getMagicDamageRolls,
-  handleSpellSelection,
+  showSpellSelectionDialogs,
+  deductMana,
+  calculateAttackBonuses,
+  performAttackRoll,
+  finalizeRollsAndPostChat,
 } from "./utils/magicSkillBonuses.mjs";
 
 /* -------------------------------------------- */
@@ -58,10 +59,12 @@ Hooks.once("init", function () {
   game.tos.getDamageRolls = getDamageRolls;
   game.tos.getEffectRolls = getEffectRolls;
   game.tos.getCriticalRolls = getCriticalRolls;
-  game.tos.handleManaCost = handleManaCost;
-  game.tos.getMagicAttackRolls = getMagicAttackRolls;
-  game.tos.getMagicDamageRolls = getMagicDamageRolls;
-  game.tos.handleSpellSelection = handleSpellSelection;
+  game.tos.showSpellSelectionDialogs = showSpellSelectionDialogs;
+  game.tos.deductMana = deductMana;
+  game.tos.calculateAttackBonuses = calculateAttackBonuses;
+  game.tos.performAttackRoll = performAttackRoll;
+  game.tos.finalizeRollsAndPostChat = finalizeRollsAndPostChat;
+
   /**
    * Set an initiative formula for the system
    * @type {String}

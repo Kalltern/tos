@@ -284,7 +284,7 @@
           "holyPower": { "label": "Holy power" },
           "domain": { "label": "Domain" },
           "shepherdsWill": { "label": "Shepherd's will" },
-          "headerType": { "label": "Type" },
+          "headerType": { "label": "Damage Type" },
           "wild": { "label": "Wild" },
           "apprentice": { "label": "Apprentice" },
           "expert": { "label": "Expert" },
