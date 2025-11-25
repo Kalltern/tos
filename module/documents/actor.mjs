@@ -124,7 +124,7 @@ export class ToSActor extends Actor {
       5 * stat.graveWounds.value - 3 * stat.graveWounds.treated;
     const archery = systemData.combatSkills.archery;
     const combat = systemData.combatSkills.combat;
-    const melee = systemData.combatSkills.combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
+    const melee = combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
     const brawler = systemData.skills.brawler;
     const attributeScore = Object.entries(systemData.attributes).map(
       ([key, attribute]) => ({
@@ -285,7 +285,7 @@ export class ToSActor extends Actor {
           }
         }
         if (combatSkill === rangeddef) {
-          if (archery.value > combat.value && archery.value != 0) {
+          if (archery.value > melee && archery.value != 0) {
             combatSkill.rating =
               rangedDefenseSet[archery.value] +
               attributeScore[combatSkill.id].total * 3 +
@@ -299,7 +299,7 @@ export class ToSActor extends Actor {
               graveWounds;
           } else {
             combatSkill.rating =
-              rangedDefenseSet[combat.value] +
+              rangedDefenseSet[melee] +
               attributeScore[combatSkill.id].total * 3 +
               combatSkill.bonus -
               graveWounds;
@@ -371,13 +371,13 @@ export class ToSActor extends Actor {
             graveWounds;
         } else if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
           combatSkill.finesseRating =
-            throwing[combat.value] +
+            throwing[melee] +
             attributeScore[1].total * 3 +
             combatSkill.bonus -
             graveWounds;
         } else {
           combatSkill.rating =
-            throwing[combat.value] +
+            throwing[melee] +
             attributeScore[combatSkill.id].total * 3 +
             combatSkill.bonus -
             graveWounds;
@@ -401,29 +401,29 @@ export class ToSActor extends Actor {
     }
 
     //Calculate brawler
-
     if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
       brawler.rating =
-        skillset1[skill.value] +
+        skillset1[brawler.value] +
         attributeScore[1].total * 3 +
-        skill.bonus -
+        brawler.bonus -
         graveWounds;
-      if (brawler.rating < rangedDefenseSet[combat.value]) {
-        rangedDefenseSet[combat.value] +
+      if (skillset1[brawler.value] < rangedDefenseSet[melee]) {
+        rangedDefenseSet[melee] +
           attributeScore[1].total * 3 +
-          skill.bonus -
+          brawler.bonus -
           graveWounds;
       }
     } else {
-      skill.rating =
-        skillset1[skill.value] +
+      brawler.rating =
+        skillset1[brawler.value] +
         attributeScore[0].total * 3 +
-        skill.bonus -
+        brawler.bonus -
         graveWounds;
-      if (brawler.rating < rangedDefenseSet[combat.value]) {
-        rangedDefenseSet[combat.value] +
+      if (skillset1[brawler.value] < rangedDefenseSet[melee]) {
+        brawler.rating =
+          rangedDefenseSet[melee] +
           attributeScore[0].total * 3 +
-          skill.bonus -
+          brawler.bonus -
           graveWounds;
       }
     }
