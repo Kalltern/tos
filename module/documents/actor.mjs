@@ -103,17 +103,17 @@ export class ToSActor extends Actor {
     const skillset1 = [0, 15, 25, 30, 35, 45, 50, 55, 65, 75, 85];
     const skillset2 = [0, 5, 10, 15, 20, 30]; // muscles, nimbleness
     const skillset3 = [0, 25, 40, 55, 70, 85]; //riding and sailing and herbalism
-    const skillset4 = [0, 40, 65, 90]; //dancing, meditation
+    const skillset4 = [0, 40, 65, 90]; //dancing
     const skillset5 = [0, 10, 20, 30, 40, 50]; //drinking
     const skillset6 = [0, 5, 10, 15, 20, 25]; //social
-    const skillset7 = [0, 20, 30, 40, 50, 60]; //survival
-    const combatset1 = [0, 20, 25, 30, 35, 45, 50, 60, 65, 75, 80];
+    const skillset7 = [0, 20, 30, 40, 50, 60]; //survival, meditation
+    const combatset1 = [0, 15, 20, 30, 35, 45, 50, 60, 65, 75, 80];
     const channeling1 = [0, 20, 25, 30, 35, 45, 50, 55, 65, 70, 80];
     const channeling2 = [0, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70];
     const throwing = [0, 20, 25, 30, 35, 40, 45, 50, 55, 65, 70];
     const dodge = [0, 20, 25, 35, 40, 50, 55, 60, 65, 75, 85];
     const rangedDefenseSet = [0, 10, 20, 25, 30, 35, 40, 45, 50, 55, 60];
-    const rangerGroup = [0, 20, 24, 28, 32, 42, 46, 51, 55, 65, 75];
+    const rangerGroup = [0, 15, 19, 28, 32, 42, 46, 56, 60, 70, 75];
     const ranger = systemData.combatSkills.ranger.value;
     const hasFinesse = systemData.finesse;
     const rangeddef = systemData.combatSkills.rangedDefense;
@@ -125,6 +125,7 @@ export class ToSActor extends Actor {
     const archery = systemData.combatSkills.archery;
     const combat = systemData.combatSkills.combat;
     const melee = systemData.combatSkills.combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
+    const brawler = systemData.skills.brawler;
     const attributeScore = Object.entries(systemData.attributes).map(
       ([key, attribute]) => ({
         total: attribute.value + (attribute.bonus ?? 0), // Combine value and bonus
@@ -143,6 +144,7 @@ export class ToSActor extends Actor {
             skill.bonus -
             graveWounds;
         }
+
         skill.rating =
           skillset1[skill.value] +
           attributeScore[skill.id].total * 3 +
@@ -395,6 +397,34 @@ export class ToSActor extends Actor {
             combatSkill.bonus -
             graveWounds;
         }
+      }
+    }
+
+    //Calculate brawler
+
+    if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
+      brawler.rating =
+        skillset1[skill.value] +
+        attributeScore[1].total * 3 +
+        skill.bonus -
+        graveWounds;
+      if (brawler.rating < rangedDefenseSet[combat.value]) {
+        rangedDefenseSet[combat.value] +
+          attributeScore[1].total * 3 +
+          skill.bonus -
+          graveWounds;
+      }
+    } else {
+      skill.rating =
+        skillset1[skill.value] +
+        attributeScore[0].total * 3 +
+        skill.bonus -
+        graveWounds;
+      if (brawler.rating < rangedDefenseSet[combat.value]) {
+        rangedDefenseSet[combat.value] +
+          attributeScore[0].total * 3 +
+          skill.bonus -
+          graveWounds;
       }
     }
 

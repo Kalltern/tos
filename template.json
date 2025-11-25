@@ -257,6 +257,16 @@
           "visible": true,
           "bonus": 0
         },
+        "brawler": {
+          "value": 0,
+          "rating": 0,
+          "critbonus": 0,
+          "critfailpenalty": 0,
+          "id": 0,
+          "type": 1,
+          "visible": true,
+          "bonus": 0
+        },
         "acrobacy": {
           "value": 0,
           "rating": 0,
@@ -465,7 +475,7 @@
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 4,
+          "id": 7,
           "type": 4,
           "visible": true,
           "bonus": 0
