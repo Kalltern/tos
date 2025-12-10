@@ -33,7 +33,44 @@
           data-dtype="Number"
         />
          </div>
+          {{#if (eq system.class "defense") }} 
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.defense"
+          value="{{system.defense}}"
+          data-dtype="Number"
+        />
+      </div>
 
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.rangedDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.rangedDefense"
+          value="{{system.rangedDefense}}"
+          data-dtype="Number"
+        />
+      </div>
+
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.dodge"
+          value="{{system.dodge}}"
+          data-dtype="Number"
+        />
+      </div>
+       {{/if}}
+      {{#unless (eq system.class "defense")}}
             <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Weapon.FIELDS.breakthrough.label"
@@ -56,17 +93,6 @@
           type="text"
           name="system.attack"
           value="{{system.attack}}"
-          data-dtype="Number"
-        />
-      </div>
-      <div class="grid-span-1">
-        <label class="resource-label">{{localize
-            "TOS.Item.Weapon.FIELDS.defense.label"
-          }}</label>
-        <input
-          type="text"
-          name="system.defense"
-          value="{{system.defense}}"
           data-dtype="Number"
         />
       </div>
@@ -158,6 +184,6 @@
 </select>
 
 
-
+  {{/unless}}
   </div>
 </section>

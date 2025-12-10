@@ -4,6 +4,12 @@
       "Actor": "ToS Actor Sheet",
       "Item": "ToS Item Sheet"
     },
+    "Config": {
+      "Initiative": {
+        "name": "Dynamic Initiative",
+        "label": "This enables Initiative to be reset and rolled again automatically when entering next round"
+      }
+    },
     "Actor": {
       "Tabs": {
         "Biography": "Biography",

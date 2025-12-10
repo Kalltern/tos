@@ -475,8 +475,8 @@
           "rating": 0,
           "critbonus": 0,
           "critfailpenalty": 0,
-          "id": 7,
-          "type": 4,
+          "id": 4,
+          "type": 7,
           "visible": true,
           "bonus": 0
         },

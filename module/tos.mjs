@@ -8,6 +8,7 @@ import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 // Import helper/utility classes and constants.
 import { TOS } from "./helpers/config.mjs";
 import { usePotion } from "./utils/usePotion.mjs";
+import { defenseRoll } from "./utils/defense.mjs";
 import {
   getNonWeaponAbility,
   getDoctrineBonuses,
@@ -64,7 +65,8 @@ Hooks.once("init", function () {
   game.tos.calculateAttackBonuses = calculateAttackBonuses;
   game.tos.performAttackRoll = performAttackRoll;
   game.tos.finalizeRollsAndPostChat = finalizeRollsAndPostChat;
-
+  game.tos.defenseRoll = defenseRoll;
+  registerDynamicInitiative();
   /**
    * Set an initiative formula for the system
    * @type {String}
@@ -77,7 +79,7 @@ Hooks.once("init", function () {
   };
 */
   // Define custom Document classes
-  CONFIG.Actor.documentClass = ToSActor;
+  (CONFIG.Actor.documentClass = ToSActor);
   CONFIG.Item.documentClass = ToSItem;
   CONFIG.Combat.documentClass = ToSCombat;
 
@@ -98,6 +100,21 @@ Hooks.once("init", function () {
     label: "TOS.SheetLabels.Item",
   });
 });
+
+/* -------------------------------------------- */
+/*  ToS Specific Game settings                  */
+/* -------------------------------------------- */
+
+function registerDynamicInitiative() {
+  game.settings.register("tos", "registerDynamicInitiative", {
+    config: true,
+    scope: "world",
+    name: "TOS.Config.Initiative.name",
+    hint: "TOS.Config.Initiative.label",
+    type: Boolean,
+    default: false,
+  });
+}
 
 /* -------------------------------------------- */
 /*  Handlebars Helpers                          */
@@ -223,6 +240,82 @@ Handlebars.registerHelper("healthPercentage", function (current, max) {
 Hooks.once("ready", function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on("hotbarDrop", (bar, data, slot) => createDocMacro(data, slot));
+  Hooks.on("preUpdateCombat", handleDynamicInitiative);
+});
+
+/* -------------------------------------------- */
+/*  Hooks for Dynamic initiative if enabled     */
+/* -------------------------------------------- */
+
+Hooks.on("ready", () => {
+  const SYS_ID = "tos";
+  const SETTING_KEY = "registerDynamicInitiative";
+  const isDynamicInitEnabled = () => game.settings.get(SYS_ID, SETTING_KEY);
+
+  //Next Round Wrapper - Reroll Initiative
+  if (
+    typeof Combat.prototype.nextRound === "function" &&
+    !Combat.prototype.nextRound.hasOwnProperty("_wrapped_by_" + SYS_ID)
+  ) {
+    const originalNextRound = Combat.prototype.nextRound;
+    originalNextRound["_wrapped_by_" + SYS_ID] = true;
+
+    Combat.prototype.nextRound = async function () {
+      if (isDynamicInitEnabled()) {
+        const combat = this;
+
+        const combatantUpdates = combat.combatants.map((c) => ({
+          _id: c.id,
+          flags: { [SYS_ID]: { PreviousRoundInitiative: c.initiative } },
+        }));
+        await Combatant.updateDocuments(combatantUpdates, { parent: combat });
+        await combat.resetAll();
+        await combat.rollAll();
+      }
+      return originalNextRound.call(this);
+    };
+  }
+
+  //Previous Round Wrapper - Restore Initiative
+  if (
+    typeof Combat.prototype.previousRound === "function" &&
+    !Combat.prototype.previousRound.hasOwnProperty("_wrapped_by_" + SYS_ID)
+  ) {
+    const originalPreviousRound = Combat.prototype.previousRound;
+    originalPreviousRound["_wrapped_by_" + SYS_ID] = true;
+
+    Combat.prototype.previousRound = async function () {
+      if (isDynamicInitEnabled()) {
+        const combat = this;
+        const combatantUpdates = [];
+
+        for (const combatant of combat.combatants) {
+          const previousInit = combatant.getFlag(
+            SYS_ID,
+            "PreviousRoundInitiative"
+          );
+
+          if (previousInit !== undefined && previousInit !== null) {
+            combatantUpdates.push({
+              _id: combatant.id,
+              initiative: previousInit,
+            });
+
+            combatant.unsetFlag(SYS_ID, "PreviousRoundInitiative");
+          }
+        }
+
+        if (combatantUpdates.length > 0) {
+          await Combatant.updateDocuments(combatantUpdates, { parent: combat });
+        }
+
+        await combat.update({ turn: combat.turns.length - 1 });
+      }
+
+      //Call original function to decrement the round
+      return originalPreviousRound.call(this);
+    };
+  }
 });
 
 /* -------------------------------------------- */
