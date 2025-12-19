@@ -409,7 +409,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         event.preventDefault();
         console.log("Re-roll button clicked");
 
-        // Call your reroll logic here
         const rollFormula = message.rolls[0].formula;
         const roll = new Roll(rollFormula);
         await roll.evaluate();
@@ -418,7 +417,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         const criticalFailureThreshold = message.flags.criticalFailureThreshold;
         const deflectChance = message.flags.deflectChance;
         const critSuccess = d100Result <= criticalSuccessThreshold;
-        const rollName = message.flags.rollName;
+        const rollName = message.getFlag("tos", "rollName");
 
         let flavorText = "";
 

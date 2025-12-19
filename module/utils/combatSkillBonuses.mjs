@@ -671,6 +671,7 @@ export async function getEffectRolls(
       }
     }
   }
+
   // 3. Process and Display ALL Merged Effects from the Map
   for (const [name, value] of customEffectRolls.entries()) {
     const modifiedEffectValue = value;
@@ -683,7 +684,9 @@ export async function getEffectRolls(
 
     // The 'name' variable here will be the user-typed custom name if applicable
     effectsRollResults += `<p><b>${name}:</b> ${d100Roll.total} < ${roundedModifiedValue}${successText}</p>`;
-  } // --- 4. Sharp Bleed Logic ---
+  }
+
+  // --- 4. Sharp Bleed Logic ---
 
   if (weapon.system.sharp && weaponEffects.bleed) {
     if (critScore > 1 && critSuccess) {

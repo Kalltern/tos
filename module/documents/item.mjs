@@ -9,6 +9,41 @@ export class ToSItem extends Item {
   prepareData() {
     super.prepareData();
 
+    // Only initialize effectTypes for relevant items (e.g., spells, consumables)
+    if (
+      (this.type === "spell" ||
+        this.type === "ability" ||
+        this.type === "weapon") &&
+      Array.isArray(this.system.effectTypes)
+    ) {
+      const defaultEffects = [
+        "bleeding",
+        "burning",
+        "chain",
+        "disorientation",
+        "dispell",
+        "flammable",
+        "frozen",
+        "concussion",
+        "paralyzed",
+        "poisoned",
+        "rooted",
+        "slowed",
+        "stun",
+        "vulnerable",
+        "weakened",
+        "custom",
+        "wet",
+      ];
+
+      // Add any missing default effects without duplicating existing ones
+      for (const effect of defaultEffects) {
+        if (!this.system.effectTypes.includes(effect)) {
+          this.system.effectTypes.push(effect);
+        }
+      }
+    }
+
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;
 

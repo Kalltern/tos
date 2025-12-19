@@ -435,22 +435,34 @@ export async function finalizeRollsAndPostChat(
   const spellEffects = spell.system.effects || {};
   let effectsRollResults = "";
 
+  const spellSchool = spell.system.type;
+  const actorEffects = actor.system.effects?.[spellSchool] || {}; // Actor-specific modifiers for this school
+
   for (const [effectName, effectValue] of Object.entries(spellEffects)) {
     if (effectValue > 0) {
-      // Apply actor/bonus modifier calculated in Function 3
-      const modifier = effectModifiers[effectName] || 0;
-      const modifiedEffectValue = effectValue + modifier;
+      // If spell effect is "custom", use the user-defined name
+      const finalEffectName =
+        effectName.toLowerCase() === "custom"
+          ? spell.system.effectName || "" // effectName field for user-defined
+          : effectName;
 
+      if (!finalEffectName) continue; // Skip if no name provided
+
+      // Add any actor-specific bonus for this effect
+      const actorBonus = actorEffects[finalEffectName] || 0;
+      const totalEffectValue = effectValue + actorBonus;
+
+      // Roll 1d100 for this effect
       const d100Roll = new Roll("1d100");
       await d100Roll.evaluate();
 
-      const roundedModifiedValue = Math.floor(modifiedEffectValue);
-      const successText =
-        d100Roll.total < roundedModifiedValue ? " SUCCESS" : "";
+      const successText = d100Roll.total <= totalEffectValue ? " SUCCESS" : "";
 
-      effectsRollResults += `<p><b>${effectName}:</b> ${d100Roll.total}<${roundedModifiedValue}${successText}</p>`;
+      effectsRollResults += `<p><b>${finalEffectName}:</b> ${d100Roll.total} < ${totalEffectValue}${successText}</p>`;
     }
   }
+
+  console.log("Final effectsRollResults:", effectsRollResults);
 
   // --- CRITICAL SCORE ROLL ---
   const critScoreRoll = new Roll(`1d20`);
