@@ -198,7 +198,8 @@
         "Attributes": "Attributes",
         "Description": "Description",
         "Doctrines": "Doctrines",
-        "Effects": "Effects"
+        "Effects": "Effects",
+        "combatEffects": "Combat Effects"
       },
       "Weapon": {
         "FIELDS": {
@@ -233,10 +234,11 @@
           "armor": { "label": "Armor" },
           "armorTotal": { "label": "Armor total" },
           "weight": { "label": "Weight" },
-          "acidArmor": { "label": "Acid armor" },
-          "fireArmor": { "label": "Fire armor" },
-          "frostArmor": { "label": "Frost armor" },
-          "lightningArmor": { "label": "Lightning armor" },
+          "acidArmor": { "label": "Acid" },
+          "fireArmor": { "label": "Fire" },
+          "frostArmor": { "label": "Frost" },
+          "lightningArmor": { "label": "Lightning" },
+          "magicArmor": { "label": "Magic" },
           "equipped": { "label": "Equipped" },
           "layer": { "label": "Armor layer" },
           "helmet": { "label": "Has head" },
@@ -276,7 +278,8 @@
           "actionCost": { "label": "Action Cost" },
           "damage": { "label": "Damage" },
           "attributeTest": { "label": "Test" },
-          "weaponAbility": { "label": "Weapon required" }
+          "weaponAbility": { "label": "Weapon required" },
+          "resourceCost": { "label": "Resource Cost" }
         }
       },
       "Spell": {
@@ -307,10 +310,13 @@
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects",
       "Custom": {
-        "name1": "Effect 1 Name",
-        "name2": "Effect 2 Name",
-        "name3": "Effect 3 Name"
-      }
+        "name1": "Extra Effect Name 1 ",
+        "name2": "Extra Effect Name 2 ",
+        "name3": "Extra Effect Name 3 "
+      },
+      "type1": "Extra Effect Type 1",
+      "type2": "Extra Effect Type 2",
+      "type3": "Extra Effect Type 3"
     }
   },
   "TYPES": {

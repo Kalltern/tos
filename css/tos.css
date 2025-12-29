@@ -338,7 +338,9 @@ table tr td:nth-child(3) {
   flex: 1;
   margin-bottom: 75px;
 }
-
+.tos .sheet-npc-header {
+  height: 440px; /* NPC-specific height */
+}
 .header-fields .grid .grid-2col input {
   text-align: center;
 }

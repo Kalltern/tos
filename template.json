@@ -7,7 +7,32 @@
         "biography": "",
         "armor": {
           "total": 0,
-          "natural": 0
+          "natural": 0,
+          "acid": {
+            "value": 0,
+            "bonus": 0,
+            "total": 0
+          },
+          "fire": {
+            "value": 0,
+            "bonus": 0,
+            "total": 0
+          },
+          "frost": {
+            "value": 0,
+            "bonus": 0,
+            "total": 0
+          },
+          "lightning": {
+            "value": 0,
+            "bonus": 0,
+            "total": 0
+          },
+          "magic": {
+            "value": 0,
+            "bonus": 0,
+            "total": 0
+          }
         }
       }
     },
@@ -43,7 +68,8 @@
           "min": 0,
           "base": 20,
           "max": 20,
-          "bonus": 0
+          "bonus": 0,
+          "temporary": 0
         },
         "graveWounds": {
           "value": 0,
@@ -924,13 +950,6 @@
           "value": 0
         }
       },
-      "armor": {
-        "acidArmor": 0,
-        "fireArmor": 0,
-        "frostArmor": 0,
-        "lightningArmor": 0,
-        "durability": 0
-      },
       "schools": {
         "fire": {
           "value": 0,
@@ -1057,11 +1076,22 @@
       "layerOptions": ["Not Armor", "Bottom", "Middle", "Top"],
       "armor": {
         "value": 0,
-        "acidArmor": 0,
-        "fireArmor": 0,
-        "frostArmor": 0,
-        "lightningArmor": 0,
-        "durability": 0
+        "durability": 0,
+        "acid": {
+          "value": 0
+        },
+        "fire": {
+          "value": 0
+        },
+        "frost": {
+          "value": 0
+        },
+        "lightning": {
+          "value": 0
+        },
+        "magic": {
+          "value": 0
+        }
       },
       "weight": 0,
       "helmet": false,

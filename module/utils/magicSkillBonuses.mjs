@@ -436,23 +436,41 @@ export async function finalizeRollsAndPostChat(
   let effectsRollResults = "";
 
   const spellSchool = spell.system.type;
-  const actorEffects = actor.system.effects?.[spellSchool] || {}; // Actor-specific modifiers for this school
+  const actorEffects = actor.system.effects?.[spellSchool] || {};
 
-  for (const [effectName, effectValue] of Object.entries(spellEffects)) {
+  for (const [key, effectValue] of Object.entries(spellEffects)) {
     if (effectValue > 0) {
-      // If spell effect is "custom", use the user-defined name
-      const finalEffectName =
-        effectName.toLowerCase() === "custom"
-          ? spell.system.effectName || "" // effectName field for user-defined
-          : effectName;
+      let finalEffectName = "";
 
-      if (!finalEffectName) continue; // Skip if no name provided
+      // 1. Handle Built-in Effects (stun, bleed)
+      if (key === "stun" || key === "bleed") {
+        finalEffectName = key.charAt(0).toUpperCase() + key.slice(1);
+      }
 
-      // Add any actor-specific bonus for this effect
+      // 2. Handle Customizable Slots (extra1, extra2, extra3)
+      else if (key.startsWith("extra")) {
+        const index = key.replace("extra", ""); // gets "1", "2", or "3"
+
+        // Look for type in system.effectType#
+        const typeValue = spell.system[`effectType${index}`] || "";
+
+        if (typeValue.toLowerCase() === "custom") {
+          // Look for custom name in system.effects.effectName#
+          finalEffectName =
+            spell.system.effects[`effectName${index}`] || `Custom ${index}`;
+        } else {
+          finalEffectName = typeValue;
+        }
+      }
+
+      // Skip if we couldn't resolve a name or if it's an internal field (like effectName1)
+      if (!finalEffectName || key.startsWith("effectName")) continue;
+
+      // Add actor-specific bonus
       const actorBonus = actorEffects[finalEffectName] || 0;
       const totalEffectValue = effectValue + actorBonus;
 
-      // Roll 1d100 for this effect
+      // Roll 1d100
       const d100Roll = new Roll("1d100");
       await d100Roll.evaluate();
 
@@ -489,7 +507,7 @@ export async function finalizeRollsAndPostChat(
   const rawTemplate = spell.system.description;
   const compiled = Handlebars.compile(rawTemplate);
   const renderedDescription = compiled(rollData);
-
+  let rollName = spell.name;
   const penetration =
     spell.system.penetration > 0
       ? `<table style="width: 100%; text-align: center; font-size: 15px;"><tr><th>Penetration</th><th>Critical Score</th></tr><tr><td>${spell.system.penetration}</td><td>${critScore} (D20: ${critScoreResult})</td></tr></tr></table><hr>`
@@ -505,6 +523,7 @@ export async function finalizeRollsAndPostChat(
     }" width="36" height="36">
             <span>${spell.name}</span>
         </div>
+        <hr>
         <table style="width: 100%; text-align: center;font-size: 15px;">
             <tr><th>Description:</th></tr>
             <tr><td>|${spell.system.spellClass} spell|<br>
@@ -519,6 +538,7 @@ export async function finalizeRollsAndPostChat(
                 ${spell.system.dmgType3} ${spell.system.bool4}
                 ${spell.system.dmgType4}</td></tr>
         </table>
+        <hr>
         <p style="text-align: center; font-size: 20px;"><b>
             ${
               critSuccess
@@ -540,10 +560,13 @@ export async function finalizeRollsAndPostChat(
         </table>
         <hr>`,
     flags: {
-      criticalSuccessThreshold:
-        actor.system.combatSkills.channeling.criticalSuccessThreshold,
-      criticalFailureThreshold:
-        actor.system.combatSkills.channeling.criticalFailureThreshold,
+      tos: {
+        rollName,
+        criticalSuccessThreshold:
+          actor.system.combatSkills.channeling.criticalSuccessThreshold,
+        criticalFailureThreshold:
+          actor.system.combatSkills.channeling.criticalFailureThreshold,
+      },
     },
   });
 }

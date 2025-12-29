@@ -126,10 +126,11 @@
     <hr>
     `,
       flags: {
-        rollName,
-        deflectChance,
-        criticalSuccessThreshold, // Store critical success threshold
-        criticalFailureThreshold, // Store critical failure threshold
+        tos: {
+          rollName,
+          criticalSuccessThreshold, // Store critical success threshold
+          criticalFailureThreshold, // Store critical failure threshold
+        },
       },
     });
   };

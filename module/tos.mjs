@@ -384,6 +384,47 @@ function rollItemMacro(itemUuid) {
   });
 }
 
+Hooks.on("createChatMessage", async (message) => {
+  try {
+    if (!message.isRoll) return;
+
+    const flavor = message.flavor ?? "";
+
+    // 1️⃣ Read existing rollName from flags.tos (macro or previous messages)
+    const existing = message.getFlag("tos", "rollName");
+
+    let shouldSet = !existing;
+
+    // 2️⃣ If complex HTML (macro message), just use the macro-provided rollName
+    if (/<(div|table|img|hr)/i.test(flavor)) {
+      if (existing) {
+        console.log("Macro Roll Name:", existing); // Already set by macro
+      }
+      shouldSet = false; // don’t try to infer
+    }
+
+    // 3️⃣ If no existing rollName, infer from flavor or first roll formula
+    if (shouldSet) {
+      let rollName = "Roll";
+
+      if (flavor.trim()) {
+        rollName = flavor.replace(/<[^>]*>/g, "").trim();
+      } else if (message.rolls?.length) {
+        rollName = message.rolls[0].formula;
+      }
+
+      await message.setFlag("tos", "rollName", rollName);
+    }
+
+    // 4️⃣ Determine rollName to use (macro flag or inferred)
+    const rollNameToUse =
+      existing || (await message.getFlag("tos", "rollName"));
+    console.log("Roll Name:", rollNameToUse);
+  } catch (err) {
+    console.error("ToS rollName hook error", err);
+  }
+});
+
 Hooks.on("renderChatMessage", (message, html, data) => {
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
@@ -413,8 +454,10 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         const roll = new Roll(rollFormula);
         await roll.evaluate();
         const d100Result = roll.dice[0]?.total; // Extract the d100 result
-        const criticalSuccessThreshold = message.flags.criticalSuccessThreshold;
-        const criticalFailureThreshold = message.flags.criticalFailureThreshold;
+        const criticalSuccessThreshold =
+          message.flags.tos.criticalSuccessThreshold;
+        const criticalFailureThreshold =
+          message.flags.tos.criticalFailureThreshold;
         const deflectChance = message.flags.deflectChance;
         const critSuccess = d100Result <= criticalSuccessThreshold;
         const rollName = message.getFlag("tos", "rollName");
@@ -436,10 +479,12 @@ Hooks.on("renderChatMessage", (message, html, data) => {
           flavor: `<p style="text-align: center; font-size: 20px;"><b><i class="fa-light fa-dice-d20"></i> ${rollName} <i class="fa-light fa-dice-d20"></i><hr></b></p>
           <p style="text-align: center; font-size: 20px;"><b>${flavorText}</b></p>`,
           flags: {
-            rollName,
-            deflectChance,
-            criticalSuccessThreshold, // Store critical success threshold
-            criticalFailureThreshold, // Store critical failure threshold
+            tos: {
+              rollName,
+              deflectChance,
+              criticalSuccessThreshold, // Store critical success threshold
+              criticalFailureThreshold, // Store critical failure threshold
+            },
           },
         });
       });

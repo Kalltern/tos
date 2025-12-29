@@ -20,19 +20,26 @@ export class ToSItem extends Item {
         "bleeding",
         "burning",
         "chain",
+        "concussion",
+        "corrosion",
+        "corrosion-severe",
+        "custom",
         "disorientation",
         "dispell",
+        "fear",
         "flammable",
         "frozen",
-        "concussion",
         "paralyzed",
         "poisoned",
+        "precision",
         "rooted",
+        "shield strain",
+        "shield break",
         "slowed",
         "stun",
+        "terror",
         "vulnerable",
         "weakened",
-        "custom",
         "wet",
       ];
 
@@ -43,6 +50,9 @@ export class ToSItem extends Item {
         }
       }
     }
+    (this.system.effectTypes ??= []).sort((a, b) =>
+      a === "custom" ? -1 : b === "custom" ? 1 : a.localeCompare(b)
+    );
 
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;

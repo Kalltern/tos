@@ -542,9 +542,11 @@ async function runAttackMacro(
 
     `,
     flags: {
-      rollName,
-      criticalSuccessThreshold,
-      criticalFailureThreshold,
+      tos: {
+        rollName,
+        criticalSuccessThreshold, // Store critical success threshold
+        criticalFailureThreshold, // Store critical failure threshold
+      },
     },
   });
 }

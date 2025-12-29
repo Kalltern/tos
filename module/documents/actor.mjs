@@ -37,8 +37,15 @@ export class ToSActor extends Actor {
     let combatSkill = systemData.combatSkills;
     let secondaryAttribute = systemData.secondaryAttributes;
     // Iterate through gear
+    const elementalTypes = ["acid", "fire", "frost", "lightning", "magic"];
+    for (const type of elementalTypes) {
+      systemData.armor[type].bonus = 0;
+    }
     let totalArmor = 0;
     for (const item of this.items) {
+      for (const type of elementalTypes) {
+        systemData.armor[type].bonus += item.system?.armor?.[type].value ?? 0;
+      }
       if (item.type === "gear" && item.system.equipped) {
         if (actorData.type === "character") {
           skill.acrobacy.bonus += item.system.acroPenalty ?? 0;
@@ -60,8 +67,11 @@ export class ToSActor extends Actor {
       }
     }
 
+    for (const type of elementalTypes) {
+      const armor = systemData.armor[type];
+      armor.total = armor.value + armor.bonus;
+    }
     systemData.armor.total = totalArmor + systemData.armor.natural;
-
     // Iterate through gear (only helmets)
     for (const item of this.items) {
       let combatSkill = systemData.combatSkills;

@@ -223,10 +223,11 @@ export async function defenseRoll(actor, weapon, ability = null) {
     <hr>
     `,
     flags: {
-      rollName,
-      deflectChance,
-      criticalSuccessThreshold,
-      criticalFailureThreshold,
+      tos: {
+        rollName,
+        criticalSuccessThreshold, // Store critical success threshold
+        criticalFailureThreshold, // Store critical failure threshold
+      },
     },
   });
 }

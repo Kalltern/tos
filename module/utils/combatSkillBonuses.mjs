@@ -402,7 +402,8 @@ export async function getAttackRolls(
   }
 
   // Roll data setup
-  const rollName = this.name;
+
+  let rollName = `${weapon.name} Attack`;
   const rollData = {
     combatSkills: actor.system.combatSkills,
     weaponAttack: weapon.system.attack || 0,
@@ -421,10 +422,10 @@ export async function getAttackRolls(
   return {
     attackRoll,
     critSuccess,
-    rollName,
     critFailure,
     criticalSuccessThreshold,
     criticalFailureThreshold,
+    rollName,
   };
 }
 
