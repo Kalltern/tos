@@ -1,233 +1,341 @@
-/**
- * Executes a Defense Roll (Melee, Ranged, or Dodge).
- * * @param {object} actor - The actor performing the roll.
- * @param {object} weapon - The selected weapon item.
- * @param {string} type - The type of defense: 'melee', 'ranged', or 'dodge'.
- * @param {object} [ability=null] - The optional ability item (used only for 'melee' defense).
- */
-export async function defenseRoll(actor, weapon, ability = null) {
-  if (!actor || !weapon || !ability) {
-    return ui.notifications.error(
-      "Missing actor, weapon, or ability for roll."
-    );
-  }
-  const type = ability.system.type;
+export async function defenseRoll({ actor = null } = {}) {
+  const selectedToken = canvas.tokens.controlled[0];
 
-  // --- 1. SETUP VARIABLES BASED ON DEFENSE TYPE ---
-  let combatSkill,
-    defenseBonus,
-    critDefenseBonus,
-    doctrineBonusKey,
-    deflectFlagKey,
-    staminaCost = 0;
-  let rollName = "";
-
-  // Determine the base skill and modifiers
-  switch (type) {
-    case "melee":
-      rollName = ability ? ability.name : "Melee Defense";
-      // Base defense is weapon defense + ability defense
-      defenseBonus =
-        (weapon.system.defense || 0) + (ability?.system.defense || 0);
-      console.log(ability?.system.defense);
-      critDefenseBonus =
-        (weapon.system.critDefense || 0) + (ability?.system.critDefense || 0);
-      combatSkill = actor.system.combatSkills.meleeDefense;
-      // Melee defense has its own doctrine bonus key (assuming the existing function provides it)
-      doctrineBonusKey = "doctrineDefenseBonus";
-      deflectFlagKey = "defenseDeflect";
-      break;
-
-    case "ranged":
-      rollName = "Ranged Defense";
-      defenseBonus =
-        (weapon.system.rangedDefense || 0) +
-        (ability?.system.rangedDefense || 0);
-      critDefenseBonus = 0;
-      combatSkill = actor.system.combatSkills.rangedDefense;
-      doctrineBonusKey = "doctrineRangedDefenseBonus";
-      deflectFlagKey = "defenseDeflect";
-      break;
-
-    case "dodge":
-      rollName = "Dodge";
-      defenseBonus = 0 + (ability?.system.dodge || 0);
-      critDefenseBonus = weapon.system.critDodge || 0;
-      combatSkill = actor.system.combatSkills.dodge;
-      deflectFlagKey = "dodgeDeflect";
-      staminaCost = 4;
-      break;
-
-    default:
-      return ui.notifications.error(`Invalid defense type: ${type}`);
-  }
-
-  // --- 2. GET DOCTRINE BONUSES (If applicable) ---
-  // NOTE: This assumes getDoctrineBonuses returns ALL doctrine bonuses, and we extract what we need.
-  let doctrineBonuses = {
-    doctrineCritDefenseBonus: 0,
-    doctrineDefenseBonus: 0,
-    doctrineRangedDefenseBonus: 0,
-  };
-  if (game.tos?.getDoctrineBonuses) {
-    doctrineBonuses = await game.tos.getDoctrineBonuses(actor, weapon);
-  }
-
-  const doctrineDefenseModifier = doctrineBonuses[doctrineBonusKey] || 0;
-  const doctrineCritModifier = doctrineBonuses.doctrineCritDefenseBonus || 0; // Crit bonus seems to be shared
-
-  // --- 3. DEDUCT COST (Only for Dodge) ---
-  if (staminaCost > 0) {
-    let stamina = actor.system.stats.stamina.value ?? 0;
-    if (stamina < staminaCost) {
-      ui.notifications.warn("Not enough stamina for Dodge!");
+  if (!actor) {
+    if (!selectedToken) {
+      ui.notifications.warn("Please select a token.");
       return;
     }
-    let newStamina = Math.max(0, stamina - staminaCost);
-    await actor.update({ "system.stats.stamina.value": newStamina });
-    ui.notifications.info(
-      `${rollName} used ${staminaCost} Stamina. Remaining: ${newStamina}`
-    );
+    actor = selectedToken.actor;
   }
 
-  // --- 4. CRITICAL THRESHOLDS ---
-  let criticalSuccessThreshold =
-    combatSkill.criticalSuccessThreshold +
-    critDefenseBonus +
-    doctrineCritModifier;
-  let criticalFailureThreshold = combatSkill.criticalFailureThreshold;
+  /* -------------------------------------------- */
+  /*  SHARED CSS                                  */
+  /* -------------------------------------------- */
 
-  console.log(
-    "Crit thresholds for",
-    actor.name,
-    "Success",
-    criticalSuccessThreshold,
-    "Fail",
-    criticalFailureThreshold
-  );
-
-  // --- 5. ROLL DATA AND FORMULA ---
-
-  // We combine all applicable additive bonuses into a single roll data key for clean formula string substitution
-  const totalRollBonus = defenseBonus + doctrineDefenseModifier;
-
-  // NOTE: The Ranged Defense formula in your code was different:
-  // Ranged: @combatSkills.rangedDefense.rating - 1d100 + ${doctrineRangedDefenseBonus}
-  // Melee: @combatSkills.meleeDefense.rating + @finalDefenseBonus + ${doctrineDefenseBonus} - 1d100
-  // Dodge: @combatSkills.dodge.rating + @weaponDodge - 1d100
-
-  // We must respect the unique formulas.
-  let defenseRollFormula;
-
-  const rollData = {
-    combatSkills: actor.system.combatSkills,
-    totalRollBonus: totalRollBonus, // Used for Melee, potentially Dodge
-    weaponDodge: weapon.system.dodge || 0, // Assuming weapon.system.dodge is the correct key for Dodge bonus
-    str: actor.system.attributes.str.value,
-    dex: actor.system.attributes.dex.value,
-    per: actor.system.attributes.per.value,
-  };
-
-  if (type === "ranged") {
-    defenseRollFormula = `@combatSkills.rangedDefense.rating + @totalRollBonus - 1d100`;
-  } else if (type === "dodge") {
-    // Assuming your provided formula uses @weaponDodge from the rollData for the bonus
-    defenseRollFormula = `@combatSkills.dodge.rating + @weaponDodge - 1d100`;
-  } else {
-    // 'melee'
-    // Melee uses the combined bonus (weapon.defense + ability.defense) and the doctrine bonus
-    defenseRollFormula = `@combatSkills.meleeDefense.rating + @totalRollBonus - 1d100`;
+  const css = `
+  #weapon-list .weapon-choice {
+    position: relative;
+    font-size: 16px;
+    color: black;
   }
 
-  const defenseRoll = new Roll(defenseRollFormula, rollData);
-  await defenseRoll.evaluate();
-  const rollResult = defenseRoll.dice[0].results[0].result;
-
-  // --- 6. ROLL RESULT ANALYSIS (Deflect) ---
-  const critSuccess = rollResult <= criticalSuccessThreshold;
-  const critFailure = rollResult >= criticalFailureThreshold;
-
-  let deflectChance = 0;
-  if (actor.system[deflectFlagKey]) {
-    deflectChance = criticalSuccessThreshold * 2;
-  }
-  const deflect = (!critSuccess && rollResult <= deflectChance) || 0;
-
-  // --- 7. ARMOR AND CHAT MESSAGE CONSTRUCTION ---
-  const armor = actor.system.armor.total;
-  const acidArmor = actor.system.armor.acidArmor;
-  const fireArmor = actor.system.armor.fireArmor;
-  const frostArmor = actor.system.armor.frostArmor;
-  const lightningArmor = actor.system.armor.lightningArmor;
-
-  let armorText = `
-        <table style="width: 100%; text-align: center; font-size: 15px;">
-        <tr>
-          <th>Type</th>
-          <th>Value</th>
-        </tr>
-    `;
-
-  // Add rows for each armor type if the value is greater than 0
-  if (armor >= 0) armorText += `<tr><td>Armor</td><td>${armor}</td></tr>`;
-  if (acidArmor > 0)
-    armorText += `<tr><td>Acid Armor</td><td>${acidArmor}</td></tr>`;
-  if (fireArmor > 0)
-    armorText += `<tr><td>Fire Armor</td><td>${fireArmor}</td></tr>`;
-  if (frostArmor > 0)
-    armorText += `<tr><td>Frost Armor</td><td>${frostArmor}</td></tr>`;
-  if (lightningArmor > 0)
-    armorText += `<tr><td>Lightning Armor</td><td>${lightningArmor}</td></tr>`;
-
-  // Use the determined deflect flag
-  if (actor.system[deflectFlagKey]) {
-    armorText += `<tr><td>Deflect Chance</td><td>${deflectChance}</td></tr>`;
-  }
-  armorText += `</table>`;
-
-  // Ability Description Block (ONLY for Melee Defense Abilities)
-  let abilityChatMessage = "";
-  if (type === "melee" && ability) {
-    const abilityDescription =
-      ability.system.description || "No description provided.";
-    abilityChatMessage = `
-        <div style="font-size: 14px; margin-bottom: 8px; padding: 5px; background: rgba(0,0,0,0.05); border: 1px solid #ccc; border-radius: 3px;">
-            ${abilityDescription}
-        </div>`;
+  #weapon-list .weapon-choice:hover {
+    color: black;
+    text-shadow: 0 0 1px red, 0 0 2px red;
   }
 
-  // Send the chat message
-  await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker(),
-    rolls: [defenseRoll],
-    flavor: `
-<div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
-  <img src="${ability?.img || weapon.img}" title="${
-      ability?.name || weapon.name
-    }" width="36" height="36">
-  <span>${rollName}</span>
-</div>
-    ${abilityChatMessage}
-    <p style="text-align: center; font-size: 20px;"><b>
-      ${
-        deflect && actor.system[deflectFlagKey]
-          ? "Deflect"
-          : critSuccess
-          ? "Critical Success!"
-          : critFailure
-          ? "Critical Failure!"
-          : ""
-      }
-    </b></p>
-    ${armorText}
-    <hr>
-    `,
-    flags: {
-      tos: {
-        rollName,
-        criticalSuccessThreshold, // Store critical success threshold
-        criticalFailureThreshold, // Store critical failure threshold
+  .weapon-dialog .window-content {
+    max-width: 300px;
+    width: 100%;
+  }
+
+  .weapon-dialog .window {
+    width: auto;
+  }
+  `;
+
+  if (!document.getElementById("tos-defense-css")) {
+    const styleSheet = document.createElement("style");
+    styleSheet.id = "tos-defense-css";
+    styleSheet.type = "text/css";
+    styleSheet.innerText = css;
+    document.head.appendChild(styleSheet);
+  }
+
+  /* -------------------------------------------- */
+  /*  DEFENSE SELECTOR                            */
+  /* -------------------------------------------- */
+
+  new Dialog({
+    title: "Select Defense Type",
+    content: "<p>Choose defense:</p>",
+    buttons: {
+      melee: {
+        label: "Melee Defense",
+        callback: () => meleeDefense(),
+      },
+      ranged: {
+        label: "Ranged Defense",
+        callback: () => rangedDefense(),
+      },
+      dodge: {
+        label: "Dodge",
+        callback: () => dodgeDefense(),
       },
     },
-  });
+    default: "melee",
+  }).render(true);
+
+  /* -------------------------------------------- */
+  /*  WEAPON DIALOG                               */
+  /* -------------------------------------------- */
+
+  function showWeaponDialog(weapons, onSelect) {
+    new Dialog({
+      title: "Select Weapon",
+      content: `
+      <form>
+        <fieldset>
+          <ul id="weapon-list" style="list-style:none;padding:0;">
+            ${weapons
+              .map(
+                (weapon, index) => `
+                <li class="weapon-choice"
+                    data-value="${index}"
+                    style="cursor:pointer;padding:5px;border-bottom:1px solid #444;">
+                  ${weapon.name}
+                </li>`
+              )
+              .join("")}
+          </ul>
+        </fieldset>
+      </form>
+      `,
+      buttons: {},
+      resizable: true,
+      width: 200,
+      height: 100,
+      render: (html) => {
+        html.find("#weapon-list li").click(async (event) => {
+          const index = Number(event.currentTarget.dataset.value);
+          await onSelect(index);
+        });
+      },
+    }).render(true);
+  }
+
+  /* -------------------------------------------- */
+  /*  MELEE DEFENSE                               */
+  /* -------------------------------------------- */
+
+  async function meleeDefense() {
+    const weapons = actor.items.filter(
+      (i) =>
+        i.type === "weapon" &&
+        ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
+        i.system.thrown !== true
+    );
+
+    if (!weapons.length) {
+      ui.notifications.warn("This actor has no melee weapons.");
+      return;
+    }
+
+    showWeaponDialog(weapons, async (index) => {
+      const weapon = weapons[index];
+      const rollName = `Defense with ${weapon.name}`;
+
+      const { doctrineCritDefenseBonus, doctrineDefenseBonus } =
+        await game.tos.getDoctrineBonuses(actor, weapon);
+
+      const defense = actor.system.combatSkills.meleeDefense;
+
+      const criticalSuccessThreshold =
+        defense.criticalSuccessThreshold +
+        weapon.system.critDefense +
+        doctrineCritDefenseBonus;
+
+      const criticalFailureThreshold = defense.criticalFailureThreshold;
+
+      const rollData = {
+        combatSkills: actor.system.combatSkills,
+        weaponDefense: weapon.system.defense || 0,
+        str: actor.system.attributes.str.value,
+        dex: actor.system.attributes.dex.value,
+        per: actor.system.attributes.per.value,
+      };
+
+      const roll = new Roll(
+        `@combatSkills.meleeDefense.rating + @weaponDefense + ${doctrineDefenseBonus} - 1d100`,
+        rollData
+      );
+
+      await roll.evaluate();
+
+      await createDefenseChatMessage(
+        roll,
+        weapon,
+        rollName,
+        criticalSuccessThreshold,
+        criticalFailureThreshold
+      );
+    });
+  }
+
+  /* -------------------------------------------- */
+  /*  RANGED DEFENSE                              */
+  /* -------------------------------------------- */
+
+  async function rangedDefense() {
+    const weapons = actor.items.filter((i) => i.type === "weapon");
+
+    if (!weapons.length) {
+      ui.notifications.warn("This actor has no weapons.");
+      return;
+    }
+
+    showWeaponDialog(weapons, async (index) => {
+      const weapon = weapons[index];
+      const rollName = `Ranged defense with ${weapon.name}`;
+
+      const { doctrineCritDefenseBonus, doctrineRangedDefenseBonus } =
+        await game.tos.getDoctrineBonuses(actor, weapon);
+
+      const defense = actor.system.combatSkills.rangedDefense;
+
+      const criticalSuccessThreshold =
+        defense.criticalSuccessThreshold + doctrineCritDefenseBonus;
+
+      const criticalFailureThreshold = defense.criticalFailureThreshold;
+
+      const rollData = {
+        combatSkills: actor.system.combatSkills,
+        weaponDefense: weapon.system.defense || 0,
+        dex: actor.system.attributes.dex.value,
+        per: actor.system.attributes.per.value,
+      };
+
+      const roll = new Roll(
+        `@combatSkills.rangedDefense.rating - 1d100 + ${doctrineRangedDefenseBonus}`,
+        rollData
+      );
+
+      await roll.evaluate();
+
+      await createDefenseChatMessage(
+        roll,
+        weapon,
+        rollName,
+        criticalSuccessThreshold,
+        criticalFailureThreshold
+      );
+    });
+  }
+
+  /* -------------------------------------------- */
+  /*  DODGE DEFENSE                               */
+  /* -------------------------------------------- */
+
+  async function dodgeDefense() {
+    const weapons = actor.items.filter((i) => i.type === "weapon");
+
+    if (!weapons.length) {
+      ui.notifications.warn("This actor has no weapons.");
+      return;
+    }
+
+    showWeaponDialog(weapons, async (index) => {
+      const weapon = weapons[index];
+      const rollName = `Dodge with ${weapon.name}`;
+
+      const dodge = actor.system.combatSkills.dodge;
+
+      const criticalSuccessThreshold =
+        dodge.criticalSuccessThreshold + weapon.system.critDodge;
+
+      const criticalFailureThreshold = dodge.criticalFailureThreshold;
+
+      const staminaCost = 4;
+      const stamina = actor.system.stats.stamina.value ?? 0;
+
+      if (stamina < staminaCost) {
+        ui.notifications.warn("Not enough stamina!");
+        return;
+      }
+
+      await actor.update({
+        "system.stats.stamina.value": stamina - staminaCost,
+      });
+
+      const rollData = {
+        combatSkills: actor.system.combatSkills,
+        weaponDodge: weapon.system.dodge,
+        dex: actor.system.attributes.dex.value,
+      };
+
+      const roll = new Roll(
+        `@combatSkills.dodge.rating + @weaponDodge - 1d100`,
+        rollData
+      );
+
+      await roll.evaluate();
+
+      await createDefenseChatMessage(
+        roll,
+        weapon,
+        rollName,
+        criticalSuccessThreshold,
+        criticalFailureThreshold
+      );
+    });
+  }
+
+  /* -------------------------------------------- */
+  /*  CHAT MESSAGE                                */
+  /* -------------------------------------------- */
+
+  async function createDefenseChatMessage(
+    roll,
+    weapon,
+    rollName,
+    criticalSuccessThreshold,
+    criticalFailureThreshold
+  ) {
+    const rollResult = roll.dice[0].results[0].result;
+
+    const critSuccess = rollResult <= criticalSuccessThreshold;
+    const critFailure = rollResult >= criticalFailureThreshold;
+
+    const armor = actor.system.armor;
+
+    const armorRows = [
+      ["Armor", armor.total],
+      ["Acid Armor", armor.acid.total],
+      ["Fire Armor", armor.fire.total],
+      ["Frost Armor", armor.frost.total],
+      ["Lightning Armor", armor.lightning.total],
+      ["Magic Armor", armor.magic.total],
+    ].filter(([, value]) => value > 0);
+
+    const armorTable = `
+      <table style="width:100%;text-align:center;font-size:15px;">
+        <tr><th>Type</th><th>Value</th></tr>
+        ${armorRows
+          .map(
+            ([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`
+          )
+          .join("")}
+      </table>
+    `;
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      rolls: [roll],
+      flavor: `
+        <div style="display:flex;align-items:center;gap:8px;font-size:1.3em;font-weight:bold;">
+          <img src="${weapon.img}" width="36" height="36">
+          <span>${rollName}</span>
+        </div>
+        <p style="text-align:center;font-size:20px;"><b>
+          ${
+            critSuccess
+              ? "Critical Success!"
+              : critFailure
+              ? "Critical Failure!"
+              : ""
+          }
+        </b></p>
+        ${armorTable}
+        <hr>
+      `,
+      flags: {
+        tos: {
+          rollName,
+          criticalSuccessThreshold,
+          criticalFailureThreshold,
+        },
+      },
+    });
+  }
 }
