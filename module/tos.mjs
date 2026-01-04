@@ -262,16 +262,31 @@ Hooks.on("ready", () => {
 
     Combat.prototype.nextRound = async function () {
       if (isDynamicInitEnabled()) {
-        const combat = this;
+        try {
+          const combat = this;
 
-        const combatantUpdates = combat.combatants.map((c) => ({
-          _id: c.id,
-          flags: { [SYS_ID]: { PreviousRoundInitiative: c.initiative } },
-        }));
-        await Combatant.updateDocuments(combatantUpdates, { parent: combat });
-        await combat.resetAll();
-        await combat.rollAll();
+          const combatantUpdates = combat.combatants.map((c) => ({
+            _id: c.id,
+            flags: { [SYS_ID]: { PreviousRoundInitiative: c.initiative } },
+          }));
+
+          await Combatant.updateDocuments(combatantUpdates, { parent: combat });
+          await combat.resetAll();
+          await combat.rollAll();
+        } catch (err) {
+          // Translate permission error for players
+          if (!game.user.isGM) {
+            ui.notifications.warn(
+              "Dynamic Initiative: the GM must advance to the next round."
+            );
+            return;
+          }
+
+          // Preserve original error behavior for GM / unexpected cases
+          throw err;
+        }
       }
+
       return originalNextRound.call(this);
     };
   }
@@ -286,30 +301,44 @@ Hooks.on("ready", () => {
 
     Combat.prototype.previousRound = async function () {
       if (isDynamicInitEnabled()) {
-        const combat = this;
-        const combatantUpdates = [];
+        try {
+          const combat = this;
+          const combatantUpdates = [];
 
-        for (const combatant of combat.combatants) {
-          const previousInit = combatant.getFlag(
-            SYS_ID,
-            "PreviousRoundInitiative"
-          );
+          for (const combatant of combat.combatants) {
+            const previousInit = combatant.getFlag(
+              SYS_ID,
+              "PreviousRoundInitiative"
+            );
 
-          if (previousInit !== undefined && previousInit !== null) {
-            combatantUpdates.push({
-              _id: combatant.id,
-              initiative: previousInit,
-            });
+            if (previousInit !== undefined && previousInit !== null) {
+              combatantUpdates.push({
+                _id: combatant.id,
+                initiative: previousInit,
+              });
 
-            combatant.unsetFlag(SYS_ID, "PreviousRoundInitiative");
+              combatant.unsetFlag(SYS_ID, "PreviousRoundInitiative");
+            }
           }
-        }
 
-        if (combatantUpdates.length > 0) {
-          await Combatant.updateDocuments(combatantUpdates, { parent: combat });
-        }
+          if (combatantUpdates.length > 0) {
+            await Combatant.updateDocuments(combatantUpdates, {
+              parent: combat,
+            });
+          }
 
-        await combat.update({ turn: combat.turns.length - 1 });
+          await combat.update({ turn: combat.turns.length - 1 });
+        } catch (err) {
+          // Translate permission error for players
+          if (!game.user.isGM) {
+            ui.notifications.warn(
+              "Dynamic Initiative: the GM must move to the previous round."
+            );
+            return;
+          }
+
+          throw err;
+        }
       }
 
       //Call original function to decrement the round
@@ -329,6 +358,7 @@ Hooks.on("ready", () => {
  * @param {number} slot     The hotbar slot to use
  * @returns {Promise}
  */
+
 async function createDocMacro(data, slot) {
   // First, determine if this is a valid owned item.
   if (data.type !== "Item") return;
@@ -387,15 +417,15 @@ function rollItemMacro(itemUuid) {
 Hooks.on("createChatMessage", async (message) => {
   try {
     if (!message.isRoll) return;
-
+    if (!game.user.isGM && message.user.id !== game.user.id) return;
     const flavor = message.flavor ?? "";
 
-    // 1️⃣ Read existing rollName from flags.tos (macro or previous messages)
+    // Read existing rollName from flags.tos (macro or previous messages)
     const existing = message.getFlag("tos", "rollName");
 
     let shouldSet = !existing;
 
-    // 2️⃣ If complex HTML (macro message), just use the macro-provided rollName
+    // If complex HTML (macro message), just use the macro-provided rollName
     if (/<(div|table|img|hr)/i.test(flavor)) {
       if (existing) {
         console.log("Macro Roll Name:", existing); // Already set by macro
@@ -403,7 +433,7 @@ Hooks.on("createChatMessage", async (message) => {
       shouldSet = false; // don’t try to infer
     }
 
-    // 3️⃣ If no existing rollName, infer from flavor or first roll formula
+    // If no existing rollName, infer from flavor or first roll formula
     if (shouldSet) {
       let rollName = "Roll";
 
@@ -416,7 +446,7 @@ Hooks.on("createChatMessage", async (message) => {
       await message.setFlag("tos", "rollName", rollName);
     }
 
-    // 4️⃣ Determine rollName to use (macro flag or inferred)
+    // Determine rollName to use (macro flag or inferred)
     const rollNameToUse =
       existing || (await message.getFlag("tos", "rollName"));
     console.log("Roll Name:", rollNameToUse);
