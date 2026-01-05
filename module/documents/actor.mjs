@@ -571,9 +571,59 @@ export class ToSActor extends Actor {
         magicDoctrine.veneficus.value || 0,
         magicDoctrine.elementalist.value || 0
       );
+      const doctrineValues = {
+        elymas: magicDoctrine.elymas.value || 0,
+        incantator: magicDoctrine.incantator.value || 0,
+        elementalist: magicDoctrine.elementalist.value || 0,
+      };
+      const SKILL_TREES = {
+        elymas: {
+          attack: [{ min: 4, bonus: 5 }],
+          defense: [
+            { min: 2, bonus: 5 },
+            { min: 6, bonus: 10 },
+          ],
+        },
+        incantator: {
+          attack: [
+            { min: 2, bonus: 5 },
+            { min: 6, bonus: 10 },
+          ],
+          defense: [{ min: 4, bonus: 5 }],
+        },
+        elementalist: {
+          attack: [{ min: 5, bonus: 5 }],
+          defense: [{ min: 3, bonus: 5 }],
+        },
+      };
 
-      console.log("Max Doctrine Value:", maxValue);
-      console.log("Current Doctrine Values:", magicDoctrine);
+      function calculateTreeBonus(magicDoctrineType, type, level) {
+        if (doctrineValues[magicDoctrineType] !== maxValue) return 0;
+
+        let bonus = 0;
+        const rules = SKILL_TREES[magicDoctrineType][type];
+        if (!rules) return 0;
+
+        for (const rule of rules) {
+          if (level >= rule.min && rule.bonus > bonus) {
+            bonus = rule.bonus;
+          }
+        }
+        return bonus;
+      }
+
+      // Hypothetical switching magic doctrine will not prevent from getting better skill bonus from the higher doctrine
+      const magicAttackBonus =
+        calculateTreeBonus("elymas", "attack", maxValue) +
+        calculateTreeBonus("incantator", "attack", maxValue) +
+        calculateTreeBonus("elementalist", "attack", maxValue);
+
+      const magicDefenseBonus =
+        calculateTreeBonus("elymas", "defense", maxValue) +
+        calculateTreeBonus("incantator", "defense", maxValue) +
+        calculateTreeBonus("elementalist", "defense", maxValue);
+      systemData.combatSkills.channeling.attack += magicAttackBonus;
+      systemData.combatSkills.channeling.defense += magicDefenseBonus;
 
       const calcElymas = [1, 2.5, 2.5, 2.5, 3, 3, 3.5, 3.5, 4, 4, 4];
       const calcIncantator = [1, 5, 5, 5, 8, 8, 10, 10, 12, 12, 12];
@@ -582,6 +632,7 @@ export class ToSActor extends Actor {
 
       if (magicDoctrine.elymas.value === maxValue) {
         console.log("Selected: Elymas");
+
         systemData.stats.mana.max = Math.floor(
           (calcCast[channeling] +
             int +
