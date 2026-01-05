@@ -9,6 +9,19 @@ import { ToSItemSheet } from "./sheets/item-sheet.mjs";
 import { TOS } from "./helpers/config.mjs";
 import { usePotion } from "./utils/usePotion.mjs";
 import { defenseRoll } from "./utils/defense.mjs";
+import { throwExplosive } from "./utils/throwExplosive.mjs";
+import { castSpell } from "./utils/castSpell.mjs";
+import { spellDefense } from "./utils/spellDefense.mjs";
+import { meleeAttack } from "./utils/meleeAttack.mjs";
+import { rangedAttack } from "./utils/rangedAttack.mjs";
+import { throwingAttack } from "./utils/throwingAttack.mjs";
+import { selectCombatAction } from "./utils/selectCombatAction.mjs";
+import {
+  delayInitiative,
+  restAndRecover,
+  longRest,
+} from "./utils/otherActions.mjs";
+
 import {
   getNonWeaponAbility,
   getDoctrineBonuses,
@@ -52,6 +65,16 @@ Hooks.once("init", function () {
   CONFIG.TOS = TOS;
 
   game.tos = game.tos || {};
+  game.tos.delayInitiative = delayInitiative;
+  game.tos.restAndRecover = restAndRecover;
+  game.tos.longRest = longRest;
+  game.tos.spellDefense = spellDefense;
+  game.tos.selectCombatAction = selectCombatAction;
+  game.tos.meleeAttack = meleeAttack;
+  game.tos.rangedAttack = rangedAttack;
+  game.tos.throwingAttack = throwingAttack;
+  game.tos.castSpell = castSpell;
+  game.tos.throwExplosive = throwExplosive;
   game.tos.usePotion = usePotion;
   game.tos.getNonWeaponAbility = getNonWeaponAbility;
   game.tos.getDoctrineBonuses = getDoctrineBonuses;
@@ -104,7 +127,6 @@ Hooks.once("init", function () {
 /* -------------------------------------------- */
 /*  ToS Specific Game settings                  */
 /* -------------------------------------------- */
-
 function registerDynamicInitiative() {
   game.settings.register("tos", "registerDynamicInitiative", {
     config: true,
@@ -282,6 +304,7 @@ Hooks.on("ready", () => {
           }
 
           // Preserve original error behavior for GM / unexpected cases
+
           throw err;
         }
       }
@@ -429,7 +452,8 @@ Hooks.on("createChatMessage", async (message) => {
       if (existing) {
         console.log("Macro Roll Name:", existing); // Already set by macro
       }
-      shouldSet = false; // don’t try to infer
+      shouldSet = false;
+      // don’t try to infer
     }
 
     // If no existing rollName, infer from flavor or first roll formula
@@ -473,7 +497,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
 
       // Append the reroll button to the container
       buttonContainer.append(rerollButton);
-
       // Add click event listener for the reroll button
       rerollButton.on("click", async (event) => {
         event.preventDefault();
