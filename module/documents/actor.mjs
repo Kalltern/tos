@@ -778,6 +778,15 @@ export class ToSActor extends Actor {
       combatSkill.rating = combatSkill.value + combatSkill.bonus;
     }
 
+    const hp = this.system.stats.health;
+    const stamina = this.system.stats.stamina;
+
+    stamina.value = Number(stamina.value) || 0;
+    stamina.max = Number(stamina.max) || 0;
+
+    hp.value = Number(hp.value) || 0;
+    hp.max = Number(hp.max) || 0;
+
     systemData.xp = systemData.cr * systemData.cr * 100;
     console.log("Armor natural", systemData.armor.natural);
     console.log("Armor", systemData.armor);
