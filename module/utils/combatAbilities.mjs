@@ -1,29 +1,30 @@
-// ====================================================================
-// 1. INITIAL SETUP AND FILTERING
-// ====================================================================
+export async function combatAbilities() {
+  // ====================================================================
+  // 1. INITIAL SETUP AND FILTERING
+  // ====================================================================
 
-const selectedToken = canvas.tokens.controlled[0];
-if (!selectedToken) return ui.notifications.warn("Please select a token.");
-const actor = selectedToken.actor;
+  const selectedToken = canvas.tokens.controlled[0];
+  if (!selectedToken) return ui.notifications.warn("Please select a token.");
+  const actor = selectedToken.actor;
 
-// Collect all relevant abilities: (type: ability) AND (type: melee OR class: defense)
-const abilities = actor.items.filter(
-  (i) =>
-    i.type === "ability" &&
-    (i.system.type === "melee" || i.system.class === "defense")
-);
-
-if (!abilities.length)
-  return ui.notifications.warn(
-    `No combat or defense abilities found on ${actor.name}.`
+  // Collect all relevant abilities: (type: ability) AND (type: melee OR class: defense)
+  const abilities = actor.items.filter(
+    (i) =>
+      i.type === "ability" &&
+      (i.system.type === "melee" || i.system.class === "defense")
   );
 
-// ====================================================================
-// 2. CSS INJECTION
-// ====================================================================
+  if (!abilities.length)
+    return ui.notifications.warn(
+      `No combat or defense abilities found on ${actor.name}.`
+    );
 
-if (!document.getElementById("tos-ability-dialog-styles")) {
-  const css = `
+  // ====================================================================
+  // 2. CSS INJECTION
+  // ====================================================================
+
+  if (!document.getElementById("tos-ability-dialog-styles")) {
+    const css = `
         #ability-list .ability-choice {
             position: relative;
             font-size: 16px;
@@ -43,72 +44,72 @@ if (!document.getElementById("tos-ability-dialog-styles")) {
         #keep-open-container { margin-bottom: 8px; font-size: 14px; }
         #keep-open { margin-right: 5px; }
     `;
-  const styleSheet = document.createElement("style");
-  styleSheet.id = "tos-ability-dialog-styles";
-  styleSheet.type = "text/css";
-  styleSheet.innerText = css;
-  document.head.appendChild(styleSheet);
-}
-
-const abilityChoices = abilities.map((a, idx) => ({
-  label: a.name,
-  value: idx,
-}));
-
-// ====================================================================
-// 3. EXECUTION HANDLER: _onAbilityChosen
-// ====================================================================
-
-async function _onAbilityChosen(
-  event,
-  container,
-  abilities,
-  abilityDialogInstance,
-  actor
-) {
-  const el = event.currentTarget;
-  const idx = Number(el.dataset.value);
-  const ability = abilities[idx];
-  if (!ability) return ui.notifications.error("Selected ability not found.");
-
-  // Determine the type of roll based on the item's class
-  const isDefenseRoll = ability.system.class === "defense";
-
-  // Only close if checkbox is NOT checked
-  const keepOpenCheckbox = container.querySelector("#keep-open");
-  const keepOpen = keepOpenCheckbox ? keepOpenCheckbox.checked : false;
-
-  try {
-    await deductAbilityCost(actor, ability);
-
-    // Both Defense and Attack Abilities require weapon selection/passing
-    if (isDefenseRoll || (ability.system && ability.system.weaponAbility)) {
-      const mode = isDefenseRoll ? "defense" : "attack";
-      await weaponSelectionFlow(actor, ability, mode);
-    }
-    // Non-Weapon Melee Abilities
-    else {
-      await game.tos.getNonWeaponAbility(actor, ability);
-    }
-  } catch (err) {
-    console.error("Error using ability:", err);
-    ui.notifications.error(
-      "There was an error using that ability. See console."
-    );
+    const styleSheet = document.createElement("style");
+    styleSheet.id = "tos-ability-dialog-styles";
+    styleSheet.type = "text/css";
+    styleSheet.innerText = css;
+    document.head.appendChild(styleSheet);
   }
 
-  if (!keepOpen && abilityDialogInstance?.close) {
-    abilityDialogInstance.close();
+  const abilityChoices = abilities.map((a, idx) => ({
+    label: a.name,
+    value: idx,
+  }));
+
+  // ====================================================================
+  // 3. EXECUTION HANDLER: _onAbilityChosen
+  // ====================================================================
+
+  async function _onAbilityChosen(
+    event,
+    container,
+    abilities,
+    abilityDialogInstance,
+    actor
+  ) {
+    const el = event.currentTarget;
+    const idx = Number(el.dataset.value);
+    const ability = abilities[idx];
+    if (!ability) return ui.notifications.error("Selected ability not found.");
+
+    // Determine the type of roll based on the item's class
+    const isDefenseRoll = ability.system.class === "defense";
+
+    // Only close if checkbox is NOT checked
+    const keepOpenCheckbox = container.querySelector("#keep-open");
+    const keepOpen = keepOpenCheckbox ? keepOpenCheckbox.checked : false;
+
+    try {
+      await deductAbilityCost(actor, ability);
+
+      // Both Defense and Attack Abilities require weapon selection/passing
+      if (isDefenseRoll || (ability.system && ability.system.weaponAbility)) {
+        const mode = isDefenseRoll ? "defense" : "attack";
+        await weaponSelectionFlow(actor, ability, mode);
+      }
+      // Non-Weapon Melee Abilities
+      else {
+        await game.tos.getNonWeaponAbility(actor, ability);
+      }
+    } catch (err) {
+      console.error("Error using ability:", err);
+      ui.notifications.error(
+        "There was an error using that ability. See console."
+      );
+    }
+
+    if (!keepOpen && abilityDialogInstance?.close) {
+      abilityDialogInstance.close();
+    }
   }
-}
 
-// ====================================================================
-// 4. MAIN DIALOG (Unified List)
-// ====================================================================
+  // ====================================================================
+  // 4. MAIN DIALOG (Unified List)
+  // ====================================================================
 
-let abilityDialog = new Dialog({
-  title: `Choose Combat or Defense Ability`,
-  content: `
+  let abilityDialog = new Dialog({
+    title: `Choose Combat or Defense Ability`,
+    content: `
         <form>
             <fieldset>
                 <div id="keep-open-container">
@@ -145,93 +146,93 @@ let abilityDialog = new Dialog({
             </fieldset>
         </form>
     `,
-  classes: ["ability-dialog"],
-  buttons: {},
-  render: (html) => {
-    const container = html instanceof HTMLElement ? html : html[0];
+    classes: ["ability-dialog"],
+    buttons: {},
+    render: (html) => {
+      const container = html instanceof HTMLElement ? html : html[0];
 
-    const list = container.querySelector("#ability-list");
-    if (!list) return;
+      const list = container.querySelector("#ability-list");
+      if (!list) return;
 
-    const items = Array.from(list.querySelectorAll(".ability-choice"));
-    for (const li of items) {
-      li.addEventListener("click", async (event) => {
-        await _onAbilityChosen(
-          event,
-          container,
-          abilities,
-          abilityDialog,
-          actor
+      const items = Array.from(list.querySelectorAll(".ability-choice"));
+      for (const li of items) {
+        li.addEventListener("click", async (event) => {
+          await _onAbilityChosen(
+            event,
+            container,
+            abilities,
+            abilityDialog,
+            actor
+          );
+        });
+      }
+    },
+  });
+
+  abilityDialog.render(true);
+
+  // ====================================================================
+  // 5. HELPER FUNCTIONS
+  // ====================================================================
+
+  /**
+   * Handles weapon selection and dispatches to the correct roll function.
+   * * @param {object} actor
+   * @param {object} ability
+   * @param {'attack'|'defense'} mode
+   */
+  async function weaponSelectionFlow(actor, ability, mode = "attack") {
+    const weapons = actor.items.filter(
+      (i) =>
+        i.type === "weapon" &&
+        ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
+        i.system.thrown !== true
+    );
+    if (!weapons.length)
+      return ui.notifications.warn("This actor has no valid weapons.");
+
+    const weaponChoices = weapons.map((w, idx) => ({
+      label: w.name,
+      value: idx,
+    }));
+
+    const handleWeaponSelection = async (weaponIndex) => {
+      const weapon = weapons[weaponIndex];
+
+      await updateCombatFlags(actor);
+
+      if (mode === "defense") {
+        // defenseRoll function
+        await game.tos.defenseRoll(actor, weapon, ability);
+      } else {
+        const abilityDamage = ability.system.roll.diceBonus || 0;
+        const abilityAttack = ability.system.attack || 0;
+        const abilityBreakthrough = ability.system.breakthrough || 0;
+        const abilityPenetration = ability.system.penetration || 0;
+        const abilityAttributeTestName = ability.system.attributeTest || 0;
+        const abilityTestModifier = ability.system.testModifier || 0;
+        const abilityCritRange = ability.system.critRange || 0;
+        const abilityCritChance = ability.system.critChance || 0;
+        const abilityCritFail = ability.system.critFail || 0;
+
+        await runAttackMacro(
+          actor,
+          weapon,
+          ability,
+          abilityDamage,
+          abilityAttack,
+          abilityBreakthrough,
+          abilityPenetration,
+          abilityAttributeTestName,
+          abilityTestModifier,
+          abilityCritRange,
+          abilityCritChance,
+          abilityCritFail
         );
-      });
-    }
-  },
-});
+      }
+    };
 
-abilityDialog.render(true);
-
-// ====================================================================
-// 5. HELPER FUNCTIONS
-// ====================================================================
-
-/**
- * Handles weapon selection and dispatches to the correct roll function.
- * * @param {object} actor
- * @param {object} ability
- * @param {'attack'|'defense'} mode
- */
-async function weaponSelectionFlow(actor, ability, mode = "attack") {
-  const weapons = actor.items.filter(
-    (i) =>
-      i.type === "weapon" &&
-      ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-      i.system.thrown !== true
-  );
-  if (!weapons.length)
-    return ui.notifications.warn("This actor has no valid weapons.");
-
-  const weaponChoices = weapons.map((w, idx) => ({
-    label: w.name,
-    value: idx,
-  }));
-
-  const handleWeaponSelection = async (weaponIndex) => {
-    const weapon = weapons[weaponIndex];
-
-    await updateCombatFlags(actor);
-
-    if (mode === "defense") {
-      // defenseRoll function
-      await game.tos.defenseRoll(actor, weapon, ability);
-    } else {
-      const abilityDamage = ability.system.roll.diceBonus || 0;
-      const abilityAttack = ability.system.attack || 0;
-      const abilityBreakthrough = ability.system.breakthrough || 0;
-      const abilityPenetration = ability.system.penetration || 0;
-      const abilityAttributeTestName = ability.system.attributeTest || 0;
-      const abilityTestModifier = ability.system.testModifier || 0;
-      const abilityCritRange = ability.system.critRange || 0;
-      const abilityCritChance = ability.system.critChance || 0;
-      const abilityCritFail = ability.system.critFail || 0;
-
-      await runAttackMacro(
-        actor,
-        weapon,
-        ability,
-        abilityDamage,
-        abilityAttack,
-        abilityBreakthrough,
-        abilityPenetration,
-        abilityAttributeTestName,
-        abilityTestModifier,
-        abilityCritRange,
-        abilityCritChance,
-        abilityCritFail
-      );
-    }
-  };
-
-  const css = `
+    const css = `
     #weapon-list .weapon-choice {
         position: relative;
         font-size: 16px;
@@ -252,18 +253,18 @@ async function weaponSelectionFlow(actor, ability, mode = "attack") {
         width: auto;
     }
 `;
-  const styleSheet = document.createElement("style");
-  styleSheet.type = "text/css";
-  styleSheet.innerText = css;
-  document.head.appendChild(styleSheet);
+    const styleSheet = document.createElement("style");
+    styleSheet.type = "text/css";
+    styleSheet.innerText = css;
+    document.head.appendChild(styleSheet);
 
-  const attackOptionsStyle = mode === "defense" ? "display: none;" : "";
+    const attackOptionsStyle = mode === "defense" ? "display: none;" : "";
 
-  const weaponDialog = new Dialog({
-    title: `Select Weapon - ${ability.name} (${
-      mode === "defense" ? "Defense" : "Attack"
-    })`,
-    content: `
+    const weaponDialog = new Dialog({
+      title: `Select Weapon - ${ability.name} (${
+        mode === "defense" ? "Defense" : "Attack"
+      })`,
+      content: `
         <form>
             <p>Choose Weapon for ${mode} roll:</p>
             <div class="form-group" style="${attackOptionsStyle}">
@@ -304,133 +305,137 @@ async function weaponSelectionFlow(actor, ability, mode = "attack") {
         </fieldset>
         </form>
     `,
-    classes: ["weapon-dialog"],
-    buttons: {},
-    render: (html) => {
-      html.find(".weapon-choice").click(async (event) => {
-        const selectedValue = $(event.currentTarget).data("value");
-        await handleWeaponSelection(selectedValue);
-        weaponDialog.close();
-      });
-    },
-  });
+      classes: ["weapon-dialog"],
+      buttons: {},
+      render: (html) => {
+        html.find(".weapon-choice").click(async (event) => {
+          const selectedValue = $(event.currentTarget).data("value");
+          await handleWeaponSelection(selectedValue);
+          weaponDialog.close();
+        });
+      },
+    });
 
-  weaponDialog.render(true);
-}
-
-// runAttackMacro, updateCombatFlags, and deductAbilityCost functions
-
-async function updateCombatFlags(actor) {
-  if (!actor) return;
-  const aimValue = parseInt(
-    document.querySelector('input[name="aim"]:checked')?.value || 0
-  );
-  const useSneak = document.querySelector("#sneak-attack-checkbox")?.checked;
-  const useFlanking = document.querySelector(
-    "#flanking-attack-checkbox"
-  )?.checked;
-
-  if (useSneak) {
-    await actor.setFlag("tos", "useSneakAttack", true);
-    await actor.setFlag("tos", "sneakAccessCounter", 0);
-  } else {
-    await actor.unsetFlag("tos", "useSneakAttack");
-    await actor.unsetFlag("tos", "sneakAccessCounter");
+    weaponDialog.render(true);
   }
 
-  if (useFlanking) {
-    await actor.setFlag("tos", "useFlankingAttack", true);
-  } else {
-    await actor.unsetFlag("tos", "useFlankingAttack");
+  // runAttackMacro, updateCombatFlags, and deductAbilityCost functions
+
+  async function updateCombatFlags(actor) {
+    if (!actor) return;
+    const aimValue = parseInt(
+      document.querySelector('input[name="aim"]:checked')?.value || 0
+    );
+    const useSneak = document.querySelector("#sneak-attack-checkbox")?.checked;
+    const useFlanking = document.querySelector(
+      "#flanking-attack-checkbox"
+    )?.checked;
+
+    if (useSneak) {
+      await actor.setFlag("tos", "useSneakAttack", true);
+      await actor.setFlag("tos", "sneakAccessCounter", 0);
+    } else {
+      await actor.unsetFlag("tos", "useSneakAttack");
+      await actor.unsetFlag("tos", "sneakAccessCounter");
+    }
+
+    if (useFlanking) {
+      await actor.setFlag("tos", "useFlankingAttack", true);
+    } else {
+      await actor.unsetFlag("tos", "useFlankingAttack");
+    }
+
+    if (aimValue > 0) {
+      await actor.setFlag("tos", "aimCount", aimValue);
+    } else {
+      await actor.unsetFlag("tos", "aimCount");
+    }
   }
 
-  if (aimValue > 0) {
-    await actor.setFlag("tos", "aimCount", aimValue);
-  } else {
-    await actor.unsetFlag("tos", "aimCount");
+  async function deductAbilityCost(actor, ability) {
+    const costType = ability.system.costType;
+    const costValue = ability.system.cost;
+    if (!costType || !costValue) return;
+
+    const currentValue = actor.system.stats[costType]?.value ?? 0;
+    const newValue = Math.max(currentValue - costValue, 0);
+
+    await actor.update({
+      [`system.stats.${costType}.value`]: newValue,
+    });
+
+    ui.notifications.info(
+      `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`
+    );
   }
-}
 
-async function deductAbilityCost(actor, ability) {
-  const costType = ability.system.costType;
-  const costValue = ability.system.cost;
-  if (!costType || !costValue) return;
-
-  const currentValue = actor.system.stats[costType]?.value ?? 0;
-  const newValue = Math.max(currentValue - costValue, 0);
-
-  await actor.update({
-    [`system.stats.${costType}.value`]: newValue,
-  });
-
-  ui.notifications.info(
-    `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`
-  );
-}
-
-async function runAttackMacro(
-  actor,
-  weapon,
-  ability,
-  abilityDamage,
-  abilityAttack,
-  abilityBreakthrough,
-  abilityPenetration,
-  abilityAttributeTestName,
-  abilityTestModifier,
-  abilityCritRange,
-  abilityCritChance,
-  abilityCritFail
-) {
-  let {
-    doctrineBonus,
-    doctrineCritBonus,
-    doctrineCritRangeBonus,
-    doctrineStunBonus,
-    doctrineSkillCritPen,
-    doctrineCritDmg,
-    doctrineBleedBonus,
-  } = await game.tos.getDoctrineBonuses(actor, weapon);
-
-  doctrineBonus += abilityCritChance;
-  doctrineCritRangeBonus += abilityCritRange;
-
-  const {
-    weaponSkillEffect,
-    weaponSkillCrit,
-    weaponSkillCritDmg,
-    weaponSkillCritPen,
-  } = await game.tos.getWeaponSkillBonuses(actor, weapon);
-
-  const penetration = (weapon.system.penetration || 0) + abilityPenetration;
-
-  let {
-    attackRoll,
-    rollName,
-    critSuccess,
-    critFailure,
-    criticalSuccessThreshold,
-    criticalFailureThreshold,
-  } = await game.tos.getAttackRolls(
+  async function runAttackMacro(
     actor,
     weapon,
-    doctrineBonus,
-    doctrineCritBonus,
-    weaponSkillCrit,
+    ability,
+    abilityDamage,
     abilityAttack,
+    abilityBreakthrough,
+    abilityPenetration,
+    abilityAttributeTestName,
+    abilityTestModifier,
+    abilityCritRange,
+    abilityCritChance,
     abilityCritFail
-  );
+  ) {
+    let {
+      doctrineBonus,
+      doctrineCritBonus,
+      doctrineCritRangeBonus,
+      doctrineStunBonus,
+      doctrineSkillCritPen,
+      doctrineCritDmg,
+      doctrineBleedBonus,
+    } = await game.tos.getDoctrineBonuses(actor, weapon);
 
-  const { damageRoll, damageTotal, breakthroughRollResult } =
-    await game.tos.getDamageRolls(
+    doctrineBonus += abilityCritChance;
+    doctrineCritRangeBonus += abilityCritRange;
+
+    const {
+      weaponSkillEffect,
+      weaponSkillCrit,
+      weaponSkillCritDmg,
+      weaponSkillCritPen,
+    } = await game.tos.getWeaponSkillBonuses(actor, weapon);
+
+    const penetration = (weapon.system.penetration || 0) + abilityPenetration;
+
+    let {
+      attackRoll,
+      rollName,
+      critSuccess,
+      critFailure,
+      criticalSuccessThreshold,
+      criticalFailureThreshold,
+    } = await game.tos.getAttackRolls(
       actor,
       weapon,
-      abilityDamage,
-      abilityBreakthrough
+      doctrineBonus,
+      doctrineCritBonus,
+      weaponSkillCrit,
+      abilityAttack,
+      abilityCritFail
     );
 
-  const { critScore, critScoreResult, critBonusPenetration, critDamageTotal } =
-    await game.tos.getCriticalRolls(
+    const { damageRoll, damageTotal, breakthroughRollResult } =
+      await game.tos.getDamageRolls(
+        actor,
+        weapon,
+        abilityDamage,
+        abilityBreakthrough
+      );
+
+    const {
+      critScore,
+      critScoreResult,
+      critBonusPenetration,
+      critDamageTotal,
+    } = await game.tos.getCriticalRolls(
       actor,
       weapon,
       doctrineCritRangeBonus,
@@ -443,64 +448,66 @@ async function runAttackMacro(
       doctrineSkillCritPen
     );
 
-  const { allBleedRollResults, bleedChanceDisplay, effectsRollResults } =
-    await game.tos.getEffectRolls(
-      actor,
-      weapon,
-      doctrineBleedBonus,
-      doctrineStunBonus,
-      weaponSkillEffect,
-      critScore,
-      critSuccess,
-      ability
-    );
+    const { allBleedRollResults, bleedChanceDisplay, effectsRollResults } =
+      await game.tos.getEffectRolls(
+        actor,
+        weapon,
+        doctrineBleedBonus,
+        doctrineStunBonus,
+        weaponSkillEffect,
+        critScore,
+        critSuccess,
+        ability
+      );
 
-  const attributeMap = {
-    strength: "str",
-    endurance: "end",
-    dexterity: "dex",
-    intelligence: "int",
-    wisdom: "wis",
-    charisma: "cha",
-  };
+    const attributeMap = {
+      strength: "str",
+      endurance: "end",
+      dexterity: "dex",
+      intelligence: "int",
+      wisdom: "wis",
+      charisma: "cha",
+    };
 
-  let concatRollAndDescription;
-  if (
-    abilityAttributeTestName &&
-    abilityAttributeTestName !== "-- Select a Type --"
-  ) {
-    const shortKey =
-      attributeMap[abilityAttributeTestName.toLowerCase()] ??
-      abilityAttributeTestName;
+    let concatRollAndDescription;
+    if (
+      abilityAttributeTestName &&
+      abilityAttributeTestName !== "-- Select a Type --"
+    ) {
+      const shortKey =
+        attributeMap[abilityAttributeTestName.toLowerCase()] ??
+        abilityAttributeTestName;
 
-    let selectedAttributeModifier = actor.system.attributes[shortKey]?.mod ?? 0;
-    if (actor.type === "npc") {
-      selectedAttributeModifier = actor.system.attributes[shortKey]?.value ?? 0;
-    }
+      let selectedAttributeModifier =
+        actor.system.attributes[shortKey]?.mod ?? 0;
+      if (actor.type === "npc") {
+        selectedAttributeModifier =
+          actor.system.attributes[shortKey]?.value ?? 0;
+      }
 
-    const attributeRoll = new Roll(
-      `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`
-    );
-    await attributeRoll.evaluate({ async: true });
+      const attributeRoll = new Roll(
+        `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`
+      );
+      await attributeRoll.evaluate({ async: true });
 
-    const attributeRollTotal = attributeRoll.total;
-    const attributeString = `
+      const attributeRollTotal = attributeRoll.total;
+      const attributeString = `
         |${abilityAttributeTestName} Test ${
-      selectedAttributeModifier + abilityTestModifier
-    }%|<br>
+        selectedAttributeModifier + abilityTestModifier
+      }%|<br>
         Margin of Success: ${attributeRollTotal}<br>
     `;
 
-    concatRollAndDescription = ability.system.description + attributeString;
-  } else {
-    concatRollAndDescription = ability.system.description;
-  }
-  rollName = `${ability.name} with ${weapon.name}`;
-  console.log(criticalSuccessThreshold);
-  await ChatMessage.create({
-    speaker: ChatMessage.getSpeaker(),
-    rolls: [attackRoll, damageRoll],
-    flavor: `
+      concatRollAndDescription = ability.system.description + attributeString;
+    } else {
+      concatRollAndDescription = ability.system.description;
+    }
+    rollName = `${ability.name} with ${weapon.name}`;
+    console.log(criticalSuccessThreshold);
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker(),
+      rolls: [attackRoll, damageRoll],
+      flavor: `
         <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
     <img src="${ability.img}" title="${ability.name}" width="36" height="36">
     <span>${ability.name} with ${weapon.name}</span>
@@ -556,12 +563,13 @@ async function runAttackMacro(
     <hr>
 
     `,
-    flags: {
-      tos: {
-        rollName,
-        criticalSuccessThreshold,
-        criticalFailureThreshold,
+      flags: {
+        tos: {
+          rollName,
+          criticalSuccessThreshold,
+          criticalFailureThreshold,
+        },
       },
-    },
-  });
+    });
+  }
 }

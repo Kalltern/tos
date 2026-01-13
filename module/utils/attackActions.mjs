@@ -1,4 +1,4 @@
-export async function selectCombatAction() {
+export async function attackActions() {
   const actor = canvas.tokens.controlled[0]?.actor;
   if (!actor) {
     ui.notifications.warn("No actor selected.");

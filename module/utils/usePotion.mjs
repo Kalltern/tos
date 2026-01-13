@@ -1,4 +1,6 @@
-export async function usePotion(selectedToken) {
+export async function usePotion() {
+  const selectedToken = canvas.tokens.controlled[0];
+
   if (!selectedToken) {
     ui.notifications.warn("Please select a token.");
     return;
@@ -66,10 +68,7 @@ export async function usePotion(selectedToken) {
   const handlePotionSelection = async (index) => {
     const consumable = consumables[index];
     const rollData = actor.getRollData();
-    const roll = await new Roll(
-      consumable.system.formula || "1d4",
-      rollData
-    ).evaluate();
+    const roll = await new Roll(consumable.system.formula, rollData).evaluate();
     const drinkingRoll = await new Roll(
       "@skills.drinking.rating - 1d100",
       rollData
@@ -85,7 +84,10 @@ export async function usePotion(selectedToken) {
       speaker: ChatMessage.getSpeaker(),
       rolls: [roll, drinkingRoll],
       flavor: `
-        <h2><img src="${consumable.img}" title="${consumable.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;"> Drinking ${consumable.name}</h2>
+    <span style="display:inline-flex; align-items:center;">
+      <img src="${consumable.img}" title="${consumable.name}" width="36" height="36" style="margin-right:8px;">
+      <strong style="font-size:20px;">Drinking ${consumable.name}</strong>
+    </span>
         <table style="width: 100%; text-align: center; font-size: 15px;">
           <tr><th>Potion Effects</th></tr>
           <tr><td><b>${effectResults}</b></td></tr>

@@ -1,4 +1,4 @@
-export async function delayInitiative() {
+export async function delayTurn() {
   const combat = game.combat;
   if (!combat) {
     ui.notifications.warn("No active combat.");
@@ -72,13 +72,7 @@ export async function delayInitiative() {
           // Option 1: After target
           if (targetId) {
             const target = combat.combatants.get(targetId);
-
-            const lower = ordered.find((c) => c.initiative < target.initiative);
-
-            const upper = target.initiative;
-            const lowerInit = lower?.initiative ?? upper - 10;
-
-            newInit = (upper + lowerInit) / 2;
+            newInit = target.initiative - 0.1;
           }
 
           // Option 2: Manual value
@@ -216,5 +210,58 @@ export async function longRest() {
   await ChatMessage.create({
     content: chatMessage,
     speaker: ChatMessage.getSpeaker({ actor }),
+  });
+}
+
+export async function firstAid() {
+  if (!token || !token.actor) {
+    ui.notifications.error("Please select a token first.");
+    return;
+  }
+
+  let actor = token.actor.system;
+  let firstAidData = actor.skills.firstAid;
+
+  const firstAidRoll = new Roll(`@skills.firstAid.rating - 1d100`, actor);
+  await firstAidRoll.evaluate({ async: true });
+
+  const d100 = firstAidRoll.dice[0]?.total;
+  const critFail = firstAidData.criticalFailureThreshold;
+  const critSuccess = firstAidData.criticalSuccessThreshold;
+
+  let critStatus = "";
+  let healRoll = null;
+
+  if (d100 >= critFail) {
+    critStatus =
+      "<strong style='color: red;'>Critical Failure! Injury caused!</strong>";
+    healRoll = new Roll("2d4");
+    Math.floor(healRoll);
+    await healRoll.evaluate({ async: true });
+  } else if (d100 <= critSuccess || firstAidRoll.total >= 50) {
+    critStatus = "<strong style='color: green;'>Critical Success!</strong>";
+    healRoll = new Roll("(3d6+3)*2");
+    Math.floor(healRoll);
+    await healRoll.evaluate({ async: true });
+  } else if (firstAidRoll.total >= 25) {
+    healRoll = new Roll("(3d6+3)*1.5");
+    Math.floor(healRoll);
+    await healRoll.evaluate({ async: true });
+  } else {
+    healRoll = new Roll("3d6+3");
+    Math.floor(healRoll);
+    await healRoll.evaluate({ async: true });
+  }
+
+  ChatMessage.create({
+    speaker: ChatMessage.getSpeaker({ actor: token.actor }),
+    flavor: `
+    <div>
+      <h2>${critStatus}</h2>
+      <p>Used ${this.name} action</p>
+      </div>
+  `,
+    rolls: healRoll ? [firstAidRoll, healRoll] : [firstAidRoll],
+    type: CONST.CHAT_MESSAGE_TYPES.ROLL,
   });
 }

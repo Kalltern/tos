@@ -15,11 +15,14 @@ import { spellDefense } from "./utils/spellDefense.mjs";
 import { meleeAttack } from "./utils/meleeAttack.mjs";
 import { rangedAttack } from "./utils/rangedAttack.mjs";
 import { throwingAttack } from "./utils/throwingAttack.mjs";
-import { selectCombatAction } from "./utils/selectCombatAction.mjs";
+import { combatAbilities } from "./utils/combatAbilities.mjs";
+import { rangedAbilities } from "./utils/rangedAbilities.mjs";
+import { attackActions } from "./utils/attackActions.mjs";
 import {
-  delayInitiative,
+  delayTurn,
   restAndRecover,
   longRest,
+  firstAid,
 } from "./utils/otherActions.mjs";
 
 import {
@@ -65,11 +68,14 @@ Hooks.once("init", function () {
   CONFIG.TOS = TOS;
 
   game.tos = game.tos || {};
-  game.tos.delayInitiative = delayInitiative;
+  game.tos.firstAid = firstAid;
+  game.tos.rangedAbilities = rangedAbilities;
+  game.tos.combatAbilities = combatAbilities;
+  game.tos.delayTurn = delayTurn;
   game.tos.restAndRecover = restAndRecover;
   game.tos.longRest = longRest;
   game.tos.spellDefense = spellDefense;
-  game.tos.selectCombatAction = selectCombatAction;
+  game.tos.attackActions = attackActions;
   game.tos.meleeAttack = meleeAttack;
   game.tos.rangedAttack = rangedAttack;
   game.tos.throwingAttack = throwingAttack;
@@ -262,6 +268,92 @@ Handlebars.registerHelper("healthPercentage", function (current, max) {
 Hooks.once("ready", function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on("hotbarDrop", (bar, data, slot) => createDocMacro(data, slot));
+});
+Hooks.once("ready", async () => {
+  // Prevent re-adding macros every load
+  if (game.user.getFlag("tos", "hotbarInitialized")) return;
+
+  // Define your preset macros
+  const macroData = [
+    {
+      name: "Attack actions",
+      command: `game.tos.attackActions();`,
+      img: "icons/skills/melee/hand-grip-sword-white-brown.webp",
+      slot: 1,
+    },
+    {
+      name: "Defense actions",
+      command: `game.tos.defenseRoll();`,
+      img: "icons/equipment/shield/shield-round-boss-wood-brown.webp",
+      slot: 2,
+    },
+    {
+      name: "Combat abilities",
+      command: `game.tos.combatAbilities();`,
+      img: "icons/skills/melee/weapons-crossed-swords-yellow.webp",
+      slot: 3,
+    },
+    {
+      name: "Ranged abilities",
+      command: `game.tos.rangedAbilities();`,
+      img: "icons/skills/ranged/target-bullseye-arrow-glowing.webp",
+      slot: 4,
+    },
+    {
+      name: "Rest",
+      command: `game.tos.restAndRecover();`,
+      img: "icons/consumables/plants/tearthumb-halberd-leaf-green.webp",
+      slot: 5,
+    },
+    {
+      name: "Channeling",
+      command: `game.tos.castSpell();`,
+      img: "icons/magic/lightning/orb-ball-spiral-blue.webp",
+      slot: 6,
+    },
+    {
+      name: "Spell defense",
+      command: `game.tos.spellDefense();`,
+      img: "icons/magic/defensive/shield-barrier-blades-teal.webp",
+      slot: 7,
+    },
+    {
+      name: "First aid",
+      command: `game.tos.firstAid();`,
+      img: "icons/magic/life/cross-yellow-green.webp",
+      slot: 8,
+    },
+
+    {
+      name: "Potions",
+      command: `game.tos.usePotion();`,
+      img: "icons/consumables/potions/bottle-round-label-cork-red.webp",
+      slot: 9,
+    },
+    {
+      name: "Delay turn",
+      command: `game.tos.delayTurn();`,
+      img: "icons/magic/time/hourglass-brown-orange.webp",
+      slot: 10,
+    },
+  ];
+
+  for (const data of macroData) {
+    let macro = game.macros.getName(data.name);
+
+    if (!macro) {
+      macro = await Macro.create({
+        name: data.name,
+        type: "script",
+        command: data.command,
+        img: data.img,
+      });
+    }
+
+    await game.user.assignHotbarMacro(macro, data.slot);
+  }
+
+  await game.user.setFlag("tos", "hotbarInitialized", true);
 });
 
 /* -------------------------------------------- */
