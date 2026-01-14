@@ -82,25 +82,26 @@ export async function throwExplosive() {
       rollResult = attackRoll.dice[0].results[0].result;
     }
 
-    const critSuccessThreshold =
+    const criticalSuccessThreshold =
       actor.system.combatSkills.throwing.criticalSuccessThreshold;
-    const critFailureThreshold =
+    const criticalFailureThreshold =
       actor.system.combatSkills.throwing.criticalFailureThreshold;
 
     const critSuccess =
-      rollResult !== null && rollResult <= critSuccessThreshold;
+      rollResult !== null && rollResult <= criticalSuccessThreshold;
     const critFailure =
-      rollResult !== null && rollResult >= critFailureThreshold;
+      rollResult !== null && rollResult >= criticalFailureThreshold;
 
     const damageRoll = new Roll(consumable.system.formula || "1d6");
     await damageRoll.evaluate();
+    const damageTotal = Math.floor(damageRoll.total);
 
     const effectResults = await applyConsumableEffects(consumable);
-
+    const rollName = `Threw ${consumable.name}`;
     const flavor = `
 <div style="display:flex; align-items:center; gap:8px; font-size:1.3em; font-weight:bold;">
   <img src="${consumable.img}" width="36" height="36">
-  <span>Threw ${consumable.name}</span>
+  <span>${rollName}</span>
 </div>
 
 <p style="text-align:center; font-size:20px;"><b>
@@ -127,7 +128,22 @@ export async function throwExplosive() {
       speaker: ChatMessage.getSpeaker(),
       rolls: attackRoll ? [attackRoll, damageRoll] : [damageRoll],
       flavor,
-      flags: consumable.name,
+
+      flags: {
+        tos: {
+          rollName,
+          criticalSuccessThreshold,
+          criticalFailureThreshold,
+        },
+
+        attack: {
+          type: "attack",
+          normal: {
+            damage: damageTotal,
+            penetration: penetration,
+          },
+        },
+      },
     });
   };
 

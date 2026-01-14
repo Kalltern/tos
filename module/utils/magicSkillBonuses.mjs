@@ -498,6 +498,8 @@ export async function finalizeRollsAndPostChat(
 
   const critDamageMapping = [0, 5, 5, 10, 20];
   const critBonusDamage = critDamageMapping[critScore] || 0;
+  const critBonusPenetration =
+    critDamageMapping[critScore] + spell.system.penetration;
   const actorCritBonus = Number(actor.system.critDamage) || 0;
   const critDamageTotal = critBonusDamage + actorCritBonus + damageTotal;
 
@@ -566,6 +568,18 @@ export async function finalizeRollsAndPostChat(
           actor.system.combatSkills.channeling.criticalSuccessThreshold,
         criticalFailureThreshold:
           actor.system.combatSkills.channeling.criticalFailureThreshold,
+      },
+      attack: {
+        type: "attack",
+        normal: {
+          damage: damageTotal,
+          penetration: penetration,
+        },
+
+        critical: {
+          damage: critDamageTotal,
+          penetration: critBonusPenetration,
+        },
       },
     },
   });

@@ -26,7 +26,7 @@
       "thumbnail": "systems/tos/assets/anvil-impact.png"
     }
   ],
-  "version": "0.5.8b",
+  "version": "0.6.0",
   "compatibility": {
     "minimum": "12.331",
     "verified": "13.350"
@@ -42,7 +42,7 @@
   ],
   "packs": [],
   "packFolders": [],
-  "socket": false,
+  "socket": true,
   "manifest": "Replace this with a link to the /latest release system.json so people can receive updates after they've installed the system",
   "download": "This must link to a .zip file of the current version",
   "background": "systems/tos/assets/anvil-impact.png",

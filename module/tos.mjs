@@ -271,6 +271,19 @@ Hooks.once("ready", function () {
   // Wait to register hotbar drop hook on ready so that modules could register earlier if they want to
   Hooks.on("hotbarDrop", (bar, data, slot) => createDocMacro(data, slot));
 });
+const SOCKET = "system.tos";
+Hooks.once("setup", () => {
+  console.log("TOS | Socket Listener Registered");
+
+  game.socket.on(SOCKET, async (data) => {
+    console.log("TOS | GM Received Socket Data:", data);
+    if (!game.user.isGM) return;
+    if (data.type === "applyDamage") {
+      await applyDamageAsGM(data);
+    }
+  });
+});
+
 Hooks.once("ready", async () => {
   // Prevent re-adding macros every load
   if (game.user.getFlag("tos", "hotbarInitialized")) return;
@@ -608,21 +621,63 @@ async function handleApplyDamage(messageId) {
   checkTargetsAndContinue();
 }
 async function applyDamageToTargets(message, targets, mode) {
-  const attack = message.flags.attack;
+  const data = {
+    type: "applyDamage",
+    messageId: message.id,
+    mode: mode,
+    sceneId: canvas.scene.id,
+    targetIds: targets.map((t) => t.id),
+  };
 
-  for (const token of targets) {
-    const actor = token.actor;
+  if (game.user.isGM) {
+    await applyDamageAsGM(data);
+  } else {
+    console.log("Player detected: Emitting to socket:", SOCKET);
+    // Ensure this string matches the one in Hooks.once("ready")
+    game.socket.emit(SOCKET, data);
+
+    // UI Feedback for player so they know they sent it
+    ui.notifications.info("Damage request sent to GM.");
+  }
+}
+async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
+  const message = game.messages.get(messageId);
+  if (!message?.flags?.attack) return;
+
+  const attack = message.flags.attack;
+  const scene = game.scenes.get(sceneId);
+
+  for (const tokenId of targetIds) {
+    // 1. Get the token document from the specific scene, not the active canvas
+    const tokenDoc = scene.tokens.get(tokenId);
+    if (!tokenDoc) {
+      console.warn(`GM: Token ${tokenId} not found in scene ${sceneId}`);
+      continue;
+    }
+
+    // 2. Access the actor (works for both linked and unlinked tokens)
+    const actor = tokenDoc.actor;
     if (!actor) continue;
+
+    // 3. Calculate (Ensure these paths are 100% correct for your system)
+    const currentHp = getProperty(actor, "system.stats.health.value");
+    const armorTotal = getProperty(actor, "system.armor.total") || 0;
 
     const result = evaluateDmgVsArmor({
       damage: attack[mode].damage,
       penetration: attack[mode].penetration ?? 0,
-      armor: actor.system.armor.total,
-      hp: actor.system.stats.health.value,
+      armor: armorTotal,
+      hp: currentHp,
     });
 
+    console.log(
+      `GM: Applying ${result.hpLoss} damage to ${actor.name}. New HP: ${result.newHp}`
+    );
+
+    // 4. Update the Actor
+    // Use numeric casting to ensure you aren't sending a string to the DB
     await actor.update({
-      "system.stats.health.value": result.newHp,
+      "system.stats.health.value": Number(result.newHp),
     });
   }
 }
@@ -630,6 +685,7 @@ async function applyDamageToTargets(message, targets, mode) {
 function openDamageSelectionDialog(message, targets) {
   const attack = message.flags.attack;
   let mode = "normal";
+  const hasCritical = attack.critical !== "" && attack.critical !== undefined;
   const hasBreakthrough =
     attack.breakthrough?.damage !== "" &&
     attack.breakthrough?.damage !== undefined;
@@ -659,7 +715,11 @@ function openDamageSelectionDialog(message, targets) {
         <fieldset>
           <legend>Damage Type</legend>
           <label><input type="radio" name="mode" value="normal" checked> Normal</label>
-          <label><input type="radio" name="mode" value="critical"> Critical</label>
+         ${
+           hasCritical
+             ? ` <label> <input type="radio" name="mode" value="critical"> Critical </label> `
+             : ""
+         }
           ${
             hasBreakthrough
               ? ` <label> <input type="radio" name="mode" value="breakthrough"> Breakthrough </label> `
@@ -723,9 +783,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
     }
     // Add logic to check if the message is a roll message and create a reroll button
     if (message.content.includes("rolled") || message.rolls.length > 0) {
-      const rerollButton = $(
-        '<button class="d100-reroll-button">Re-Roll</button>'
-      );
+      const rerollButton = $('<button class="reroll-button">Re-Roll</button>');
 
       // Check if a button container already exists, if not, create one
       let buttonContainer = html.find(".button-container");
@@ -750,7 +808,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
           message.flags.tos.criticalSuccessThreshold;
         const criticalFailureThreshold =
           message.flags.tos.criticalFailureThreshold;
-        const deflectChance = message.flags.deflectChance;
         const critSuccess = d100Result <= criticalSuccessThreshold;
         const rollName = message.getFlag("tos", "rollName");
 
@@ -773,7 +830,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
           flags: {
             tos: {
               rollName,
-              deflectChance,
               criticalSuccessThreshold, // Store critical success threshold
               criticalFailureThreshold, // Store critical failure threshold
             },

@@ -856,31 +856,21 @@ table tr td:nth-child(3) {
 }
 
 .button-container {
+  margin-top: 6px;
   display: flex;
-  gap: 4px; /* Adds spacing between buttons */
-  justify-content: flex-start; /* Aligns buttons to the right */
-  flex-wrap: wrap; /* Allows buttons to wrap if needed */
+  gap: 4px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.button-container a.button,
+.button-container button {
+  color: #6f6a5f;
 }
 
-.d100-reroll-button {
-  flex: 1 1 auto; /* Allows buttons to shrink and expand evenly */
-  min-width: 50px; /* Ensures buttons don't get too small */
-  max-width: 100px; /* Prevents them from getting too large */
-  padding: 4px 8px;
-  margin-top: 10px;
-  border: 1px solid #616164;
-  color: var(--color-text-light-primary);
-  background: url(../ui/parchment_dark.jpg) repeat;
-  text-align: center;
+.button-container a.button:hover,
+.button-container button:hover {
+  color: #ffffff;
 }
-.damage-roll-button {
-  flex: 1 1 auto; /* Allows buttons to shrink and expand evenly */
-  min-width: 50px; /* Ensures buttons don't get too small */
-  max-width: 100px; /* Prevents them from getting too large */
-  padding: 4px 8px;
-  text-align: center;
-}
-
 .checkbox-row {
   display: flex;
   align-items: center;
