@@ -173,12 +173,30 @@ ${damageTable}
     <td><b>${allBleedRollResults}</b> ${effectsRollResults}</td>
   </tr>
 </table>
+
 `,
       flags: {
         tos: {
           rollName,
           criticalSuccessThreshold,
           criticalFailureThreshold,
+        },
+
+        attack: {
+          type: "attack",
+          normal: {
+            damage: damageTotal,
+            penetration: penetration,
+          },
+
+          critical: {
+            damage: critDamageTotal,
+            penetration: critBonusPenetration,
+          },
+
+          breakthrough: {
+            damage: breakthroughRollResult,
+          },
         },
       },
     });

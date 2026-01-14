@@ -33,6 +33,7 @@ import {
   getDamageRolls,
   getEffectRolls,
   getCriticalRolls,
+  evaluateDmgVsArmor,
 } from "./utils/combatSkillBonuses.mjs";
 import {
   showSpellSelectionDialogs,
@@ -68,6 +69,7 @@ Hooks.once("init", function () {
   CONFIG.TOS = TOS;
 
   game.tos = game.tos || {};
+  game.tos.evaluateDmgVsArmor = evaluateDmgVsArmor;
   game.tos.firstAid = firstAid;
   game.tos.rangedAbilities = rangedAbilities;
   game.tos.combatAbilities = combatAbilities;
@@ -569,10 +571,156 @@ Hooks.on("createChatMessage", async (message) => {
     console.error("ToS rollName hook error", err);
   }
 });
+async function handleApplyDamage(messageId) {
+  const message = game.messages.get(messageId);
+  if (!message?.flags?.attack) return;
+
+  const checkTargetsAndContinue = () => {
+    const targets = Array.from(game.user.targets);
+    if (!targets.length) {
+      ui.notifications.warn("Please select at least one target.");
+      return false;
+    }
+    continueApplyDamage(message, targets);
+    return true;
+  };
+  function continueApplyDamage(message, targets) {
+    openDamageSelectionDialog(message, targets);
+  }
+
+  // Initial check
+  if (!Array.from(game.user.targets).length) {
+    new Dialog({
+      title: "No Targets Selected",
+      content: "<p>Please select one or more targets, then press OK.</p>",
+      buttons: {
+        ok: {
+          label: "OK",
+          callback: checkTargetsAndContinue,
+        },
+      },
+      default: "ok",
+    }).render(true);
+    return;
+  }
+
+  // Targets already selected
+  checkTargetsAndContinue();
+}
+async function applyDamageToTargets(message, targets, mode) {
+  const attack = message.flags.attack;
+
+  for (const token of targets) {
+    const actor = token.actor;
+    if (!actor) continue;
+
+    const result = evaluateDmgVsArmor({
+      damage: attack[mode].damage,
+      penetration: attack[mode].penetration ?? 0,
+      armor: actor.system.armor.total,
+      hp: actor.system.stats.health.value,
+    });
+
+    await actor.update({
+      "system.stats.health.value": result.newHp,
+    });
+  }
+}
+
+function openDamageSelectionDialog(message, targets) {
+  const attack = message.flags.attack;
+  let mode = "normal";
+  const hasBreakthrough =
+    attack.breakthrough?.damage !== "" &&
+    attack.breakthrough?.damage !== undefined;
+
+  const renderPreview = () =>
+    targets
+      .map((t) => {
+        const result = evaluateDmgVsArmor({
+          damage: attack[mode].damage,
+          penetration: attack[mode].penetration ?? 0,
+          armor: t.actor.system.armor.total,
+          hp: t.actor.system.stats.health.value,
+        });
+
+        return `
+        <li>
+          ${t.name} →
+          <strong>${result.hpLoss} HP</strong>
+        </li>`;
+      })
+      .join("");
+
+  new Dialog({
+    title: "Apply Damage",
+    content: `
+      <form>
+        <fieldset>
+          <legend>Damage Type</legend>
+          <label><input type="radio" name="mode" value="normal" checked> Normal</label>
+          <label><input type="radio" name="mode" value="critical"> Critical</label>
+          ${
+            hasBreakthrough
+              ? ` <label> <input type="radio" name="mode" value="breakthrough"> Breakthrough </label> `
+              : ""
+          }
+        </fieldset>
+
+        <ul class="damage-preview">
+          ${renderPreview()}
+        </ul>
+      </form>
+    `,
+    buttons: {
+      apply: {
+        label: "Apply",
+        callback: () => applyDamageToTargets(message, targets, mode),
+      },
+      cancel: { label: "Cancel" },
+    },
+    render: (html) => {
+      html.find('input[name="mode"]').on("change", (ev) => {
+        mode = ev.target.value;
+        html.find(".damage-preview").html(renderPreview());
+      });
+    },
+  }).render(true);
+}
 
 Hooks.on("renderChatMessage", (message, html, data) => {
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
+    // Only create Apply Damage if this is an attack message
+    if (message.flags?.attack) {
+      // Reuse or create the button container
+      let buttonContainer = html.find(".button-container");
+
+      if (buttonContainer.length === 0) {
+        buttonContainer = $(`
+        <div class="button-container"
+             style="display:flex; gap:6px; justify-content:center; margin-top:6px;">
+        </div>
+      `);
+        html.find(".message-content").append(buttonContainer);
+      }
+
+      const applyDamageButton = $(`
+      <button
+        type="button"
+        class="tos-apply-damage"
+        data-message-id="${message.id}">
+        Apply Damage
+      </button>
+    `);
+
+      buttonContainer.append(applyDamageButton);
+
+      applyDamageButton.on("click", async () => {
+        console.log("Apply Damage clicked", message);
+        await handleApplyDamage(message.id);
+      });
+    }
     // Add logic to check if the message is a roll message and create a reroll button
     if (message.content.includes("rolled") || message.rolls.length > 0) {
       const rerollButton = $(

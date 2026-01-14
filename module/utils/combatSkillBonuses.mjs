@@ -736,3 +736,19 @@ export async function getEffectRolls(
     effectsRollResults,
   };
 }
+
+export function evaluateDmgVsArmor({ damage, penetration, armor, hp }) {
+  let hpLoss;
+
+  if (damage <= penetration) {
+    hpLoss = damage;
+  } else {
+    const effectiveDamage = Math.max(damage - armor, 0);
+    hpLoss = effectiveDamage < penetration ? penetration : effectiveDamage;
+  }
+
+  return {
+    hpLoss,
+    newHp: Math.max(hp - hpLoss, 0),
+  };
+}

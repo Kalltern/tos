@@ -154,9 +154,11 @@ export async function rangedAttack() {
 </table>
 `,
       flags: {
-        rollName,
-        criticalSuccessThreshold,
-        criticalFailureThreshold,
+        tos: {
+          rollName,
+          criticalSuccessThreshold,
+          criticalFailureThreshold,
+        },
       },
     });
   };
