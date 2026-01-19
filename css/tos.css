@@ -337,6 +337,7 @@ table tr td:nth-child(3) {
 .tos .sheet-header .header-fields {
   flex: 1;
   margin-bottom: 75px;
+  margin-left: 5px;
 }
 .tos .sheet-npc-header {
   height: 440px; /* NPC-specific height */
@@ -347,6 +348,9 @@ table tr td:nth-child(3) {
 
 .header-fields input {
   text-align: center;
+}
+.header-fields input:not([readonly]):not([type="checkbox"]) {
+  background-color: #232323;
 }
 
 /* Center the grid items inside their grid cell */
@@ -428,6 +432,20 @@ table tr td:nth-child(3) {
   width: 40px; /* Fixed width for input and modifier */
   max-width: 40px; /* Prevent it from growing wider */
   text-align: center; /* Center text in input and span */
+}
+.configstats input:not([readonly]) {
+  background-color: #232323;
+}
+.tos .attribute-mod {
+  color: silver;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #112021,
+    #101623 65%,
+    #080c14 100%
+  );
+  box-shadow: inset 0 -2px 3px rgb(22 18 18), inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
 }
 .tos .items-header {
   display: flex;
@@ -642,8 +660,11 @@ table tr td:nth-child(3) {
 .tos .items-list .items-header .item-name {
   text-align: left;
 }
-.tos .spellDifficulty {
-  text-align: center;
+.item-name.spellDifficulty {
+  text-indent: 3rem;
+}
+.item-name.spellCost {
+  text-indent: 0.8rem;
 }
 .tos .item-formula {
   display: flex;
@@ -790,6 +811,7 @@ table tr td:nth-child(3) {
   text-align: center; /* Center the text for better appearance */
   font-size: 0.9rem; /* Adjust font size if the text appears too large */
   max-height: 20px;
+  background-color: #232323;
 }
 .spell-value {
   width: 2.5rem; /* Small box for max 2-digit numbers */
@@ -906,10 +928,24 @@ label {
   font-weight: bold;
 }
 
+.stats-resource-label {
+  display: flex;
+  align-items: flex-end; /* push text to bottom */
+  min-height: 35px;
+  justify-content: center;
+}
+
+.attribute.flexcolumn.flex-group-center.input.attribute-mod {
+  width: 80px;
+  height: 70px;
+  background: linear-gradient(145deg, #3a4a6a, #1c2333);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
 /* Container for current and max value inputs */
 .stat-values {
   display: flex;
   justify-content: space-between;
+  flex-direction: column;
   gap: 5px; /* Space between current and max value inputs */
   align-items: center;
 }
@@ -922,6 +958,89 @@ label {
 }
 input[data-class="stat-input"] {
   text-align: center;
+}
+.stat-input.stat-current.resource {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #323337,
+    #101623 65%,
+    #080c14 100%
+  );
+  box-shadow: inset 0 -2px 3px rgb(22 18 18), inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+.stat-input.stat-max.resource {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #392c2c,
+    #271f1be6 65%,
+    #080c14 100%
+  );
+  box-shadow: inset 0 -2px 3px #292929, inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+.stat-input.stat-current.resource,
+.stat-input.stat-max.resource {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-width: 2px;
+  padding: 0;
+}
+
+.stat-input.stat-current.resource.health {
+  color: #b33f3f;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.health {
+  color: #d90000;
+  border-color: #650000;
+}
+
+.stat-input.stat-current.resource.stamina {
+  color: #b3a63f;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.stamina {
+  color: #c3ad00;
+  border-color: #6f6300;
+}
+
+.stat-input.stat-current.resource.toxicity {
+  color: #35a53f;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.toxicity {
+  color: #35a53f;
+  border-color: #175b1d;
+}
+
+.stat-input.stat-current.resource.mana {
+  color: #2a65d7;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.mana {
+  color: #005dd5;
+  border-color: #01318b;
+}
+
+.stat-input.stat-current.resource.holyEnergy {
+  color: #b59bcc;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.holyEnergy {
+  color: #b59bcc;
+  border-color: #513c5e;
+}
+
+body.theme-dark input:not([readonly]):not([type="checkbox"]) {
+  border-color: #4d4d4d;
+}
+
+.attributes.flexrow {
+  margin-bottom: 3px;
 }
 
 .reroll-container {

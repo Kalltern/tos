@@ -10,16 +10,18 @@ export async function castSpell() {
 
   // --- 2. School / Spell Selection ---
   // Returns the selected spell or null if canceled
-  const spell = await game.tos.showSpellSelectionDialogs(actor);
-  if (!spell) {
+  const result = await game.tos.showSpellSelectionDialogs(actor);
+  if (!result) {
     ui.notifications.info("Spell casting canceled.");
     return;
   }
 
+  const { spell, freeCast, focusSpent } = result;
+
   // --- 3. Mana Deduction ---
-  const manaDeducted = await game.tos.deductMana(actor, spell);
-  if (!manaDeducted) {
-    return;
+  if (!freeCast) {
+    const ok = await game.tos.deductMana(actor, spell);
+    if (!ok) return;
   }
 
   // --- 4. Bonus Calculation (Scalable) ---
@@ -29,7 +31,8 @@ export async function castSpell() {
   const attackResults = await game.tos.performAttackRoll(
     actor,
     spell,
-    bonuses.attackBonus
+    bonuses.attackBonus,
+    focusSpent
   );
 
   // --- 6. Finalization ---

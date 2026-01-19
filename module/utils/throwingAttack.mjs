@@ -7,7 +7,7 @@ export async function throwingAttack() {
 
   const actor = selectedToken.actor;
   const weapons = actor.items.filter(
-    (i) => i.type === "weapon" && i.system.thrown === true
+    (i) => i.type === "weapon" && i.system.thrown === true,
   );
 
   if (!weapons.length) {
@@ -65,7 +65,7 @@ export async function throwingAttack() {
       doctrineBonus,
       doctrineCritBonus,
       weaponSkillCrit,
-      customAttack
+      customAttack,
     );
 
     // ─── Damage Roll ───
@@ -88,7 +88,7 @@ export async function throwingAttack() {
       damageTotal,
       penetration,
       doctrineCritDmg,
-      doctrineSkillCritPen
+      doctrineSkillCritPen,
     );
 
     // ─── Effects Roll ───
@@ -105,7 +105,7 @@ export async function throwingAttack() {
         customEffect2,
         customEffect3,
         critScore,
-        critSuccess
+        critSuccess,
       );
 
     await ChatMessage.create({
@@ -141,10 +141,8 @@ export async function throwingAttack() {
     <th>Penetration | Critical</th>
     <th>Critical Score</th>
   </tr>
-  <tr>
-    <td>${penetration} | ${critBonusPenetration}</td>
-    <td>${critScore} (D20: ${critScoreResult})</td>
-  </tr>
+    <td>${penetration}/${critBonusPenetration}</td>
+    <td title="Crit range result ${critScoreResult}">[${critScore}]</td>
 </table>
 
 <hr>
@@ -210,7 +208,7 @@ export async function throwingAttack() {
     data-value="${c.value}"
     style="cursor:pointer; padding:5px; border-bottom:1px solid #444;">
   ${c.label}
-</li>`
+</li>`,
     )
     .join("")}
 </ul>

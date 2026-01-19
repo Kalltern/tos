@@ -154,9 +154,25 @@ function registerDynamicInitiative() {
 Handlebars.registerHelper("toLowerCase", function (str) {
   return str.toLowerCase();
 });
+
+Handlebars.registerHelper("or", function () {
+  return Array.from(arguments).slice(0, -1).some(Boolean);
+});
+
 Handlebars.registerHelper("eq", function (a, b) {
   return a === b;
 });
+
+Handlebars.registerHelper("hasVisibleSkillsOfId", function (skills, id) {
+  if (!skills) return false;
+
+  const targetId = Number(id);
+
+  return Object.values(skills).some(
+    (skill) => skill.id === targetId && skill.visible
+  );
+});
+
 Handlebars.registerHelper(
   "filterSkillsByAbility",
   function (skills, abilityId) {
@@ -632,8 +648,6 @@ async function applyDamageToTargets(message, targets, mode) {
   if (game.user.isGM) {
     await applyDamageAsGM(data);
   } else {
-    console.log("Player detected: Emitting to socket:", SOCKET);
-    // Ensure this string matches the one in Hooks.once("ready")
     game.socket.emit(SOCKET, data);
 
     // UI Feedback for player so they know they sent it
@@ -648,18 +662,15 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
   const scene = game.scenes.get(sceneId);
 
   for (const tokenId of targetIds) {
-    // 1. Get the token document from the specific scene, not the active canvas
     const tokenDoc = scene.tokens.get(tokenId);
     if (!tokenDoc) {
       console.warn(`GM: Token ${tokenId} not found in scene ${sceneId}`);
       continue;
     }
 
-    // 2. Access the actor (works for both linked and unlinked tokens)
     const actor = tokenDoc.actor;
     if (!actor) continue;
 
-    // 3. Calculate (Ensure these paths are 100% correct for your system)
     const currentHp = getProperty(actor, "system.stats.health.value");
     const armorTotal = getProperty(actor, "system.armor.total") || 0;
 
@@ -674,8 +685,6 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
       `GM: Applying ${result.hpLoss} damage to ${actor.name}. New HP: ${result.newHp}`
     );
 
-    // 4. Update the Actor
-    // Use numeric casting to ensure you aren't sending a string to the DB
     await actor.update({
       "system.stats.health.value": Number(result.newHp),
     });

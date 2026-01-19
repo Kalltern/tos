@@ -1,6 +1,25 @@
 // --- Helper for Dialogs (CSS Injection) ---
 function _injectDialogCSS() {
   const css = `
+            .spell-dialog-form {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+          }
+
+          .casting-options {
+            border: 1px solid #7a7971;
+            border-radius: 4px;
+            padding: 6px;
+            background: #f8f8f8;
+          }
+
+          .casting-options .option-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+          }
         /* General Dialog styling */
         .spell-dialog .window-content {
             max-width: 400px; /* Increased max width for tabs */
@@ -187,10 +206,34 @@ export function showSpellSelectionDialogs(actor) {
       }
 
       const dialogContent = `
-                <div class="spell-tabs">
-                    <div class="tab-headers">${tabHeadersHtml}</div>
-                    <div class="tab-content">${tabContentHtml}</div>
-                </div>
+  <form class="spell-dialog-form">
+
+    <!-- CASTING OPTIONS (ABOVE TABS) -->
+    <div class="casting-options">
+      <div class="option-row">
+        <label>
+           Focus:
+   <input type="number"
+          name="focus"
+          value="0"
+          min="0"
+          step="1"
+          style="width: 60px;">
+        </label>
+       <label>
+          <input type="checkbox" name="freeCast">
+          Free Cast
+        </label>
+      </div>
+    </div>
+
+    <!-- SPELL TABS -->
+    <div class="spell-tabs">
+      <div class="tab-headers">${tabHeadersHtml}</div>
+      <div class="tab-content">${tabContentHtml}</div>
+    </div>
+
+  </form>
             `;
 
       const spellDialog = new Dialog({
@@ -219,9 +262,18 @@ export function showSpellSelectionDialogs(actor) {
             const selectedId = $(event.currentTarget).data("spell-id");
             // Find the spell item object using its ID
             const selectedSpell = allSpells.find((s) => s.id === selectedId);
+            // Check if the cast is for free
+            const freeCast = html.find('input[name="freeCast"]').is(":checked");
+            const focusSpent = Number(
+              html.find('input[name="focus"]').val() || 0
+            );
 
             spellDialog.close();
-            resolve(selectedSpell); // Resolve the promise with the selected spell
+            resolve({
+              spell: selectedSpell,
+              freeCast,
+              focusSpent,
+            });
           });
         },
         close: () => {
@@ -364,7 +416,16 @@ export function calculateAttackBonuses(actor, spell) {
  * @param {number} bonus - The calculated total bonus for the attack roll formula.
  * @returns {Promise<{attackRoll: object, critSuccess: boolean, critFailure: boolean}>}
  */
-export async function performAttackRoll(actor, spell, bonus) {
+
+function getEffectiveDifficulty(spell, focusSpent) {
+  const base = spell.system.difficulty || 0;
+  const focusBonus = focusSpent * 10;
+  return Math.min(0, base + focusBonus);
+}
+
+export async function performAttackRoll(actor, spell, bonus, focusSpent) {
+  const effectiveDifficulty = getEffectiveDifficulty(spell, focusSpent);
+
   const critSuccessThreshold =
     actor.system.combatSkills.channeling.criticalSuccessThreshold;
   const critFailureThreshold =
@@ -374,8 +435,7 @@ export async function performAttackRoll(actor, spell, bonus) {
 
   const rollData = {
     combatSkills: actor.system.combatSkills,
-    difficulty: spell.system.difficulty,
-    // The bonus is now integrated into the formula string
+    difficulty: effectiveDifficulty,
   };
 
   const attackRoll = new Roll(attackRollFormula, rollData);

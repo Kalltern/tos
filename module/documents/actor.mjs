@@ -27,9 +27,11 @@ export class ToSActor extends Actor {
    * available both inside and outside of character sheets (such as if an actor
    * is queried and has a roll executed directly from it).
    */
+
   prepareDerivedData() {
     const actorData = this;
     const systemData = actorData.system;
+
     const flags = actorData.flags.tos || {};
 
     systemData.rerolls = {};
@@ -631,8 +633,6 @@ export class ToSActor extends Actor {
       const calcVeneficus = [1, 1, 1, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5];
 
       if (magicDoctrine.elymas.value === maxValue) {
-        console.log("Selected: Elymas");
-
         systemData.stats.mana.max = Math.floor(
           (calcCast[channeling] +
             int +
@@ -644,7 +644,6 @@ export class ToSActor extends Actor {
             calcElymas[magicDoctrine.elymas.value]
         );
       } else if (magicDoctrine.incantator.value === maxValue) {
-        console.log("Selected: Incantator");
         systemData.stats.mana.max = Math.floor(
           (calcCast[channeling] +
             int +
@@ -656,7 +655,6 @@ export class ToSActor extends Actor {
             calcIncantator[magicDoctrine.incantator.value]
         );
       } else if (magicDoctrine.elementalist.value === maxValue) {
-        console.log("Selected: Elementalist");
         systemData.stats.mana.max = Math.floor(
           (calcCast[channeling] +
             int +
@@ -668,7 +666,6 @@ export class ToSActor extends Actor {
             calcElementalist[magicDoctrine.elementalist.value]
         );
       } else if (magicDoctrine.veneficus.value === maxValue) {
-        console.log("Selected: Veneficus");
         systemData.stats.mana.max = Math.floor(
           (calcCast[melee] +
             int +
@@ -788,9 +785,6 @@ export class ToSActor extends Actor {
     hp.max = Number(hp.max) || 0;
 
     systemData.xp = systemData.cr * systemData.cr * 100;
-    console.log("Armor natural", systemData.armor.natural);
-    console.log("Armor", systemData.armor);
-    console.log("ArmorTotal", systemData.armor.total);
   }
 
   /**

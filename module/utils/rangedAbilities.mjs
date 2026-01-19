@@ -4,7 +4,7 @@ export async function rangedAbilities() {
   const actor = selectedToken.actor;
 
   const abilities = actor.items.filter(
-    (i) => i.type === "ability" && i.system.type === "ranged"
+    (i) => i.type === "ability" && i.system.type === "ranged",
   );
 
   if (!abilities.length)
@@ -77,7 +77,7 @@ export async function rangedAbilities() {
                        abilities[c.value].img
                      }" width="24" height="24" style="vertical-align: middle;" />
                     ${c.label}
-                  </li>`
+                  </li>`,
               )
               .join("")}
           </ul>
@@ -109,7 +109,7 @@ export async function rangedAbilities() {
     container,
     abilities,
     abilityDialogInstance,
-    actor
+    actor,
   ) {
     // event.currentTarget is the clicked <li>
     const el = event.currentTarget;
@@ -129,7 +129,7 @@ export async function rangedAbilities() {
     } catch (err) {
       console.error("Error using ability:", err);
       ui.notifications.error(
-        "There was an error using that ability. See console."
+        "There was an error using that ability. See console.",
       );
     }
 
@@ -146,7 +146,7 @@ export async function rangedAbilities() {
       (i) =>
         (i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class)) ||
         (["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-          i.system.thrown === true)
+          i.system.thrown === true),
     );
     if (!weapons.length)
       return ui.notifications.warn("This actor has no valid weapons.");
@@ -191,7 +191,7 @@ export async function rangedAbilities() {
         abilityCritFail,
         abilityEffect1,
         abilityEffect2,
-        abilityEffect3
+        abilityEffect3,
       );
     };
 
@@ -234,10 +234,10 @@ export async function rangedAbilities() {
         .map(
           (n) => `
         <input type="radio" name="aim" id="aim-${n}" value="${n}" ${
-            n === 0 ? "checked" : ""
-          }>
+          n === 0 ? "checked" : ""
+        }>
         <label for="aim-${n}" class="aim-dot">${n === 0 ? "–" : n}</label>
-      `
+      `,
         )
         .join("")}
     </div>
@@ -257,7 +257,7 @@ export async function rangedAbilities() {
       ${weaponChoices
         .map(
           (c) =>
-            `<li class="weapon-choice" data-value="${c.value}" style="cursor: pointer; padding: 5px; border-bottom: 1px solid #444;">${c.label}</li>`
+            `<li class="weapon-choice" data-value="${c.value}" style="cursor: pointer; padding: 5px; border-bottom: 1px solid #444;">${c.label}</li>`,
         )
         .join("")}
     </ul>
@@ -281,11 +281,11 @@ export async function rangedAbilities() {
   async function updateCombatFlags(actor) {
     if (!actor) return;
     const aimValue = parseInt(
-      document.querySelector('input[name="aim"]:checked')?.value || 0
+      document.querySelector('input[name="aim"]:checked')?.value || 0,
     );
     const useSneak = document.querySelector("#sneak-attack-checkbox")?.checked;
     const useFlanking = document.querySelector(
-      "#flanking-attack-checkbox"
+      "#flanking-attack-checkbox",
     )?.checked;
 
     if (useSneak) {
@@ -322,7 +322,7 @@ export async function rangedAbilities() {
     });
 
     ui.notifications.info(
-      `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`
+      `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`,
     );
   }
 
@@ -343,7 +343,7 @@ export async function rangedAbilities() {
     abilityCritFail,
     abilityEffect1,
     abilityEffect2,
-    abilityEffect3
+    abilityEffect3,
   ) {
     let {
       doctrineBonus,
@@ -385,7 +385,7 @@ export async function rangedAbilities() {
       doctrineCritBonus,
       weaponSkillCrit,
       abilityAttack,
-      abilityCritFail
+      abilityCritFail,
     );
 
     // Log thresholds value to confirm
@@ -395,7 +395,7 @@ export async function rangedAbilities() {
       "Success",
       criticalSuccessThreshold,
       "Fail",
-      criticalFailureThreshold
+      criticalFailureThreshold,
     );
 
     // DAMAGE ROLL
@@ -404,7 +404,7 @@ export async function rangedAbilities() {
         actor,
         weapon,
         abilityDamage,
-        abilityBreakthrough
+        abilityBreakthrough,
       );
 
     // CRITICAL SCORE ROLL (only in flavor text)
@@ -423,7 +423,7 @@ export async function rangedAbilities() {
       damageTotal,
       penetration,
       doctrineCritDmg,
-      doctrineSkillCritPen
+      doctrineSkillCritPen,
     );
 
     // EFFECTS ROLL
@@ -440,14 +440,14 @@ export async function rangedAbilities() {
         abilityEffect2,
         abilityEffect3,
         critScore,
-        critSuccess
+        critSuccess,
       );
 
     console.log(
       "bleed, weaponSKill,DoctrineBleed",
       bleedChanceDisplay,
       weaponSkillEffect,
-      doctrineBleedBonus
+      doctrineBleedBonus,
     );
 
     const attributeMap = {
@@ -476,15 +476,15 @@ export async function rangedAbilities() {
       }
 
       const attributeRoll = new Roll(
-        `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`
+        `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`,
       );
       await attributeRoll.evaluate({ async: true });
 
       const attributeRollTotal = attributeRoll.total;
       const attributeString = `
     |${abilityAttributeTestName} Test ${
-        selectedAttributeModifier + abilityTestModifier
-      }%|<br>
+      selectedAttributeModifier + abilityTestModifier
+    }%|<br>
     Margin of Success: ${attributeRollTotal}<br>
   `;
 
@@ -498,10 +498,10 @@ export async function rangedAbilities() {
       rolls: [attackRoll, damageRoll],
       flavor: `
   <h2><img src="${ability.img}" title="${ability.name} with ${
-        weapon.name
-      }" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">${
-        ability.name
-      } with ${weapon.name}</h2>
+    weapon.name
+  }" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">${
+    ability.name
+  } with ${weapon.name}</h2>
 <table style="width: 100%; text-align: center;font-size: 15px;">
     <tr>
       <th>Description:</th>
@@ -530,8 +530,8 @@ export async function rangedAbilities() {
       <th>Critical Score</th>
     </tr>
     <tr>
-      <td>${penetration} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ${critBonusPenetration}</td>
-      <td>${critScore} (D20: ${critScoreResult})</td>
+    <td>${penetration}/${critBonusPenetration}</td>
+    <td title="Crit range result ${critScoreResult}">[${critScore}]</td>
     </tr>
   </table>
    <hr>
@@ -553,6 +553,23 @@ export async function rangedAbilities() {
           rollName,
           criticalSuccessThreshold, // Store critical success threshold
           criticalFailureThreshold, // Store critical failure threshold
+        },
+        attack: {
+          type: "attack",
+          normal: {
+            damage: damageTotal,
+            penetration: penetration,
+          },
+
+          critical: {
+            damage: critDamageTotal,
+            penetration: critBonusPenetration,
+          },
+
+          breakthrough: {
+            damage: breakthroughRollResult,
+            penetration: penetration,
+          },
         },
       },
     });

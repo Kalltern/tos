@@ -465,8 +465,15 @@ export async function getDamageRolls(
   // If the weapon has breakthrough, roll it
   let breakthroughRollResult = "";
   if (weapon.system.breakthrough) {
-    const breakthroughFormula =
-      weapon.system.breakthrough + abilityBreakthrough;
+    let breakthroughFormula = `${weapon.system.breakthrough}`;
+    if (abilityBreakthrough) breakthroughFormula += ` + ${abilityBreakthrough}`;
+    breakthroughFormula = breakthroughFormula.replace(/\s*\+\s*$/, "");
+    breakthroughFormula = breakthroughFormula.replace(
+      /@([\w.]+)/g,
+      (_, key) => {
+        return foundry.utils.getProperty(rollData, key) ?? 0;
+      }
+    );
     const breakthroughRoll = new Roll(breakthroughFormula, actor.system);
     await breakthroughRoll.evaluate();
     breakthroughRollResult = `${breakthroughRoll.total}`; // Customize as needed

@@ -23,10 +23,10 @@ export async function attackActions() {
         .map(
           (n) => `
         <input type="radio" name="aim" id="aim-${n}" value="${n}" ${
-            n === 0 ? "checked" : ""
-          }>
+          n === 0 ? "checked" : ""
+        }>
         <label for="aim-${n}" class="aim-dot">${n === 0 ? "–" : n}</label>
-      `
+      `,
         )
         .join("")}
     </div>
@@ -82,7 +82,7 @@ export async function attackActions() {
   }
 
   new Dialog({
-    title: "Select Combat Action",
+    title: "Select Attack Action",
     content,
     buttons,
     default: Object.keys(buttons)[0],

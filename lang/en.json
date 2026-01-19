@@ -284,6 +284,7 @@
       },
       "Spell": {
         "FIELDS": {
+          "isOffensive": { "label": "Offensive" },
           "difficulty": { "label": "Difficulty" },
           "cost": { "label": "Cost" },
           "perRound": { "label": "Cost per round" },

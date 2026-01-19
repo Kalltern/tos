@@ -14,21 +14,21 @@
       width="216"
     />
 
-    <div class="grid grid-2col">
+<div class="grid {{#if (or system.magicPotential system.priest)}}grid-4col{{else}}grid-3col{{/if}}">
 
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource health"
             name="system.stats.health.value"
             value="{{system.stats.health.value}}"
             data-value="system.stats.health.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource health"
             value="{{system.stats.health.max}}"
             data-value="system.stats.health.max"
             readonly
@@ -37,18 +37,18 @@
       </div>
 
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.stamina.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.stamina.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource stamina"
             name="system.stats.stamina.value"
             value="{{system.stats.stamina.value}}"
             data-value="system.stats.stamina.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource stamina"
             value="{{system.stats.stamina.max}}"
             data-value="system.stats.stamina.max"
             readonly
@@ -57,18 +57,18 @@
       </div>
 
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.toxicity.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.toxicity.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource toxicity"
             name="system.stats.toxicity.value"
             value="{{system.stats.toxicity.value}}"
             data-value="system.stats.toxicity.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource toxicity"
             value="{{system.stats.toxicity.max}}"
             data-value="system.stats.toxicity.max"
             readonly
@@ -78,20 +78,43 @@
 
       {{#if system.magicPotential}}
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.mana.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.mana.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource mana"
             name="system.stats.mana.value"
             value="{{system.stats.mana.value}}"
             data-value="system.stats.mana.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource mana"
             value="{{system.stats.mana.max}}"
             data-value="system.stats.mana.max"
+            readonly
+          />
+        </div>
+      </div>
+      {{/if}}
+
+            {{#if system.priest}}
+      <div class="grid-span-1">
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.holyEnergy.value.label')}}</label>
+        <div class="stat-values">
+          <input
+            type="text"
+            class="stat-input stat-current resource holyEnergy"
+            name="system.stats.holyEnergy.value"
+            value="{{system.stats.holyEnergy.value}}"
+            data-value="system.stats.holyEnergy.value"
+          />
+          <input
+            type="text"
+            class="stat-input stat-max resource holyEnergy"
+            name="system.stats.holyEnergy.max"
+            value="{{system.stats.holyEnergy.max}}"
+            data-value="system.stats.holyEnergy.max"
             readonly
           />
         </div>
@@ -148,21 +171,19 @@
           data-dtype="Number"
           readonly
         />
+        <input
+          type="text"
+          value="{{numberFormat attribute.mod decimals=0}}"
+          class="attribute-mod"
+          data-dtype="Number"
+          readonly
+        />
 
-        <span
-          class="attribute-mod rollable"
-          data-action="roll"
-          data-roll="(@attributes.{{key}}.mod)-1d100"
-          data-roll-type="attribute"
-          data-label="{{key}}"
-        >
-          {{numberFormat attribute.mod decimals=0}}
-        </span>
       </div>
       {{/each}}
     </div>
 
-    <div class="Attributes flexrow">
+    <div class="attributes flexrow">
       {{#each system.secondaryAttributes as |attribute key|}}
       <div class="attribute flexcolumn flex-group-center">
 
@@ -292,18 +313,18 @@
     <div class="grid grid-2col">
 
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource health"
             name="system.stats.health.value"
             value="{{system.stats.health.value}}"
             data-value="system.stats.health.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource health"
             name="system.stats.health.max"
             value="{{system.stats.health.max}}"
             data-value="system.stats.health.max"
@@ -312,18 +333,18 @@
       </div>
 
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.stamina.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.stamina.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource stamina"
             name="system.stats.stamina.value"
             value="{{system.stats.stamina.value}}"
             data-value="system.stats.stamina.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource stamina"
             name="system.stats.stamina.max"
             value="{{system.stats.stamina.max}}"
             data-value="system.stats.stamina.max"
@@ -332,18 +353,18 @@
       </div>
 
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.toxicity.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.toxicity.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource toxity"
             name="system.stats.toxicity.value"
             value="{{system.stats.toxicity.value}}"
             data-value="system.stats.toxicity.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource toxity"
             name="system.stats.toxicity.max"
             value="{{system.stats.toxicity.max}}"
             data-value="system.stats.toxicity.max"
@@ -353,18 +374,18 @@
 
       {{#if system.magicPotential}}
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.mana.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.mana.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource mana"
             name="system.stats.mana.value"
             value="{{system.stats.mana.value}}"
             data-value="system.stats.mana.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource mana"
             name="system.stats.mana.max"
             value="{{system.stats.mana.max}}"
             data-value="system.stats.mana.max"
@@ -375,18 +396,18 @@
 
       {{#if system.priest}}
       <div class="grid-span-1">
-        <label>{{localize (concat 'TOS.Actor.Character.stats.holyEnergy.value.label')}}</label>
+        <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.holyEnergy.value.label')}}</label>
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current"
+            class="stat-input stat-current resource holyEnergy"
             name="system.stats.holyEnergy.value"
             value="{{system.stats.holyEnergy.value}}"
             data-value="system.stats.holyEnergy.value"
           />
           <input
             type="text"
-            class="stat-input stat-max"
+            class="stat-input stat-max resource holyEnergy"
             name="system.stats.holyEnergy.max"
             value="{{system.stats.holyEnergy.max}}"
             data-value="system.stats.holyEnergy.max"

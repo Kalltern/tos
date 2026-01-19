@@ -7,7 +7,7 @@ export async function rangedAttack() {
 
   const actor = selectedToken.actor;
   const weapons = actor.items.filter(
-    (i) => i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class)
+    (i) => i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class),
   );
 
   if (!weapons.length) {
@@ -62,7 +62,7 @@ export async function rangedAttack() {
       doctrineBonus,
       doctrineCritBonus,
       0,
-      customAttack
+      customAttack,
     );
 
     // ─── Damage Roll ───
@@ -85,7 +85,7 @@ export async function rangedAttack() {
       damageTotal,
       penetration,
       doctrineCritDmg,
-      doctrineSkillCritPen
+      doctrineSkillCritPen,
     );
 
     // ─── Effects Roll ───
@@ -102,7 +102,7 @@ export async function rangedAttack() {
         customEffect2,
         customEffect3,
         critScore,
-        critSuccess
+        critSuccess,
       );
 
     await ChatMessage.create({
@@ -139,8 +139,8 @@ export async function rangedAttack() {
     <th>Critical Score</th>
   </tr>
   <tr>
-    <td>${penetration} | ${critBonusPenetration}</td>
-    <td>${critScore} (D20: ${critScoreResult})</td>
+    <td>${penetration}/${critBonusPenetration}</td>
+    <td title="Crit range result ${critScoreResult}">[${critScore}]</td>
   </tr>
 </table>
 
@@ -206,7 +206,7 @@ export async function rangedAttack() {
     data-value="${c.value}"
     style="cursor:pointer; padding:5px; border-bottom:1px solid #444;">
   ${c.label}
-</li>`
+</li>`,
     )
     .join("")}
 </ul>

@@ -11,12 +11,12 @@ export async function combatAbilities() {
   const abilities = actor.items.filter(
     (i) =>
       i.type === "ability" &&
-      (i.system.type === "melee" || i.system.class === "defense")
+      (i.system.type === "melee" || i.system.class === "defense"),
   );
 
   if (!abilities.length)
     return ui.notifications.warn(
-      `No combat or defense abilities found on ${actor.name}.`
+      `No combat or defense abilities found on ${actor.name}.`,
     );
 
   // ====================================================================
@@ -65,7 +65,7 @@ export async function combatAbilities() {
     container,
     abilities,
     abilityDialogInstance,
-    actor
+    actor,
   ) {
     const el = event.currentTarget;
     const idx = Number(el.dataset.value);
@@ -94,7 +94,7 @@ export async function combatAbilities() {
     } catch (err) {
       console.error("Error using ability:", err);
       ui.notifications.error(
-        "There was an error using that ability. See console."
+        "There was an error using that ability. See console.",
       );
     }
 
@@ -139,7 +139,7 @@ export async function combatAbilities() {
                                             : "Attack"
                                         })
                                     </span>
-                                </li>`
+                                </li>`,
                       )
                       .join("")}
                 </ul>
@@ -162,7 +162,7 @@ export async function combatAbilities() {
             container,
             abilities,
             abilityDialog,
-            actor
+            actor,
           );
         });
       }
@@ -186,7 +186,7 @@ export async function combatAbilities() {
       (i) =>
         i.type === "weapon" &&
         ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-        i.system.thrown !== true
+        i.system.thrown !== true,
     );
     if (!weapons.length)
       return ui.notifications.warn("This actor has no valid weapons.");
@@ -227,7 +227,7 @@ export async function combatAbilities() {
           abilityTestModifier,
           abilityCritRange,
           abilityCritChance,
-          abilityCritFail
+          abilityCritFail,
         );
       }
     };
@@ -279,7 +279,7 @@ export async function combatAbilities() {
                         <label for="aim-${n}" class="aim-dot">${
                           n === 0 ? "–" : n
                         }</label>
-                    `
+                    `,
                       )
                       .join("")}
                 </div>
@@ -298,7 +298,7 @@ export async function combatAbilities() {
             ${weaponChoices
               .map(
                 (c) =>
-                  `<li class="weapon-choice" data-value="${c.value}" style="cursor: pointer; padding: 5px; border-bottom: 1px solid #444;">${c.label}</li>`
+                  `<li class="weapon-choice" data-value="${c.value}" style="cursor: pointer; padding: 5px; border-bottom: 1px solid #444;">${c.label}</li>`,
               )
               .join("")}
         </ul>
@@ -324,11 +324,11 @@ export async function combatAbilities() {
   async function updateCombatFlags(actor) {
     if (!actor) return;
     const aimValue = parseInt(
-      document.querySelector('input[name="aim"]:checked')?.value || 0
+      document.querySelector('input[name="aim"]:checked')?.value || 0,
     );
     const useSneak = document.querySelector("#sneak-attack-checkbox")?.checked;
     const useFlanking = document.querySelector(
-      "#flanking-attack-checkbox"
+      "#flanking-attack-checkbox",
     )?.checked;
 
     if (useSneak) {
@@ -365,7 +365,7 @@ export async function combatAbilities() {
     });
 
     ui.notifications.info(
-      `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`
+      `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`,
     );
   }
 
@@ -381,7 +381,7 @@ export async function combatAbilities() {
     abilityTestModifier,
     abilityCritRange,
     abilityCritChance,
-    abilityCritFail
+    abilityCritFail,
   ) {
     let {
       doctrineBonus,
@@ -419,7 +419,7 @@ export async function combatAbilities() {
       doctrineCritBonus,
       weaponSkillCrit,
       abilityAttack,
-      abilityCritFail
+      abilityCritFail,
     );
 
     const { damageRoll, damageTotal, breakthroughRollResult } =
@@ -427,7 +427,7 @@ export async function combatAbilities() {
         actor,
         weapon,
         abilityDamage,
-        abilityBreakthrough
+        abilityBreakthrough,
       );
 
     const {
@@ -445,7 +445,7 @@ export async function combatAbilities() {
       damageTotal,
       penetration,
       doctrineCritDmg,
-      doctrineSkillCritPen
+      doctrineSkillCritPen,
     );
 
     const { allBleedRollResults, bleedChanceDisplay, effectsRollResults } =
@@ -457,7 +457,7 @@ export async function combatAbilities() {
         weaponSkillEffect,
         critScore,
         critSuccess,
-        ability
+        ability,
       );
 
     const attributeMap = {
@@ -486,15 +486,15 @@ export async function combatAbilities() {
       }
 
       const attributeRoll = new Roll(
-        `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`
+        `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`,
       );
       await attributeRoll.evaluate({ async: true });
 
       const attributeRollTotal = attributeRoll.total;
       const attributeString = `
         |${abilityAttributeTestName} Test ${
-        selectedAttributeModifier + abilityTestModifier
-      }%|<br>
+          selectedAttributeModifier + abilityTestModifier
+        }%|<br>
         Margin of Success: ${attributeRollTotal}<br>
     `;
 
@@ -545,8 +545,8 @@ export async function combatAbilities() {
             <th>Critical Score</th>
         </tr>
         <tr>
-            <td>${penetration} | ${critBonusPenetration}</td>
-            <td>${critScore} (D20: ${critScoreResult})</td>
+    <td>${penetration}/${critBonusPenetration}</td>
+    <td title="Crit range result ${critScoreResult}">[${critScore}]</td>
         </tr>
     </table>
     <hr>
@@ -568,6 +568,23 @@ export async function combatAbilities() {
           rollName,
           criticalSuccessThreshold,
           criticalFailureThreshold,
+        },
+        attack: {
+          type: "attack",
+          normal: {
+            damage: damageTotal,
+            penetration: penetration,
+          },
+
+          critical: {
+            damage: critDamageTotal,
+            penetration: critBonusPenetration,
+          },
+
+          breakthrough: {
+            damage: breakthroughRollResult,
+            penetration: penetration,
+          },
         },
       },
     });

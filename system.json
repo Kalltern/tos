@@ -26,10 +26,10 @@
       "thumbnail": "systems/tos/assets/anvil-impact.png"
     }
   ],
-  "version": "0.6.0",
+  "version": "0.6.3a",
   "compatibility": {
     "minimum": "12.331",
-    "verified": "13.350"
+    "verified": "13.351"
   },
   "esmodules": ["module/tos.mjs"],
   "styles": ["css/tos.css"],
@@ -51,7 +51,5 @@
     "distance": 1.5,
     "units": "Meters",
     "diagonals": 0
-  },
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "mana"
+  }
 }

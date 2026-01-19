@@ -10,7 +10,7 @@ export async function meleeAttack() {
     (i) =>
       i.type === "weapon" &&
       ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-      i.system.thrown !== true
+      i.system.thrown !== true,
   );
 
   if (!weapons.length) {
@@ -68,7 +68,7 @@ export async function meleeAttack() {
       doctrineBonus,
       doctrineCritBonus,
       weaponSkillCrit,
-      customAttack
+      customAttack,
     );
 
     // ─── Damage Roll ───
@@ -91,7 +91,7 @@ export async function meleeAttack() {
       damageTotal,
       penetration,
       doctrineCritDmg,
-      doctrineSkillCritPen
+      doctrineSkillCritPen,
     );
 
     // ─── Effects Roll ───
@@ -108,14 +108,20 @@ export async function meleeAttack() {
         customEffect2,
         customEffect3,
         critScore,
-        critSuccess
+        critSuccess,
       );
-
-    const hasBreakthrough = weapon.system.breakthrough === true;
+    console.log("BreakthroughRollResult", breakthroughRollResult);
+    const hasBreakthrough =
+      typeof breakthroughRollResult === "string" &&
+      breakthroughRollResult.trim() !== "";
     const damageTable =
-      hasBreakthrough && breakthroughRollResult != null
+      hasBreakthrough === true
         ? `<table style="width:100%; text-align:center; font-size:15px;">
-            <tr><th>Normal</th></tr>
+            <tr>
+            <th>Normal</th>
+            <th>Crit</th>
+            <th>Breakthrough</th>
+            </tr>
             <tr>
               <td>${damageTotal}</td>
               <td>${critDamageTotal}</td>
@@ -196,6 +202,7 @@ ${damageTable}
 
           breakthrough: {
             damage: breakthroughRollResult,
+            penetration: penetration,
           },
         },
       },
@@ -229,7 +236,7 @@ ${damageTable}
     data-value="${c.value}"
     style="cursor:pointer; padding:5px; border-bottom:1px solid #444;">
   ${c.label}
-</li>`
+</li>`,
     )
     .join("")}
 </ul>

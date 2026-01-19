@@ -11,49 +11,39 @@ export class ToSItem extends Item {
 
     // Only initialize effectTypes for relevant items (e.g., spells, consumables)
     if (
-      (this.type === "spell" ||
-        this.type === "ability" ||
-        this.type === "weapon") &&
-      Array.isArray(this.system.effectTypes)
+      this.type === "spell" ||
+      this.type === "ability" ||
+      this.type === "weapon"
     ) {
-      const defaultEffects = [
-        "bleeding",
-        "burning",
-        "chain",
-        "concussion",
-        "corrosion",
-        "corrosion-severe",
-        "custom",
-        "disorientation",
-        "dispell",
-        "fear",
-        "flammable",
-        "frozen",
-        "paralyzed",
-        "poisoned",
-        "precision",
-        "rooted",
-        "shield strain",
-        "shield break",
-        "slowed",
-        "stun",
-        "terror",
-        "vulnerable",
-        "weakened",
-        "wet",
+      this.system.effectTypes = [
+        "Custom",
+        "Bleeding",
+        "Blinded",
+        "Burning",
+        "Chain",
+        "Corrosion",
+        "Corrosion-severe",
+        "Dazzled",
+        "Disorientation",
+        "Dispell",
+        "Fear",
+        "Flammable",
+        "Frozen",
+        "Heavy stun",
+        "Paralyzed",
+        "Poisoned",
+        "Precision",
+        "Rooted",
+        "Shield strain",
+        "Shield break",
+        "Slowed",
+        "Stun",
+        "Terror",
+        "Vulnerable",
+        "Weakened",
+        "Wet",
       ];
-
-      // Add any missing default effects without duplicating existing ones
-      for (const effect of defaultEffects) {
-        if (!this.system.effectTypes.includes(effect)) {
-          this.system.effectTypes.push(effect);
-        }
-      }
     }
-    (this.system.effectTypes ??= []).sort((a, b) =>
-      a === "custom" ? -1 : b === "custom" ? 1 : a.localeCompare(b)
-    );
-
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;
 
@@ -73,11 +63,11 @@ export class ToSItem extends Item {
 
           // Check if the actor owns an item named "Finesse"
           const hasFinesse = this.actor.items.some(
-            (item) => item.name.toLowerCase() === "finesse"
+            (item) => item.name.toLowerCase() === "finesse",
           );
           // Check if the actor owns an item named "Finesse"
           const hasGiant = this.actor.items.some(
-            (item) => item.name.toLowerCase() === "giant"
+            (item) => item.name.toLowerCase() === "giant",
           );
 
           // Check if *this* weapon has finesse
