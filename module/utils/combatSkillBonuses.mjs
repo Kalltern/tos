@@ -78,6 +78,31 @@ export async function getNonWeaponAbility(actor, ability) {
     attributeTestRoll = attributeRoll; // store for chat message
   }
 
+  // --- Custom Effects ---
+  const customEffectRolls = new Map();
+  let effectsRollResults = "";
+
+  const effects = ability.system.effects || {};
+  const system = ability.system || {};
+
+  for (let i = 1; i <= 3; i++) {
+    const value = effects[`extra${i}`] || 0;
+    if (value <= 0) continue;
+
+    const name = getEffectName(system, effects, i);
+    if (!name || name.trim() === "") continue;
+
+    customEffectRolls.set(name, value);
+  }
+
+  for (const [name, value] of customEffectRolls.entries()) {
+    const roll = new Roll("1d100");
+    await roll.evaluate({ async: true });
+
+    const success = roll.total <= value ? " SUCCESS" : "";
+    effectsRollResults += `<p><b>${name}:</b> ${roll.total} < ${value}${success}</p>`;
+  }
+
   // DAMAGE ROLL
   let damageRoll = null;
   const rollData = actor.getRollData();
@@ -91,15 +116,19 @@ export async function getNonWeaponAbility(actor, ability) {
     speaker: ChatMessage.getSpeaker(),
     rolls: [attributeTestRoll, damageRoll].filter((r) => r),
     flavor: `
-      <h2>
-        <img src="${ability.img}" title="${ability.name}" width="36" height="36" style="vertical-align: middle; margin-right: 8px;">
-        ${ability.name}
-      </h2>
+        <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
+            <img src="${ability.img}" title="${ability.name}" width="36" height="36">
+            <span>${ability.name}</span>
+        </div>
       <table style="width: 100%; text-align: center;font-size: 15px;">
     <tr>
       <th>Description:</th>
     </tr>
     <td>${concatRollAndDescription}</td>
+     <tr>
+      <th>Effects:</th>
+    </tr>
+    <td>${effectsRollResults}</td>
     </table>
     `,
   });
@@ -133,7 +162,7 @@ export async function getDoctrineBonuses(actor, weapon) {
     };
   }
   for (const [doctrineName, doctrineValue] of Object.entries(
-    weapon.system.doctrines
+    weapon.system.doctrines,
   )) {
     if (doctrineValue === true) {
       if (doctrineName === "pikeman" && doctrine.pikeman.value >= 3) {
@@ -271,7 +300,7 @@ export async function getDoctrineBonuses(actor, weapon) {
     }
   }
   console.log(
-    `Doctrine Bonus: ${doctrineBonus}, ${doctrineCritBonus}, ${doctrineCritRangeBonus}, ${doctrineStunBonus}, ${doctrineBleedBonus}`
+    `Doctrine Bonus: ${doctrineBonus}, ${doctrineCritBonus}, ${doctrineCritRangeBonus}, ${doctrineStunBonus}, ${doctrineBleedBonus}`,
   );
 
   return {
@@ -344,7 +373,7 @@ export async function getAttackRolls(
   doctrineCritBonus,
   weaponSkillCrit,
   abilityAttack = 0,
-  customCritFail = 0
+  customCritFail = 0,
 ) {
   let criticalSuccessThreshold = 0;
   let criticalFailureThreshold = 0;
@@ -433,7 +462,7 @@ export async function getDamageRolls(
   actor,
   weapon,
   abilityDamage = 0,
-  abilityBreakthrough = 0
+  abilityBreakthrough = 0,
 ) {
   const rollData = {
     combatSkills: actor.system.combatSkills,
@@ -472,7 +501,7 @@ export async function getDamageRolls(
       /@([\w.]+)/g,
       (_, key) => {
         return foundry.utils.getProperty(rollData, key) ?? 0;
-      }
+      },
     );
     const breakthroughRoll = new Roll(breakthroughFormula, actor.system);
     await breakthroughRoll.evaluate();
@@ -495,7 +524,7 @@ export async function getCriticalRolls(
   damageTotal,
   penetration,
   doctrineCritDmg,
-  doctrineSkillCritPen
+  doctrineSkillCritPen,
 ) {
   // CRITICAL SCORE ROLL (only in flavor text)
   const failedAttack = attackRoll.total < 0 ? -5 : 0;
@@ -568,7 +597,7 @@ export async function getEffectRolls(
   weaponSkillEffect,
   critScore,
   critSuccess,
-  ability = {}
+  ability = {},
 ) {
   // --- Initial Setup ---
   const { sneakEffect } = await getSneakDamageFormula(actor, weapon);

@@ -37,6 +37,7 @@ export class ToSItem extends Item {
         "Shield strain",
         "Shield break",
         "Slowed",
+        "Soul mark",
         "Stun",
         "Terror",
         "Vulnerable",
@@ -183,5 +184,35 @@ export class ToSItem extends Item {
       });
       return roll;
     }
+  }
+  // Handle tooltip data
+
+  getTooltipData() {
+    const system = this.system;
+
+    return {
+      name: this.name,
+      difficulty: system.difficulty,
+      cost: system.cost,
+      perRound: system.perRound,
+      actionCost: system.actionCost,
+      range: system.range,
+      description: system.description,
+      penetration: system.penetration,
+      //damage types
+      dmgType1: system.dmgType1,
+      dmgType2: system.dmgType2,
+      dmgType3: system.dmgType3,
+      dmgType4: system.dmgType4,
+      bool2: system.bool2,
+      bool3: system.bool3,
+      bool4: system.bool4,
+      //effect types
+      effectType1: system.effectType1,
+      effectType2: system.effectType2,
+      effectType3: system.effectType3,
+      //effect chances
+      effects: system.effects,
+    };
   }
 }

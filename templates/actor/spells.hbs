@@ -83,7 +83,7 @@
               <div class="item-name flexrow">
                 <div class="item-image">
                   <a class="rollable" data-roll-type="item" data-action="roll">
-                    <img src="{{item.img}}" title="{{item.name}}" width="24" height="24"/>
+                    <img src="{{item.img}}" class="spell-icon" data-item-id="{{item._id}}" width="24" height="24"/>
                   </a>
                 </div>
                 <div>{{item.name}}</div>
@@ -114,3 +114,5 @@
 
   </section>
 {{/each}}
+{{!-- GLOBAL spell tooltip --}}
+<div id="spell-tooltip" class="spell-tooltip"></div>

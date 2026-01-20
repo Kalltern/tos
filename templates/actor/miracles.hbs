@@ -19,7 +19,7 @@ Divine blessings
           name="system.stats.holyEnergy.power"
           value="{{system.stats.holyEnergy.power}}"
           data-dtype="Number"
-          readonly
+        {{#unless (eq actor.type "npc")}}readonly{{/unless}}
         />
  </div>
     <div class="grid-span-2">

@@ -310,7 +310,7 @@
       width="216"
     />
 
-    <div class="grid grid-2col">
+<div class="grid {{#if (or system.magicPotential system.priest)}}grid-4col{{else}}grid-3col{{/if}}">
 
       <div class="grid-span-1">
         <label class="stats-resource-label">{{localize (concat 'TOS.Actor.Character.stats.health.value.label')}}</label>
@@ -357,14 +357,14 @@
         <div class="stat-values">
           <input
             type="text"
-            class="stat-input stat-current resource toxity"
+            class="stat-input stat-current resource toxicity"
             name="system.stats.toxicity.value"
             value="{{system.stats.toxicity.value}}"
             data-value="system.stats.toxicity.value"
           />
           <input
             type="text"
-            class="stat-input stat-max resource toxity"
+            class="stat-input stat-max resource toxicity"
             name="system.stats.toxicity.max"
             value="{{system.stats.toxicity.max}}"
             data-value="system.stats.toxicity.max"
@@ -411,8 +411,7 @@
             name="system.stats.holyEnergy.max"
             value="{{system.stats.holyEnergy.max}}"
             data-value="system.stats.holyEnergy.max"
-            readonly
-          />
+            />
         </div>
       </div>
       {{/if}}

@@ -110,7 +110,7 @@ Hooks.once("init", function () {
   };
 */
   // Define custom Document classes
-  (CONFIG.Actor.documentClass = ToSActor);
+  CONFIG.Actor.documentClass = ToSActor;
   CONFIG.Item.documentClass = ToSItem;
   CONFIG.Combat.documentClass = ToSCombat;
 
@@ -169,7 +169,7 @@ Handlebars.registerHelper("hasVisibleSkillsOfId", function (skills, id) {
   const targetId = Number(id);
 
   return Object.values(skills).some(
-    (skill) => skill.id === targetId && skill.visible
+    (skill) => skill.id === targetId && skill.visible,
   );
 });
 
@@ -177,9 +177,9 @@ Handlebars.registerHelper(
   "filterSkillsByAbility",
   function (skills, abilityId) {
     return Object.entries(skills).filter(
-      ([key, skill]) => skill.id === abilityId
+      ([key, skill]) => skill.id === abilityId,
     );
-  }
+  },
 );
 Handlebars.registerHelper("range", function (start, end) {
   var range = [];
@@ -421,7 +421,7 @@ Hooks.on("ready", () => {
           // Translate permission error for players
           if (!game.user.isGM) {
             ui.notifications.warn(
-              "Dynamic Initiative: the GM must advance to the next round."
+              "Dynamic Initiative: the GM must advance to the next round.",
             );
             return;
           }
@@ -453,7 +453,7 @@ Hooks.on("ready", () => {
           for (const combatant of combat.combatants) {
             const previousInit = combatant.getFlag(
               SYS_ID,
-              "PreviousRoundInitiative"
+              "PreviousRoundInitiative",
             );
 
             if (previousInit !== undefined && previousInit !== null) {
@@ -477,7 +477,7 @@ Hooks.on("ready", () => {
           // Translate permission error for players
           if (!game.user.isGM) {
             ui.notifications.warn(
-              "Dynamic Initiative: the GM must move to the previous round."
+              "Dynamic Initiative: the GM must move to the previous round.",
             );
             return;
           }
@@ -509,7 +509,7 @@ async function createDocMacro(data, slot) {
   if (data.type !== "Item") return;
   if (!data.uuid.includes("Actor.") && !data.uuid.includes("Token.")) {
     return ui.notifications.warn(
-      "You can only create macro buttons for owned Items"
+      "You can only create macro buttons for owned Items",
     );
   }
   // If it is, retrieve it based on the uuid.
@@ -518,7 +518,7 @@ async function createDocMacro(data, slot) {
   // Create the macro command using the uuid.
   const command = `game.tos.rollItemMacro("${data.uuid}");`;
   let macro = game.macros.find(
-    (m) => m.name === item.name && m.command === command
+    (m) => m.name === item.name && m.command === command,
   );
   if (!macro) {
     macro = await Macro.create({
@@ -550,7 +550,7 @@ function rollItemMacro(itemUuid) {
     if (!item || !item.parent) {
       const itemName = item?.name ?? itemUuid;
       return ui.notifications.warn(
-        `Could not find item ${itemName}. You may need to delete and recreate this macro.`
+        `Could not find item ${itemName}. You may need to delete and recreate this macro.`,
       );
     }
 
@@ -682,7 +682,7 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
     });
 
     console.log(
-      `GM: Applying ${result.hpLoss} damage to ${actor.name}. New HP: ${result.newHp}`
+      `GM: Applying ${result.hpLoss} damage to ${actor.name}. New HP: ${result.newHp}`,
     );
 
     await actor.update({
@@ -856,7 +856,7 @@ Hooks.once("ready", () => {
     let isChecked = $(this).prop("checked");
 
     console.log(
-      `Toggling visibility for skill: ${skillKey}, Checked: ${isChecked}`
+      `Toggling visibility for skill: ${skillKey}, Checked: ${isChecked}`,
     );
 
     // Target the specific skill entry

@@ -7,7 +7,7 @@ const { api, sheets } = foundry.applications;
  * @extends {ActorSheetV2}
  */
 export class ToSActorSheet extends api.HandlebarsApplicationMixin(
-  sheets.ActorSheetV2
+  sheets.ActorSheetV2,
 ) {
   constructor(options = {}) {
     super(options);
@@ -35,6 +35,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       myAction: this._myAction,
       toggleReroll: this._toggleReroll,
       toggleSchool: this._toggleSchool,
+      buildSpellTooltip: this._buildSpellTooltip,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -98,7 +99,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     target.classList.toggle("active", rerollActive[index]);
     console.debug(
       "Icon class toggled:",
-      rerollActive[index] ? "active" : "inactive"
+      rerollActive[index] ? "active" : "inactive",
     );
   }
 
@@ -107,8 +108,37 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     console.log(
       `My custom action triggered, checkbox is ${
         isChecked ? "checked" : "unchecked"
-      }`
+      }`,
     );
+  }
+
+  static _buildSpellTooltip(spell) {
+    const data = spell.getTooltipData();
+
+    return `
+    <strong>${data.name}</strong>
+    <hr>
+    <tr><td>Damage types:</td></tr>
+    <tr><td>
+    ${data.dmgType1} ${data.bool2}
+    ${data.dmgType2} ${data.bool3}
+    ${data.dmgType3} ${data.bool4}
+    ${data.dmgType4}
+    </td></tr>
+    <hr>
+    <tr><td>Effect types:</td></tr>
+    <tr><td>
+    ${data.effectType1} ${data.effects.extra1}
+    ${data.effectType2} ${data.effects.extra2}
+    ${data.effectType3} ${data.effects.extra3}
+    </td></tr>
+    <hr>
+    <div><b>Difficulty:</b> ${data.difficulty}</div>
+    <div><b>Cost:</b> ${data.cost}${data.perRound ? ` / ${data.perRound}` : ""}</div>
+    <div><b>Actions:</b> ${data.actionCost}</div>
+    <div><b>Range:</b> ${data.range}</div>
+    ${data.description ? `<hr>${data.description}` : ""}
+  `;
   }
 
   static _toggleSchool(event) {
@@ -147,7 +177,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           console.log(
             `Effect ${effect.name} updated: ${
               isChecked ? "equipped" : "unequipped"
-            }`
+            }`,
           );
         }
       }
@@ -215,7 +245,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           "spells",
           "miracles",
           "effects",
-          "config"
+          "config",
         );
         break;
       case "npc":
@@ -224,7 +254,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           "abilities",
           "spells",
           "miracles",
-          "effects"
+          "effects",
         );
         break;
     }
@@ -282,7 +312,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
             rollData: this.actor.getRollData(),
             // Relative UUID resolution
             relativeTo: this.actor,
-          }
+          },
         );
         break;
       case "effects":
@@ -291,7 +321,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         context.effects = prepareActiveEffectCategories(
           // A generator that returns all effects stored on the actor
           // as well as any items
-          this.actor.allApplicableEffects()
+          this.actor.allApplicableEffects(),
         );
         break;
     }
@@ -488,7 +518,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     context.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.consumables = consumables.sort(
-      (a, b) => (a.sort || 0) - (b.sort || 0)
+      (a, b) => (a.sort || 0) - (b.sort || 0),
     );
     context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.ability = ability.sort((a, b) => (a.sort || 0) - (b.sort || 0));
@@ -518,6 +548,50 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    *   ACTIONS
    *
    **************/
+
+  // Render spell tooltips
+  render(force, options) {
+    super.render(force, options);
+
+    const tooltip = this.element.querySelector("#spell-tooltip");
+    if (!tooltip) return;
+
+    this.element.querySelectorAll(".spell-icon").forEach((icon) => {
+      icon.addEventListener("mouseenter", (ev) => {
+        const itemId = ev.currentTarget.dataset.itemId;
+        const spell = this.actor.items.get(itemId);
+        if (!spell) return;
+
+        tooltip.innerHTML = this._buildSpellTooltip(spell);
+        tooltip.classList.remove("hidden");
+
+        tooltip.style.left = `${ev.clientX + 12}px`;
+        tooltip.style.top = `${ev.clientY + 12}px`;
+      });
+
+      icon.addEventListener("mousemove", (ev) => {
+        tooltip.style.left = `${ev.clientX + 12}px`;
+        tooltip.style.top = `${ev.clientY + 12}px`;
+      });
+
+      icon.addEventListener("mouseleave", () => {
+        tooltip.classList.add("hidden");
+      });
+    });
+  }
+
+  render(force, options) {
+    super.render(force, options);
+
+    const tooltip = this.element.querySelector("#spell-tooltip");
+
+    this.element.querySelectorAll(".spell-icon").forEach((icon) => {
+      icon.addEventListener("mouseenter", (ev) => {
+        console.log("Hovered element:", ev.currentTarget);
+        console.log("Item ID:", ev.currentTarget.dataset.itemId);
+      });
+    });
+  }
 
   /**
    * Handle changing a Document's image.
@@ -699,14 +773,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
             dataset.rollType === "combat-skill"
               ? `TOS.Actor.Character.skills.${skillKey}.label`
               : dataset.rollType === "attribute"
-              ? `TOS.Actor.Character.Attribute.${
-                  skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
-                }.long`
-              : dataset.rollType === "secondaryAttribute"
-              ? `TOS.Actor.Character.SecondaryAttribute.${
-                  skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
-                }.long`
-              : `TOS.Actor.Character.skills.${skillKey}.label`
+                ? `TOS.Actor.Character.Attribute.${
+                    skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                  }.long`
+                : dataset.rollType === "secondaryAttribute"
+                  ? `TOS.Actor.Character.SecondaryAttribute.${
+                      skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                    }.long`
+                  : `TOS.Actor.Character.skills.${skillKey}.label`,
           )}`
         : "";
       const rollName = label;
@@ -726,16 +800,16 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           dataset.rollType === "skill"
             ? this.actor.system.skills[skillKey]
             : dataset.rollType === "combat-skill"
-            ? this.actor.system.combatSkills[skillKey]
-            : dataset.rollType === "attribute"
-            ? this.actor.system.attributes[skillKey] // Handle attributes
-            : dataset.rollType === "secondaryAttribute";
+              ? this.actor.system.combatSkills[skillKey]
+              : dataset.rollType === "attribute"
+                ? this.actor.system.attributes[skillKey] // Handle attributes
+                : dataset.rollType === "secondaryAttribute";
 
         if (skillData) {
           const criticalMessage = this.evaluateCriticalSuccess(
             d100Result,
             skillData.criticalSuccessThreshold, // Use the skill-specific threshold
-            skillData.criticalFailureThreshold // Use the skill-specific threshold
+            skillData.criticalFailureThreshold, // Use the skill-specific threshold
           );
           console.log(
             "Rolled:",
@@ -743,7 +817,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
             "Crit chance:",
             skillData.criticalSuccessThreshold, // Use the skill-specific threshold
             "Crit fail chance:",
-            skillData.criticalFailureThreshold
+            skillData.criticalFailureThreshold,
           );
 
           // Modify the label to include critical success/failure indication
@@ -999,7 +1073,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (item.type === "consumable") {
       // Look for an existing stackable consumable with the same name
       let existingItem = this.actor.items.find(
-        (i) => i.name === item.name && i.type === "consumable"
+        (i) => i.name === item.name && i.type === "consumable",
       );
 
       if (existingItem) {
@@ -1030,7 +1104,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       folder.contents.map(async (item) => {
         if (!(document instanceof Item)) item = await fromUuid(item.uuid);
         return item;
-      })
+      }),
     );
     return this._onDropItemCreate(droppedItemData, event);
   }
@@ -1155,3 +1229,49 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
 }
+
+Hooks.on("renderActorSheetV2", (sheet, html) => {
+  const tooltip = html.querySelector("#spell-tooltip");
+  if (!tooltip) return;
+
+  html.querySelectorAll(".spell-icon").forEach((icon) => {
+    icon.addEventListener("mouseenter", (ev) => {
+      const itemId = ev.currentTarget.dataset.itemId;
+      const spell = sheet.actor.items.get(itemId);
+      if (!spell) return;
+
+      tooltip.innerHTML = sheet.constructor._buildSpellTooltip(spell);
+      tooltip.classList.remove("hidden");
+
+      const iconRect = ev.currentTarget.getBoundingClientRect();
+      const sheetRect = html.getBoundingClientRect();
+
+      const OFFSET_X = 25;
+      const OFFSET_Y = -150;
+      const PADDING = 38; // set if you want breathing room
+
+      // ⬇️ STORE top
+      let top = iconRect.top - sheetRect.top + OFFSET_Y;
+      let left = iconRect.right - sheetRect.left + OFFSET_X;
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+
+      // ⬇️ MEASURE
+      const tooltipHeight = tooltip.offsetHeight;
+      const sheetHeight = html.clientHeight;
+
+      // ⬇️ HARD RULE: bottom must not pass sheet bottom
+      const maxTop = sheetHeight - tooltipHeight - PADDING;
+
+      if (top > maxTop) {
+        top = maxTop;
+        tooltip.style.top = `${top}px`;
+      }
+    });
+
+    icon.addEventListener("mouseleave", () => {
+      tooltip.classList.add("hidden");
+    });
+  });
+});

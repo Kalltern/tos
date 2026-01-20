@@ -311,7 +311,6 @@ export async function combatAbilities() {
         html.find(".weapon-choice").click(async (event) => {
           const selectedValue = $(event.currentTarget).data("value");
           await handleWeaponSelection(selectedValue);
-          weaponDialog.close();
         });
       },
     });

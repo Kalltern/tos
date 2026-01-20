@@ -101,7 +101,7 @@ export class ToSActor extends Actor {
       attribute.total = attribute.value + attribute.bonus;
     }
     for (let [key, attribute] of Object.entries(
-      systemData.secondaryAttributes
+      systemData.secondaryAttributes,
     )) {
       // Calculate the attribute rating using ToS rules.
       attribute.total = attribute.value + (attribute.bonus ?? 0);
@@ -141,7 +141,7 @@ export class ToSActor extends Actor {
     const attributeScore = Object.entries(systemData.attributes).map(
       ([key, attribute]) => ({
         total: attribute.value + (attribute.bonus ?? 0), // Combine value and bonus
-      })
+      }),
     );
 
     // Iterate through skills
@@ -238,14 +238,14 @@ export class ToSActor extends Actor {
     // Calculate the attribute rating using ToS rules. Rework calculations for stun effects
     for (let [key, attribute] of Object.entries(systemData.attributes)) {
       attribute.mod = Math.floor(
-        15 + attribute.modBonus + (attribute.bonus + attribute.value) * 10
+        15 + attribute.modBonus + (attribute.bonus + attribute.value) * 10,
       );
       if (key === "str") {
         attribute.mod = Math.floor(
           15 +
             attribute.modBonus +
             systemData.skills.muscles.rating +
-            (attribute.bonus + attribute.value) * 10
+            (attribute.bonus + attribute.value) * 10,
         );
       }
       if (key === "dex") {
@@ -253,7 +253,7 @@ export class ToSActor extends Actor {
           15 +
             attribute.modBonus +
             systemData.skills.nimbleness.rating +
-            (attribute.bonus + attribute.value) * 10
+            (attribute.bonus + attribute.value) * 10,
         );
       }
     }
@@ -571,7 +571,7 @@ export class ToSActor extends Actor {
         magicDoctrine.elymas.value || 0,
         magicDoctrine.incantator.value || 0,
         magicDoctrine.veneficus.value || 0,
-        magicDoctrine.elementalist.value || 0
+        magicDoctrine.elementalist.value || 0,
       );
       const doctrineValues = {
         elymas: magicDoctrine.elymas.value || 0,
@@ -641,7 +641,7 @@ export class ToSActor extends Actor {
             stat.mana.bonus +
             stat.mana.base -
             3 * stat.fatigue.value) *
-            calcElymas[magicDoctrine.elymas.value]
+            calcElymas[magicDoctrine.elymas.value],
         );
       } else if (magicDoctrine.incantator.value === maxValue) {
         systemData.stats.mana.max = Math.floor(
@@ -652,7 +652,7 @@ export class ToSActor extends Actor {
             stat.mana.bonus +
             stat.mana.base -
             3 * stat.fatigue.value) *
-            calcIncantator[magicDoctrine.incantator.value]
+            calcIncantator[magicDoctrine.incantator.value],
         );
       } else if (magicDoctrine.elementalist.value === maxValue) {
         systemData.stats.mana.max = Math.floor(
@@ -663,7 +663,7 @@ export class ToSActor extends Actor {
             stat.mana.bonus +
             stat.mana.base -
             3 * stat.fatigue.value) *
-            calcElementalist[magicDoctrine.elementalist.value]
+            calcElementalist[magicDoctrine.elementalist.value],
         );
       } else if (magicDoctrine.veneficus.value === maxValue) {
         systemData.stats.mana.max = Math.floor(
@@ -674,7 +674,7 @@ export class ToSActor extends Actor {
             stat.mana.bonus +
             stat.mana.base -
             3 * stat.fatigue.value) *
-            calcVeneficus[magicDoctrine.veneficus.value]
+            calcVeneficus[magicDoctrine.veneficus.value],
         );
       } else {
         console.log("No matching doctrine, using default calculation.");
@@ -691,30 +691,30 @@ export class ToSActor extends Actor {
       // prevent mana to go below 0
       systemData.stats.mana.max = Math.max(
         systemData.stats.mana.max,
-        systemData.stats.mana.min
+        systemData.stats.mana.min,
       );
     }
 
     // Prevent current stat exceed max
     systemData.stats.health.value = Math.min(
       systemData.stats.health.value,
-      systemData.stats.health.max
+      systemData.stats.health.max,
     );
     systemData.stats.stamina.value = Math.min(
       systemData.stats.stamina.value,
-      systemData.stats.stamina.max
+      systemData.stats.stamina.max,
     );
     systemData.stats.toxicity.value = Math.min(
       systemData.stats.toxicity.value,
-      systemData.stats.toxicity.max
+      systemData.stats.toxicity.max,
     );
     systemData.stats.mana.value = Math.min(
       systemData.stats.mana.value,
-      systemData.stats.mana.max
+      systemData.stats.mana.max,
     );
     systemData.stats.mind.value = Math.min(
       systemData.stats.mind.value,
-      systemData.stats.mind.max
+      systemData.stats.mind.max,
     );
 
     // Define critical thresholds influenced by luck
@@ -732,13 +732,13 @@ export class ToSActor extends Actor {
         // Calculate critical success threshold for each skill
         anySkill.criticalSuccessThreshold = Math.max(
           1,
-          baseCriticalSuccess + Math.max(0, luck) + critBonus
+          baseCriticalSuccess + Math.max(0, luck) + critBonus,
         );
 
         // Calculate critical failure threshold for each skill
         anySkill.criticalFailureThreshold = Math.min(
           100,
-          baseCriticalFailure - Math.max(0, -luck) + critFailPenalty
+          baseCriticalFailure - Math.max(0, -luck) + critFailPenalty,
         );
       }
     }
@@ -751,12 +751,12 @@ export class ToSActor extends Actor {
     // Global thresholds based on luck.value
     this.criticalSuccessThreshold = Math.max(
       1,
-      baseCriticalSuccess + Math.max(0, luck)
+      baseCriticalSuccess + Math.max(0, luck),
     );
 
     this.criticalFailureThreshold = Math.min(
       100,
-      baseCriticalFailure - Math.max(0, -luck)
+      baseCriticalFailure - Math.max(0, -luck),
     );
 
     // Store thresholds in actor data if needed
@@ -775,8 +775,16 @@ export class ToSActor extends Actor {
       combatSkill.rating = combatSkill.value + combatSkill.bonus;
     }
 
-    const hp = this.system.stats.health;
-    const stamina = this.system.stats.stamina;
+    const hp = systemData.stats.health;
+    const stamina = systemData.stats.stamina;
+    const holyEnergy = systemData.stats.holyEnergy;
+    const mana = systemData.stats.mana;
+
+    mana.value = Number(mana.value) || 0;
+    mana.max = Number(mana.max) || 0;
+
+    holyEnergy.value = Number(holyEnergy.value) || 0;
+    holyEnergy.max = Number(holyEnergy.max) || 0;
 
     stamina.value = Number(stamina.value) || 0;
     stamina.max = Number(stamina.max) || 0;
