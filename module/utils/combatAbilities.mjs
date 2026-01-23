@@ -203,7 +203,7 @@ export async function combatAbilities() {
 
       if (mode === "defense") {
         // defenseRoll function
-        await game.tos.defenseRoll(actor, weapon, ability);
+        await game.tos.defenseRoll({ actor, weapon, ability });
       } else {
         const abilityDamage = ability.system.roll.diceBonus || 0;
         const abilityAttack = ability.system.attack || 0;

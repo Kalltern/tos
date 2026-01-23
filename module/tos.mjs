@@ -826,8 +826,6 @@ Hooks.on("renderChatMessage", (message, html, data) => {
           flavorText = "Critical Success!";
         } else if (d100Result >= criticalFailureThreshold) {
           flavorText = "Critical Failure!";
-        } else if (!critSuccess && d100Result <= deflectChance) {
-          flavorText = "Deflect!";
         } else {
           flavorText = "";
         }

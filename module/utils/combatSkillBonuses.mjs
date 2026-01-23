@@ -39,11 +39,12 @@ export async function getNonWeaponAbility(actor, ability) {
 
   const attributeMap = {
     strength: "str",
-    endurance: "end",
     dexterity: "dex",
+    endurance: "end",
     intelligence: "int",
-    wisdom: "wis",
+    will: "wil",
     charisma: "cha",
+    perception: "per",
   };
 
   let concatRollAndDescription = ability.system.description;

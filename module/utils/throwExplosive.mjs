@@ -7,7 +7,7 @@ export async function throwExplosive() {
 
   const actor = selectedToken.actor;
   const consumables = actor.items.filter(
-    (i) => i.type === "consumable" && i.system.option === "explosive"
+    (i) => i.type === "consumable" && i.system.option === "explosive",
   );
 
   if (!consumables.length) {
@@ -110,8 +110,8 @@ export async function throwExplosive() {
       ? critSuccess
         ? "Critical Success!"
         : critFailure
-        ? "Critical Failure!"
-        : "Damage"
+          ? "Critical Failure!"
+          : "Damage"
       : ""
   }
 </b></p>
@@ -140,7 +140,7 @@ export async function throwExplosive() {
           type: "attack",
           normal: {
             damage: damageTotal,
-            penetration: penetration,
+            penetration: consumable.system.penetration,
           },
         },
       },
@@ -174,7 +174,7 @@ export async function throwExplosive() {
         ${explosiveChoices
           .map(
             (c) =>
-              `<li class="explosive-choice" data-value="${c.value}">${c.label}</li>`
+              `<li class="explosive-choice" data-value="${c.value}">${c.label}</li>`,
           )
           .join("")}
       </ul>

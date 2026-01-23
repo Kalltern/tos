@@ -1223,6 +1223,15 @@
         "piercing",
         "slash"
       ],
+      "testOptions": [
+        "Strength",
+        "Dexterity",
+        "Endurance",
+        "Inteligence",
+        "Will",
+        "Charisma",
+        "Perception"
+      ],
       "isOffensive": true,
       "difficulty": 0,
       "cost": 0,

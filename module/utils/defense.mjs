@@ -1,4 +1,4 @@
-export async function defenseRoll({ actor = null } = {}) {
+export async function defenseRoll({ actor, weapon, ability = null } = {}) {
   const selectedToken = canvas.tokens.controlled[0];
 
   if (!actor) {
@@ -44,28 +44,46 @@ export async function defenseRoll({ actor = null } = {}) {
   }
 
   /* -------------------------------------------- */
+  /*  Overwrite the logic if the ability is given */
+  /* -------------------------------------------- */
+  if (ability) {
+    if (ability.system?.rangedDefense != null) {
+      return rangedDefense({ ability, weapon });
+    }
+
+    if (ability.system?.dodge != null) {
+      return dodgeDefense({ ability, weapon });
+    }
+
+    if (ability.system?.defense != null) {
+      return meleeDefense({ ability, weapon });
+    }
+  }
+
+  /* -------------------------------------------- */
   /*  DEFENSE SELECTOR                            */
   /* -------------------------------------------- */
-
-  new Dialog({
-    title: "Select Defense Type",
-    content: "<p>Choose defense:</p>",
-    buttons: {
-      melee: {
-        label: "Melee Defense",
-        callback: () => meleeDefense(),
+  if (!ability) {
+    new Dialog({
+      title: "Select Defense Type",
+      content: "<p>Choose defense:</p>",
+      buttons: {
+        melee: {
+          label: "Melee Defense",
+          callback: () => meleeDefense({}),
+        },
+        ranged: {
+          label: "Ranged Defense",
+          callback: () => rangedDefense({}),
+        },
+        dodge: {
+          label: "Dodge",
+          callback: () => dodgeDefense({}),
+        },
       },
-      ranged: {
-        label: "Ranged Defense",
-        callback: () => rangedDefense(),
-      },
-      dodge: {
-        label: "Dodge",
-        callback: () => dodgeDefense(),
-      },
-    },
-    default: "melee",
-  }).render(true);
+      default: "melee",
+    }).render(true);
+  }
 
   /* -------------------------------------------- */
   /*  WEAPON DIALOG                               */
@@ -85,7 +103,7 @@ export async function defenseRoll({ actor = null } = {}) {
                     data-value="${index}"
                     style="cursor:pointer;padding:5px;border-bottom:1px solid #444;">
                   ${weapon.name}
-                </li>`
+                </li>`,
               )
               .join("")}
           </ul>
@@ -104,32 +122,20 @@ export async function defenseRoll({ actor = null } = {}) {
       },
     }).render(true);
   }
-
   /* -------------------------------------------- */
   /*  MELEE DEFENSE                               */
   /* -------------------------------------------- */
 
-  async function meleeDefense() {
-    const weapons = actor.items.filter(
-      (i) =>
-        i.type === "weapon" &&
-        ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-        i.system.thrown !== true
-    );
-
-    if (!weapons.length) {
-      ui.notifications.warn("This actor has no melee weapons.");
-      return;
-    }
-
-    showWeaponDialog(weapons, async (index) => {
-      const weapon = weapons[index];
+  async function meleeDefense({ ability = null, weapon = null } = {}) {
+    const resolveWithWeapon = async (weapon) => {
       const rollName = `Defense with ${weapon.name}`;
 
       const { doctrineCritDefenseBonus, doctrineDefenseBonus } =
         await game.tos.getDoctrineBonuses(actor, weapon);
 
       const defense = actor.system.combatSkills.meleeDefense;
+      const defenseRating = defense.rating;
+      const abilityDefense = ability?.system?.defense ?? 0;
 
       const criticalSuccessThreshold =
         defense.criticalSuccessThreshold +
@@ -139,16 +145,15 @@ export async function defenseRoll({ actor = null } = {}) {
       const criticalFailureThreshold = defense.criticalFailureThreshold;
 
       const rollData = {
-        combatSkills: actor.system.combatSkills,
-        weaponDefense: weapon.system.defense || 0,
-        str: actor.system.attributes.str.value,
-        dex: actor.system.attributes.dex.value,
-        per: actor.system.attributes.per.value,
+        defenseRating,
+        weaponDefense: weapon.system.defense ?? 0,
+        doctrineDefenseBonus,
+        abilityDefense,
       };
 
       const roll = new Roll(
-        `@combatSkills.meleeDefense.rating + @weaponDefense + ${doctrineDefenseBonus} - 1d100`,
-        rollData
+        "@defenseRating + @weaponDefense + @doctrineDefenseBonus + @abilityDefense - 1d100",
+        rollData,
       );
 
       await roll.evaluate();
@@ -158,8 +163,34 @@ export async function defenseRoll({ actor = null } = {}) {
         weapon,
         rollName,
         criticalSuccessThreshold,
-        criticalFailureThreshold
+        criticalFailureThreshold,
       );
+    };
+
+    /* -------------------------------------------- */
+    /*  IF WEAPON ALREADY KNOWN → SKIP DIALOG       */
+    /* -------------------------------------------- */
+    if (weapon) {
+      return resolveWithWeapon(weapon);
+    }
+
+    /* -------------------------------------------- */
+    /*  OTHERWISE → ASK PLAYER                     */
+    /* -------------------------------------------- */
+    const weapons = actor.items.filter(
+      (i) =>
+        i.type === "weapon" &&
+        ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
+        i.system.thrown !== true,
+    );
+
+    if (!weapons.length) {
+      ui.notifications.warn("This actor has no melee weapons.");
+      return;
+    }
+
+    showWeaponDialog(weapons, async (index) => {
+      await resolveWithWeapon(weapons[index]);
     });
   }
 
@@ -167,22 +198,15 @@ export async function defenseRoll({ actor = null } = {}) {
   /*  RANGED DEFENSE                              */
   /* -------------------------------------------- */
 
-  async function rangedDefense() {
-    const weapons = actor.items.filter((i) => i.type === "weapon");
-
-    if (!weapons.length) {
-      ui.notifications.warn("This actor has no weapons.");
-      return;
-    }
-
-    showWeaponDialog(weapons, async (index) => {
-      const weapon = weapons[index];
+  async function rangedDefense({ ability = null, weapon = null } = {}) {
+    const resolveWithWeapon = async (weapon) => {
       const rollName = `Ranged defense with ${weapon.name}`;
 
       const { doctrineCritDefenseBonus, doctrineRangedDefenseBonus } =
         await game.tos.getDoctrineBonuses(actor, weapon);
 
       const defense = actor.system.combatSkills.rangedDefense;
+      const abilityDefense = ability?.system?.rangedDefense ?? 0;
 
       const criticalSuccessThreshold =
         defense.criticalSuccessThreshold + doctrineCritDefenseBonus;
@@ -190,15 +214,14 @@ export async function defenseRoll({ actor = null } = {}) {
       const criticalFailureThreshold = defense.criticalFailureThreshold;
 
       const rollData = {
-        combatSkills: actor.system.combatSkills,
-        weaponDefense: weapon.system.defense || 0,
-        dex: actor.system.attributes.dex.value,
-        per: actor.system.attributes.per.value,
+        defenseRating: defense.rating,
+        doctrineRangedDefenseBonus,
+        abilityDefense,
       };
 
       const roll = new Roll(
-        `@combatSkills.rangedDefense.rating - 1d100 + ${doctrineRangedDefenseBonus}`,
-        rollData
+        "@defenseRating + @doctrineRangedDefenseBonus + @abilityDefense - 1d100",
+        rollData,
       );
 
       await roll.evaluate();
@@ -208,16 +231,20 @@ export async function defenseRoll({ actor = null } = {}) {
         weapon,
         rollName,
         criticalSuccessThreshold,
-        criticalFailureThreshold
+        criticalFailureThreshold,
       );
-    });
-  }
+    };
 
-  /* -------------------------------------------- */
-  /*  DODGE DEFENSE                               */
-  /* -------------------------------------------- */
+    /* -------------------------------------------- */
+    /*  IF WEAPON ALREADY KNOWN → SKIP DIALOG       */
+    /* -------------------------------------------- */
+    if (weapon) {
+      return resolveWithWeapon(weapon);
+    }
 
-  async function dodgeDefense() {
+    /* -------------------------------------------- */
+    /*  OTHERWISE → ASK PLAYER                     */
+    /* -------------------------------------------- */
     const weapons = actor.items.filter((i) => i.type === "weapon");
 
     if (!weapons.length) {
@@ -226,10 +253,20 @@ export async function defenseRoll({ actor = null } = {}) {
     }
 
     showWeaponDialog(weapons, async (index) => {
-      const weapon = weapons[index];
+      await resolveWithWeapon(weapons[index]);
+    });
+  }
+
+  /* -------------------------------------------- */
+  /*  DODGE DEFENSE                               */
+  /* -------------------------------------------- */
+
+  async function dodgeDefense({ ability = null, weapon = null } = {}) {
+    const resolveWithWeapon = async (weapon) => {
       const rollName = `Dodge with ${weapon.name}`;
 
       const dodge = actor.system.combatSkills.dodge;
+      const abilityDefense = ability?.system?.dodge ?? 0;
 
       const criticalSuccessThreshold =
         dodge.criticalSuccessThreshold + weapon.system.critDodge;
@@ -249,14 +286,14 @@ export async function defenseRoll({ actor = null } = {}) {
       });
 
       const rollData = {
-        combatSkills: actor.system.combatSkills,
-        weaponDodge: weapon.system.dodge,
-        dex: actor.system.attributes.dex.value,
+        dodgeRating: dodge.rating,
+        weaponDodge: weapon.system.dodge ?? 0,
+        abilityDefense,
       };
 
       const roll = new Roll(
-        `@combatSkills.dodge.rating + @weaponDodge - 1d100`,
-        rollData
+        "@dodgeRating + @weaponDodge + @abilityDefense - 1d100",
+        rollData,
       );
 
       await roll.evaluate();
@@ -266,8 +303,29 @@ export async function defenseRoll({ actor = null } = {}) {
         weapon,
         rollName,
         criticalSuccessThreshold,
-        criticalFailureThreshold
+        criticalFailureThreshold,
       );
+    };
+
+    /* -------------------------------------------- */
+    /*  IF WEAPON ALREADY KNOWN → SKIP DIALOG       */
+    /* -------------------------------------------- */
+    if (weapon) {
+      return resolveWithWeapon(weapon);
+    }
+
+    /* -------------------------------------------- */
+    /*  OTHERWISE → ASK PLAYER                     */
+    /* -------------------------------------------- */
+    const weapons = actor.items.filter((i) => i.type === "weapon");
+
+    if (!weapons.length) {
+      ui.notifications.warn("This actor has no weapons.");
+      return;
+    }
+
+    showWeaponDialog(weapons, async (index) => {
+      await resolveWithWeapon(weapons[index]);
     });
   }
 
@@ -280,7 +338,7 @@ export async function defenseRoll({ actor = null } = {}) {
     weapon,
     rollName,
     criticalSuccessThreshold,
-    criticalFailureThreshold
+    criticalFailureThreshold,
   ) {
     const rollResult = roll.dice[0].results[0].result;
 
@@ -303,7 +361,7 @@ export async function defenseRoll({ actor = null } = {}) {
         <tr><th>Type</th><th>Value</th></tr>
         ${armorRows
           .map(
-            ([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`
+            ([label, value]) => `<tr><td>${label}</td><td>${value}</td></tr>`,
           )
           .join("")}
       </table>
@@ -322,8 +380,8 @@ export async function defenseRoll({ actor = null } = {}) {
             critSuccess
               ? "Critical Success!"
               : critFailure
-              ? "Critical Failure!"
-              : ""
+                ? "Critical Failure!"
+                : ""
           }
         </b></p>
         ${armorTable}

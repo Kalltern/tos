@@ -316,7 +316,7 @@ table tr td:nth-child(3) {
   font-family: "Roboto", sans-serif;
 }
 .tos .sheet-header {
-  height: 370px; /* Adjust the height as needed */
+  height: 390px; /* Adjust the height as needed */
   overflow: hidden; /* Ensures content does not exceed the height */
   flex: 0 auto;
   display: flex;

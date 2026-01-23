@@ -138,7 +138,7 @@ export function showSpellSelectionDialogs(actor) {
       if (schoolDialog) schoolDialog.close();
 
       const allSpells = actor.items.filter(
-        (i) => i.type === "spell" && i.system.type === schoolName
+        (i) => i.type === "spell" && i.system.type === schoolName,
       );
 
       // Define Ranks (now lowercase) and Group Spells
@@ -176,15 +176,15 @@ export function showSpellSelectionDialogs(actor) {
           // Tab Header (Capitalize the rank name for display)
           tabHeadersHtml += `<div class="tab-item" data-tab="${tabId}">
                         ${rank.charAt(0).toUpperCase() + rank.slice(1)} (${
-            spells.length
-          })
+                          spells.length
+                        })
                     </div>`;
 
           // Tab Content (List of spells)
           const spellListHtml = spells
             .map(
               (spell) =>
-                `<li class="spell-choice" data-spell-id="${spell.id}">${spell.name}</li>`
+                `<li class="spell-choice" data-spell-id="${spell.id}">${spell.name}</li>`,
             )
             .join("");
 
@@ -200,7 +200,7 @@ export function showSpellSelectionDialogs(actor) {
 
       if (!tabHeadersHtml) {
         ui.notifications.warn(
-          `No spells found in the selected school: ${schoolName}`
+          `No spells found in the selected school: ${schoolName}`,
         );
         return;
       }
@@ -265,7 +265,7 @@ export function showSpellSelectionDialogs(actor) {
             // Check if the cast is for free
             const freeCast = html.find('input[name="freeCast"]').is(":checked");
             const focusSpent = Number(
-              html.find('input[name="focus"]').val() || 0
+              html.find('input[name="focus"]').val() || 0,
             );
 
             spellDialog.close();
@@ -293,7 +293,7 @@ export function showSpellSelectionDialogs(actor) {
                     (school) =>
                       `<li class="spell-choice" data-value="${school}">
                         ${school.charAt(0).toUpperCase() + school.slice(1)}
-                    </li>`
+                    </li>`,
                   )
                   .join("")}
             </ul></fieldset></form>`,
@@ -328,7 +328,7 @@ export async function deductMana(actor, spell) {
 
   if (currentMana < spellCost) {
     ui.notifications.warn(
-      `Not enough mana to cast ${spell.name} (Cost: ${spellCost}).`
+      `Not enough mana to cast ${spell.name} (Cost: ${spellCost}).`,
     );
     return false;
   }
@@ -368,7 +368,7 @@ export function calculateAttackBonuses(actor, spell) {
 
   // Check if the actor has a matching temperament for the spell's school
   for (const [temperamentName, requiredSchool] of Object.entries(
-    temperamentBonusMap
+    temperamentBonusMap,
   )) {
     // Find the item by name AND check if the spell's school matches the required school
     if (
@@ -465,7 +465,7 @@ export async function finalizeRollsAndPostChat(
   actor,
   spell,
   bonuses,
-  attackResults
+  attackResults,
 ) {
   const { attackRoll, critSuccess, critFailure } = attackResults;
   const { damageBonus, effectModifiers } = bonuses;
@@ -479,11 +479,59 @@ export async function finalizeRollsAndPostChat(
     spellPower: actor.system.schools[spell.system.type]?.spellPower || 0,
   };
 
+  const spellAttributeTestName = spell.system.attributeTest || 0;
+  const spellTestModifier = spell.system.testModifier || 0;
+
+  const attributeMap = {
+    strength: "str",
+    dexterity: "dex",
+    endurance: "end",
+    intelligence: "int",
+    will: "wil",
+    charisma: "cha",
+    perception: "per",
+  };
+  let concatRollAndDescription = spell.system.description;
+  let attributeTestRoll = null;
+  if (
+    spellAttributeTestName &&
+    spellAttributeTestName !== "-- Select a Type --"
+  ) {
+    const shortKey =
+      attributeMap[spellAttributeTestName.toLowerCase()] ??
+      spellAttributeTestName;
+
+    let selectedAttributeModifier = actor.system.attributes[shortKey]?.mod ?? 0;
+    if (actor.type === "npc") {
+      selectedAttributeModifier = actor.system.attributes[shortKey]?.value ?? 0;
+    }
+
+    const attributeRoll = new Roll(
+      `(${selectedAttributeModifier} + ${spellTestModifier}) - 1d100`,
+      rollData,
+    );
+    await attributeRoll.evaluate({ async: true });
+
+    // Roll modifier separately for display
+    const modifierRoll = new Roll(
+      `${selectedAttributeModifier} + ${spellTestModifier || 0}`,
+      rollData,
+    );
+    await modifierRoll.evaluate({ async: true });
+
+    const attributeString = `
+  |${spellAttributeTestName} Test ${modifierRoll.total}%|<br>
+  Margin of Success: ${attributeRoll.total}<br>
+`;
+
+    concatRollAndDescription += attributeString;
+    attributeTestRoll = attributeRoll;
+  }
   // --- DAMAGE ROLL ---
   let damageFormula = spell.system.formula || "1d6";
   damageFormula = damageFormula.replace(
     /@(\w+\.\w+\.\w+|\w+)/g,
-    (_, key) => rollData[key] || 0
+    (_, key) => rollData[key] || 0,
   );
 
   const damageRoll = new Roll(damageFormula, actor.system);
@@ -566,7 +614,7 @@ export async function finalizeRollsAndPostChat(
   // --- CHAT MESSAGE CONSTRUCTION ---
   const attack =
     attackRoll.total + (actor.system.combatSkills.channeling.attack || 0);
-  const rawTemplate = spell.system.description;
+  const rawTemplate = concatRollAndDescription;
   const compiled = Handlebars.compile(rawTemplate);
   const renderedDescription = compiled(rollData);
   let rollName = spell.name;
@@ -581,8 +629,8 @@ export async function finalizeRollsAndPostChat(
     flavor: `
         <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
             <img src="${spell.img}" title="${
-      spell.name
-    }" width="36" height="36">
+              spell.name
+            }" width="36" height="36">
             <span>${spell.name}</span>
         </div>
         <hr>
@@ -592,8 +640,8 @@ export async function finalizeRollsAndPostChat(
                 Difficulty:${rollData.difficulty}<br>${renderedDescription}</td>
             </tr>
             <tr><td>Magic attack: ${attack} Range: ${
-      spell.system.range
-    }</td></tr>
+              spell.system.range
+            }</td></tr>
             <tr><td>Damage types:</td></tr>
             <tr><td>${spell.system.dmgType1} ${spell.system.bool2}
                 ${spell.system.dmgType2} ${spell.system.bool3}
@@ -606,8 +654,8 @@ export async function finalizeRollsAndPostChat(
               critSuccess
                 ? "Critical Success!"
                 : critFailure
-                ? "Critical Failure!"
-                : ""
+                  ? "Critical Failure!"
+                  : ""
             }
         </b></p>
         <table style="width: 100%; text-align: center;font-size: 15px;">

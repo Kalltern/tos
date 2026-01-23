@@ -395,6 +395,22 @@
           <label class="resource-label">{{localize "TOS.Item.Weapon.FIELDS.rollMod.label"}}</label>
           <input type="text" name="system.roll.diceBonus" value="{{system.roll.diceBonus}}" data-dtype="String" placeholder="e.g. @spellPower"/>
         </div>
+       <div class="grid-span-1">
+            <label for="test-type">Test Type:</label>
+            <select name="system.attributeTest" id="test-type">
+              <option value="">-- Select a Type --</option>
+              {{#each system.testOptions as |testOption|}}
+                <option value="{{testOption}}" {{#if (eq ../system.attributeTest testOption)}}selected{{/if}}>
+                  {{testOption}}
+                </option>
+              {{/each}}
+            </select>
+       </div>
+         
+          <div class="grid-span-1">
+            <label class="resource-label">Test Modifier</label>
+            <input type="text" name="system.testModifier" value="{{system.testModifier}}" data-dtype="String" placeholder="e.g. @spellPower"/>
+          </div>
          </div>
          <div class="grid grid-3col">
         <div class="grid-span-1">
@@ -411,6 +427,8 @@
           <label>{{localize "TOS.Item.Spell.FIELDS.isOffensive.label"}}</label>
           <input type="checkbox" name="system.isOffensive" {{#if system.isOffensive}}checked{{/if}} />
         </div>
+
+
 
       </div>
     {{/if}}
