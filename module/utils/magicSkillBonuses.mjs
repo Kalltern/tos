@@ -420,7 +420,9 @@ export function calculateAttackBonuses(actor, spell) {
 function getEffectiveDifficulty(spell, focusSpent) {
   const base = spell.system.difficulty || 0;
   const focusBonus = focusSpent * 10;
-  return Math.min(0, base + focusBonus);
+  console.log(`base Difficulty`, base);
+  console.log(`focus Bonus`, focusBonus);
+  return base > 0 ? base : Math.min(0, base + focusBonus);
 }
 
 export async function performAttackRoll(actor, spell, bonus, focusSpent) {

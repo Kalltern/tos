@@ -119,7 +119,7 @@ export class ToSActor extends Actor {
     const skillset5 = [0, 10, 20, 30, 40, 50]; //drinking
     const skillset6 = [0, 5, 10, 15, 20, 25]; //social
     const skillset7 = [0, 20, 30, 40, 50, 60]; //survival, meditation
-    const combatset1 = [0, 15, 20, 30, 35, 45, 50, 60, 65, 75, 80];
+    const combatset1 = [0, 15, 20, 30, 35, 45, 50, 60, 65, 75, 80]; // combat + archery
     const channeling1 = [0, 20, 25, 30, 35, 45, 50, 55, 65, 70, 80];
     const channeling2 = [0, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70];
     const throwing = [0, 20, 25, 30, 35, 40, 45, 50, 55, 65, 70];
@@ -138,6 +138,7 @@ export class ToSActor extends Actor {
     const combat = systemData.combatSkills.combat;
     const melee = combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
     const brawler = systemData.skills.brawler;
+    const meleeOrRanged = Math.max(throwing[melee], combatset1[archery.value]);
     const attributeScore = Object.entries(systemData.attributes).map(
       ([key, attribute]) => ({
         total: attribute.value + (attribute.bonus ?? 0), // Combine value and bonus
@@ -383,13 +384,13 @@ export class ToSActor extends Actor {
             graveWounds;
         } else if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
           combatSkill.finesseRating =
-            throwing[melee] +
+            meleeOrRanged +
             attributeScore[1].total * 3 +
             combatSkill.bonus -
             graveWounds;
         } else {
           combatSkill.rating =
-            throwing[melee] +
+            meleeOrRanged +
             attributeScore[combatSkill.id].total * 3 +
             combatSkill.bonus -
             graveWounds;
@@ -793,6 +794,39 @@ export class ToSActor extends Actor {
     hp.max = Number(hp.max) || 0;
 
     systemData.xp = systemData.cr * systemData.cr * 100;
+
+    const baseCriticalSuccess = 5; // Base critical success threshold
+    const baseCriticalFailure = 96 - stat.fatigue.value; // Base critical failure threshold
+
+    // Function to calculate thresholds for each skill type (e.g., skills, combatSkills)
+    function calculateSkillThresholds(skillsObject) {
+      for (const [key, anySkill] of Object.entries(skillsObject)) {
+        // Ensure skillData is defined and contains critical bonus properties
+        const critBonus = anySkill.critbonus || 0;
+        const critFailPenalty = anySkill.critfailpenalty || 0;
+
+        // Calculate critical success threshold for each skill
+        anySkill.criticalSuccessThreshold = Math.max(
+          1,
+          baseCriticalSuccess + critBonus,
+        );
+
+        // Calculate critical failure threshold for each skill
+        anySkill.criticalFailureThreshold = Math.min(
+          100,
+          baseCriticalFailure + critFailPenalty,
+        );
+      }
+    }
+
+    // Calculate thresholds for regular skills and combat skills and attributes
+    calculateSkillThresholds(systemData.skills);
+    calculateSkillThresholds(systemData.combatSkills);
+    calculateSkillThresholds(systemData.attributes);
+
+    // Store thresholds in actor data if needed
+    actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
+    actorData.criticalFailureThreshold = this.criticalFailureThreshold;
   }
 
   /**
