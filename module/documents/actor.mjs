@@ -31,6 +31,9 @@ export class ToSActor extends Actor {
   prepareDerivedData() {
     const actorData = this;
     const systemData = actorData.system;
+    const tempHp = systemData.stats.temporaryHealth;
+    tempHp.value = Number(tempHp.value) || 0;
+    tempHp.max = Number(tempHp.max) || 0;
 
     const flags = actorData.flags.tos || {};
 
@@ -796,7 +799,7 @@ export class ToSActor extends Actor {
     systemData.xp = systemData.cr * systemData.cr * 100;
 
     const baseCriticalSuccess = 5; // Base critical success threshold
-    const baseCriticalFailure = 96 - stat.fatigue.value; // Base critical failure threshold
+    const baseCriticalFailure = 96; // Base critical failure threshold
 
     // Function to calculate thresholds for each skill type (e.g., skills, combatSkills)
     function calculateSkillThresholds(skillsObject) {
@@ -820,7 +823,6 @@ export class ToSActor extends Actor {
     }
 
     // Calculate thresholds for regular skills and combat skills and attributes
-    calculateSkillThresholds(systemData.skills);
     calculateSkillThresholds(systemData.combatSkills);
     calculateSkillThresholds(systemData.attributes);
 

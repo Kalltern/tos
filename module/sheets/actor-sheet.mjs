@@ -552,21 +552,24 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   // Render spell tooltips
   render(force, options) {
     super.render(force, options);
+    if (!this.element) return;
+    this._activateSpellTooltips();
+  }
 
+  _activateSpellTooltips() {
     const tooltip = this.element.querySelector("#spell-tooltip");
     if (!tooltip) return;
 
-    this.element.querySelectorAll(".spell-icon").forEach((icon) => {
+    for (const icon of this.element.querySelectorAll(".spell-icon")) {
+      if (icon.dataset.tooltipBound) continue; // prevent duplicates
+      icon.dataset.tooltipBound = "true";
+
       icon.addEventListener("mouseenter", (ev) => {
-        const itemId = ev.currentTarget.dataset.itemId;
-        const spell = this.actor.items.get(itemId);
+        const spell = this.actor.items.get(ev.currentTarget.dataset.itemId);
         if (!spell) return;
 
         tooltip.innerHTML = this._buildSpellTooltip(spell);
         tooltip.classList.remove("hidden");
-
-        tooltip.style.left = `${ev.clientX + 12}px`;
-        tooltip.style.top = `${ev.clientY + 12}px`;
       });
 
       icon.addEventListener("mousemove", (ev) => {
@@ -577,20 +580,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       icon.addEventListener("mouseleave", () => {
         tooltip.classList.add("hidden");
       });
-    });
-  }
-
-  render(force, options) {
-    super.render(force, options);
-
-    const tooltip = this.element.querySelector("#spell-tooltip");
-
-    this.element.querySelectorAll(".spell-icon").forEach((icon) => {
-      icon.addEventListener("mouseenter", (ev) => {
-        console.log("Hovered element:", ev.currentTarget);
-        console.log("Item ID:", ev.currentTarget.dataset.itemId);
-      });
-    });
+    }
   }
 
   /**

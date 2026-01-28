@@ -183,6 +183,82 @@
   {{/each}}
 </select>
 
+
+<div class="grid-span-4">
+<label class="resource-label">Other Resource costs</label>
+</div>
+
+<div class="grid-span-2">
+<label class="resource-label">Resource type</label>
+<select name="system.resources.0.type" id="resource0Type">
+  <option value="">-- Select a type --</option>
+  {{#each system.resourceOptions.types as |resourceType|}}
+    <option value="{{resourceType}}" {{#if (eq ../system.resources.0.type resourceType)}}selected{{/if}}>
+      {{resourceType}}
+    </option>
+  {{/each}}
+</select>
+</div>
+
+<div class="grid-span-1">
+<label class="resource-label">Mode</label>
+<select name="system.resources.0.mode" id="resource0Mode">
+  <option value="">-- Select a type --</option>
+  {{#each system.resourceOptions.modes as |AddOrBurn|}}
+    <option value="{{AddOrBurn}}" {{#if (eq ../system.resources.0.mode AddOrBurn)}}selected{{/if}}>
+      {{AddOrBurn}}
+    </option>
+  {{/each}}
+</select>
+</div>
+
+<div class="grid-span-1">
+  <label class="resource-label">Amount</label>
+  <input
+    type="text"
+    name="system.resources.0.amount"
+    value="{{system.resources.0.amount}}"
+    data-dtype="Number"
+  />
+</div>
+
+<div class="grid-span-2">
+  <select name="system.resources.1.type" id="resource1Type">
+    <option value="">-- Select a type --</option>
+    {{#each system.resourceOptions.types as |resourceType|}}
+      <option
+        value="{{resourceType}}"
+        {{#if (eq ../system.resources.1.type resourceType)}}selected{{/if}}
+      >
+        {{resourceType}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="grid-span-1">
+  <select name="system.resources.1.mode" id="resource1Mode">
+    <option value="">-- Select a type --</option>
+    {{#each system.resourceOptions.modes as |AddOrBurn|}}
+      <option
+        value="{{AddOrBurn}}"
+        {{#if (eq ../system.resources.1.mode AddOrBurn)}}selected{{/if}}
+      >
+        {{AddOrBurn}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="grid-span-1">
+  <input
+    type="text"
+    name="system.resources.1.amount"
+    value="{{system.resources.1.amount}}"
+    data-dtype="Number"
+  />
+</div>
+
   {{/unless}}
   </div>
 </section>

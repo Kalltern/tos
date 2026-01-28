@@ -323,20 +323,58 @@ export function showSpellSelectionDialogs(actor) {
  * @returns {Promise<boolean>} - True if mana was deducted successfully, false otherwise.
  */
 export async function deductMana(actor, spell) {
-  const spellCost = spell.system.cost || 0;
-  let currentMana = actor.system.stats.mana.value;
+  const updates = {};
 
-  if (currentMana < spellCost) {
-    ui.notifications.warn(
-      `Not enough mana to cast ${spell.name} (Cost: ${spellCost}).`,
-    );
-    return false;
+  const spellCost = Number(spell.system.cost) || 0;
+
+  if (spellCost) {
+    const currentMana = actor.system.stats.mana?.value ?? 0;
+
+    if (currentMana < spellCost) {
+      ui.notifications.warn(
+        `Not enough mana to cast ${spell.name} (Cost: ${spellCost}).`,
+      );
+      return false;
+    }
+
+    updates["system.stats.mana.value"] = Math.max(currentMana - spellCost, 0);
   }
 
-  currentMana -= spellCost;
-  await actor.update({
-    "system.stats.mana.value": currentMana,
-  });
+  const resources = Array.isArray(spell.system.resources)
+    ? spell.system.resources
+    : Object.values(spell.system.resources ?? {});
+
+  for (const res of resources) {
+    const { type, mode, amount } = res ?? {};
+    const amt = Number(amount);
+
+    if (!type || !mode || !amt) continue;
+
+    const statKey = type.toLowerCase();
+    const baseValue =
+      updates[`system.stats.${statKey}.value`] ??
+      actor.system.stats[statKey]?.value ??
+      0;
+
+    let newValue = baseValue;
+
+    if (mode === "drain") {
+      newValue = Math.max(baseValue - amt, 0);
+    }
+
+    if (mode === "add") {
+      newValue = baseValue + amt;
+    }
+
+    updates[`system.stats.${statKey}.value`] = newValue;
+  }
+
+  /* -------- APPLY -------- */
+
+  if (Object.keys(updates).length) {
+    await actor.update(updates);
+  }
+
   return true;
 }
 

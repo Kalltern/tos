@@ -352,20 +352,68 @@ export async function combatAbilities() {
   }
 
   async function deductAbilityCost(actor, ability) {
+    console.log("ABILITY:", ability.name);
+    console.log("RESOURCES RAW:", ability.system.resources);
+    console.log("IS ARRAY:", Array.isArray(ability.system.resources));
+    const updates = {};
     const costType = ability.system.costType;
     const costValue = ability.system.cost;
-    if (!costType || !costValue) return;
 
-    const currentValue = actor.system.stats[costType]?.value ?? 0;
-    const newValue = Math.max(currentValue - costValue, 0);
+    if (costType && costValue) {
+      const currentValue = actor.system.stats[costType]?.value ?? 0;
 
-    await actor.update({
-      [`system.stats.${costType}.value`]: newValue,
-    });
+      if (currentValue < costValue) {
+        ui.notifications.warn(`Not enough ${costType}`);
+        return;
+      }
 
-    ui.notifications.info(
-      `${ability.name} used ${costValue} ${costType}. Remaining: ${newValue}`,
-    );
+      updates[`system.stats.${costType}.value`] = Math.max(
+        currentValue - costValue,
+        0,
+      );
+    }
+
+    const resources = Array.isArray(ability.system.resources)
+      ? ability.system.resources
+      : Object.values(ability.system.resources ?? {});
+    for (const res of resources) {
+      console.log("RESOURCE ENTRY:", res);
+      const { type, mode, amount } = res;
+      console.log("PARSED:", { type, mode, amount });
+      // Skip incomplete rows
+      if (!type || !mode || !amount) continue;
+
+      const statKey = type.toLowerCase();
+      console.log("STAT KEY:", statKey);
+      console.log("STAT EXISTS:", actor.system.stats[statKey]);
+      const currentValue = actor.system.stats[statKey]?.value ?? 0;
+      let newValue = currentValue;
+
+      if (mode === "drain") {
+        newValue = Math.max(currentValue - amount, 0);
+      }
+
+      if (mode === "add") {
+        newValue = currentValue + amount;
+      }
+      console.log(
+        "UPDATING",
+        `system.stats.${statKey}.value`,
+        "FROM",
+        currentValue,
+        "TO",
+        newValue,
+      );
+      updates[`system.stats.${statKey}.value`] = newValue;
+    }
+
+    if (Object.keys(updates).length) {
+      console.log("FINAL UPDATES:", updates);
+      await actor.update(updates);
+      console.log("ACTOR HEALTH AFTER:", actor.system.stats.health.value);
+    }
+
+    ui.notifications.info(`${ability.name} activated`);
   }
 
   async function runAttackMacro(

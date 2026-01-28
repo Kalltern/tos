@@ -774,18 +774,25 @@ export async function getEffectRolls(
   };
 }
 
-export function evaluateDmgVsArmor({ damage, penetration, armor, hp }) {
-  let hpLoss;
-
+export function evaluateDmgVsArmor({ damage, penetration, armor, hp, tempHp }) {
+  let finalDamage;
   if (damage <= penetration) {
-    hpLoss = damage;
+    finalDamage = damage;
   } else {
-    const effectiveDamage = Math.max(damage - armor, 0);
-    hpLoss = effectiveDamage < penetration ? penetration : effectiveDamage;
+    const effective = Math.max(damage - armor, 0);
+    finalDamage = effective < penetration ? penetration : effective;
   }
+
+  const tempHpLoss = Math.min(tempHp, finalDamage);
+  const remainingDamage = finalDamage - tempHpLoss;
+  const hpLoss = Math.min(hp, remainingDamage);
+  const totalHpLoss = hpLoss + tempHpLoss;
 
   return {
     hpLoss,
+    tempHpLoss,
+    totalHpLoss,
     newHp: Math.max(hp - hpLoss, 0),
+    newTempHp: tempHp - tempHpLoss,
   };
 }

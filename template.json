@@ -68,8 +68,7 @@
           "min": 0,
           "base": 20,
           "max": 20,
-          "bonus": 0,
-          "temporary": 0
+          "bonus": 0
         },
         "graveWounds": {
           "value": 0,
@@ -136,6 +135,12 @@
           "bonus": 0,
           "cast": 0,
           "power": 0
+        },
+        "temporaryHealth": {
+          "value": 0,
+          "min": 0,
+          "max": 10,
+          "bonus": 0
         }
       },
       "effects": {
@@ -864,6 +869,12 @@
           "max": 900,
           "bonus": 0,
           "power": 0
+        },
+        "temporaryHealth": {
+          "value": 0,
+          "min": 0,
+          "max": 10,
+          "bonus": 0
         }
       },
       "attributes": {
@@ -1159,6 +1170,17 @@
       "effectOptions": ["and", "or"],
       "effectTypes": [],
       "classOptions": ["movement", "attack", "defense"],
+      "resources": [
+        {
+          "mode": "",
+          "amount": 0,
+          "type": ""
+        }
+      ],
+      "resourceOptions": {
+        "modes": ["add", "drain"],
+        "types": []
+      },
       "testOptions": [
         "Strength",
         "Dexterity",
@@ -1246,6 +1268,17 @@
         "Charisma",
         "Perception"
       ],
+      "resources": [
+        {
+          "mode": "",
+          "amount": 0,
+          "type": ""
+        }
+      ],
+      "resourceOptions": {
+        "modes": ["add", "burn"],
+        "types": [""]
+      },
       "isOffensive": true,
       "difficulty": 0,
       "cost": 0,

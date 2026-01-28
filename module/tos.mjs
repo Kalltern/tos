@@ -103,12 +103,6 @@ Hooks.once("init", function () {
    * @type {String}
    */
 
-  /*CONFIG.Combat.initiative = {
-    formula:
-      "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total",
-    decimals: 0,
-  };
-*/
   // Define custom Document classes
   CONFIG.Actor.documentClass = ToSActor;
   CONFIG.Item.documentClass = ToSItem;
@@ -660,7 +654,7 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
 
   const attack = message.flags.attack;
   const scene = game.scenes.get(sceneId);
-
+  const combat = game.combat;
   for (const tokenId of targetIds) {
     const tokenDoc = scene.tokens.get(tokenId);
     if (!tokenDoc) {
@@ -672,6 +666,10 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
     if (!actor) continue;
 
     const currentHp = getProperty(actor, "system.stats.health.value");
+    const currentTemporaryHp = getProperty(
+      actor,
+      "system.stats.temporaryHealth.value",
+    );
     const armorTotal = getProperty(actor, "system.armor.total") || 0;
 
     const result = evaluateDmgVsArmor({
@@ -679,15 +677,30 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
       penetration: attack[mode].penetration ?? 0,
       armor: armorTotal,
       hp: currentHp,
+      tempHp: currentTemporaryHp,
     });
 
+    const author =
+      message.user ??
+      game.users.get(message.userId) ??
+      game.users.get(message.author);
+    const authorIsGM = author?.isGM;
+
+    if (game.user.isGM && !authorIsGM) {
+      ui.notifications.info(
+        `${author.name} applied ${healthLost} damage to ${actor.name}`,
+      );
+    }
     console.log(
-      `GM: Applying ${result.hpLoss} damage to ${actor.name}. New HP: ${result.newHp}`,
+      `GM: Applying ${result.totalHpLoss} damage to ${actor.name}. New HP: ${result.newHp}`,
     );
 
     await actor.update({
+      "system.stats.temporaryHealth.value": Number(result.newTempHp),
       "system.stats.health.value": Number(result.newHp),
     });
+    const combatant = combat?.combatants.find((c) => c.tokenId === tokenDoc.id);
+    await handlePostDamageStatus({ actor, combatant });
   }
 }
 
@@ -707,12 +720,13 @@ function openDamageSelectionDialog(message, targets) {
           penetration: attack[mode].penetration ?? 0,
           armor: t.actor.system.armor.total,
           hp: t.actor.system.stats.health.value,
+          tempHp: t.actor.system.stats.temporaryHealth.value,
         });
 
         return `
         <li>
           ${t.name} →
-          <strong>${result.hpLoss} HP</strong>
+          <strong>${result.totalHpLoss} HP</strong>
         </li>`;
       })
       .join("");
@@ -757,6 +771,34 @@ function openDamageSelectionDialog(message, targets) {
   }).render(true);
 }
 
+async function handlePostDamageStatus({ actor, combatant }) {
+  console.log("Actor", actor);
+  console.log("combatant", combatant);
+  const hp = actor.system.stats.health.value;
+  if (hp > 0) return;
+
+  // Characters fall prone
+  if (actor.type === "character") {
+    if (!actor.statuses.has("prone")) {
+      await actor.toggleStatusEffect("prone", { active: true });
+    }
+    return;
+  }
+
+  // NPCs die
+  if (!actor.statuses.has("dead")) {
+    await actor.toggleStatusEffect("dead", {
+      active: true,
+      overlay: true,
+    });
+  }
+
+  // Remove from combat if applicable
+  if (combatant) {
+    await combatant.parent.deleteEmbeddedDocuments("Combatant", [combatant.id]);
+  }
+}
+
 Hooks.on("renderChatMessage", (message, html, data) => {
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
@@ -790,6 +832,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
         await handleApplyDamage(message.id);
       });
     }
+
     // Add logic to check if the message is a roll message and create a reroll button
     if (message.content.includes("rolled") || message.rolls.length > 0) {
       const rerollButton = $('<button class="reroll-button">Re-Roll</button>');

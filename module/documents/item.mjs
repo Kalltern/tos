@@ -10,6 +10,7 @@ export class ToSItem extends Item {
     super.prepareData();
 
     // Only initialize effectTypes for relevant items (e.g., spells, consumables)
+
     if (
       this.type === "spell" ||
       this.type === "ability" ||
@@ -44,6 +45,13 @@ export class ToSItem extends Item {
         "Weakened",
         "Wet",
       ];
+
+      if (this.type === "spell" || this.type === "ability") {
+        this.system.resourceOptions = {
+          modes: ["add", "drain"],
+          types: ["Health", "Stamina", "Mana", "Toxicity"],
+        };
+      }
     }
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;

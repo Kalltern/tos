@@ -5,7 +5,7 @@
 export class ToSCombat extends Combat {
   async rollInitiative(
     ids,
-    { formula = null, updateTurn = true, messageOptions = {} } = {}
+    { formula = null, updateTurn = true, messageOptions = {} } = {},
   ) {
     console.log("Rolling initiative for IDs:", ids);
 
@@ -27,6 +27,8 @@ export class ToSCombat extends Combat {
           ? "1d12 + @secondaryAttributes.ini.value"
           : "1d12 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total";
 
+      // "2d12kh1 + @secondaryAttributes.ini.total + @secondaryAttributes.spd.total"; for 7 level rogues
+
       const roll = new Roll(rollFormula, actor.getRollData());
       await roll.evaluate();
 
@@ -44,7 +46,7 @@ export class ToSCombat extends Combat {
           }),
           flags: { "core.initiativeRoll": true },
         },
-        messageOptions
+        messageOptions,
       );
 
       const chatData = await roll.toMessage(messageData, { create: false });
@@ -52,8 +54,8 @@ export class ToSCombat extends Combat {
         "rollMode" in messageOptions
           ? messageOptions.rollMode
           : combatant.hidden
-          ? CONST.DICE_ROLL_MODES.PRIVATE
-          : chatRollMode;
+            ? CONST.DICE_ROLL_MODES.PRIVATE
+            : chatRollMode;
 
       if (i > 0) chatData.sound = null;
       messages.push(chatData);
