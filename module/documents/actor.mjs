@@ -16,6 +16,10 @@ export class ToSActor extends Actor {
   prepareBaseData() {
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
+    const system = this.system;
+
+    system.globalBonus ??= 0;
+    system.globalPenalty ??= 0;
   }
 
   /**
@@ -27,11 +31,31 @@ export class ToSActor extends Actor {
    * available both inside and outside of character sheets (such as if an actor
    * is queried and has a roll executed directly from it).
    */
+  _prepareGlobalMod() {
+    const system = this.system;
 
+    system.globalMod = 0;
+    // Grave wounds
+    const gw = system.stats?.graveWounds ?? {};
+    const graveWounds = 5 * (gw.value ?? 0) - 3 * (gw.treated ?? 0);
+    if (graveWounds > 0) {
+      system.globalMod -= graveWounds;
+    }
+
+    // Fatigue
+    const fatigue = system.stats?.fatigue?.value ?? 0;
+    if (fatigue >= 3) {
+      system.globalMod -= 10;
+    }
+    system.globalMod += system.globalBonus ?? 0;
+    system.globalMod -= system.globalPenalty ?? 0;
+  }
   prepareDerivedData() {
     const actorData = this;
     const systemData = actorData.system;
     const tempHp = systemData.stats.temporaryHealth;
+    // Reset global penalties
+
     tempHp.value = Number(tempHp.value) || 0;
     tempHp.max = Number(tempHp.max) || 0;
 
@@ -85,6 +109,8 @@ export class ToSActor extends Actor {
         systemData.dodgePenalty += item.system.perPenalty ?? 0;
       }
     }
+
+    this._prepareGlobalMod();
     // Make separate methods for each Actor type (character, npc, etc.) to keep
     // things organized.
     this._prepareCharacterData(actorData);
@@ -133,10 +159,9 @@ export class ToSActor extends Actor {
     const hasFinesse = systemData.finesse;
     const rangeddef = systemData.combatSkills.rangedDefense;
     const stat = systemData.stats;
+    const globalMod = systemData.globalMod;
     const visage = systemData.secondaryAttributes.vis.total;
     const sin = systemData.secondaryAttributes.sin.total;
-    const graveWounds =
-      5 * stat.graveWounds.value - 3 * stat.graveWounds.treated;
     const archery = systemData.combatSkills.archery;
     const combat = systemData.combatSkills.combat;
     const melee = combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
@@ -157,35 +182,35 @@ export class ToSActor extends Actor {
           skill.swimming +=
             skillset1[skill.value] +
             attributeScore[skill.id].total * 3 +
-            skill.bonus -
-            graveWounds;
+            skill.bonus +
+            globalMod;
         }
 
         skill.rating =
           skillset1[skill.value] +
           attributeScore[skill.id].total * 3 +
-          skill.bonus -
-          graveWounds;
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 2) {
         skill.rating = skillset2[skill.value];
       } else if (skill.type === 3) {
         skill.rating =
           skillset3[skill.value] +
           attributeScore[skill.id].total * 3 +
-          skill.bonus -
-          graveWounds;
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 4) {
         skill.rating =
           skillset4[skill.value] +
           attributeScore[skill.id].total * 3 +
-          skill.bonus -
-          graveWounds;
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 5) {
         skill.rating =
           skillset5[skill.value] +
           attributeScore[skill.id].total * 3 +
-          skill.bonus -
-          graveWounds;
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 6) {
         if (key === "deception") {
           skill.rating =
@@ -193,8 +218,8 @@ export class ToSActor extends Actor {
             attributeScore[skill.id].total * 5 +
             attributeScore[3].total * 3 +
             visage +
-            skill.bonus -
-            graveWounds;
+            skill.bonus +
+            globalMod;
         }
         if (key === "intimidation") {
           skill.rating =
@@ -202,8 +227,8 @@ export class ToSActor extends Actor {
             attributeScore[skill.id].total * 5 +
             attributeScore[0].total * 3 +
             -Math.min(0, visage * 2) +
-            skill.bonus -
-            graveWounds;
+            skill.bonus +
+            globalMod;
         }
         if (key === "persuasion") {
           skill.rating =
@@ -211,8 +236,8 @@ export class ToSActor extends Actor {
             attributeScore[skill.id].total * 5 +
             attributeScore[4].total * 3 +
             visage +
-            skill.bonus -
-            graveWounds;
+            skill.bonus +
+            globalMod;
         }
         if (key === "seduction") {
           skill.rating =
@@ -220,34 +245,38 @@ export class ToSActor extends Actor {
             attributeScore[skill.id].total * 5 +
             Math.max(attributeScore[6].total, visage) * 3 +
             sin +
-            skill.bonus -
-            graveWounds;
+            skill.bonus +
+            globalMod;
         }
         if (key === "insight") {
           skill.rating =
             skillset6[skill.value] +
             attributeScore[skill.id].total * 5 +
             attributeScore[5].total * 4 +
-            skill.bonus -
-            graveWounds;
+            skill.bonus +
+            globalMod;
         }
       } else if (skill.type === 7) {
         skill.rating =
           skillset7[skill.value] +
           attributeScore[skill.id].total * 3 +
-          skill.bonus -
-          graveWounds;
+          skill.bonus +
+          globalMod;
       }
     }
     // Calculate the attribute rating using ToS rules. Rework calculations for stun effects
     for (let [key, attribute] of Object.entries(systemData.attributes)) {
       attribute.mod = Math.floor(
-        15 + attribute.modBonus + (attribute.bonus + attribute.value) * 10,
+        15 +
+          attribute.modBonus +
+          (systemData.globalMod ?? 0) +
+          (attribute.bonus + attribute.value) * 10,
       );
       if (key === "str") {
         attribute.mod = Math.floor(
           15 +
             attribute.modBonus +
+            (systemData.globalMod ?? 0) +
             systemData.skills.muscles.rating +
             (attribute.bonus + attribute.value) * 10,
         );
@@ -256,6 +285,7 @@ export class ToSActor extends Actor {
         attribute.mod = Math.floor(
           15 +
             attribute.modBonus +
+            (systemData.globalMod ?? 0) +
             systemData.skills.nimbleness.rating +
             (attribute.bonus + attribute.value) * 10,
         );
@@ -274,14 +304,14 @@ export class ToSActor extends Actor {
             combat.finesseRating =
               rangerGroup[ranger] +
               attributeScore[1].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else {
             combat.finesseRating =
               combatset1[melee] +
               attributeScore[1].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           }
         }
         if (combatSkill === combat) {
@@ -290,14 +320,14 @@ export class ToSActor extends Actor {
             combatSkill.rating =
               rangerGroup[ranger] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else {
             combatSkill.rating =
               combatset1[melee] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           }
         }
         if (combatSkill === rangeddef) {
@@ -305,20 +335,20 @@ export class ToSActor extends Actor {
             combatSkill.rating =
               rangedDefenseSet[archery.value] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else if (ranger > 0) {
             combatSkill.rating =
               rangedDefenseSet[ranger] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else {
             combatSkill.rating =
               rangedDefenseSet[melee] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           }
         }
 
@@ -327,14 +357,14 @@ export class ToSActor extends Actor {
             archery.rating =
               combatset1[ranger] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else {
             archery.rating =
               combatset1[archery.value] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           }
         }
 
@@ -345,28 +375,28 @@ export class ToSActor extends Actor {
             combatSkill.rating =
               combatset1[melee] +
               attributeScore[0].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           }
           // Check if the actor has predatorySenses enabled
           else if (systemData.predatorySenses) {
             combatSkill.rating =
               rangerGroup[ranger] +
               attributeScore[6].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else if (ranger > 0) {
             combatSkill.rating =
               rangerGroup[ranger] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           } else {
             combatSkill.rating =
               combatset1[melee] +
               attributeScore[combatSkill.id].total * 3 +
-              combatSkill.bonus -
-              graveWounds;
+              combatSkill.bonus +
+              globalMod;
           }
         }
       }
@@ -375,28 +405,28 @@ export class ToSActor extends Actor {
         combatSkill.rating =
           dodge[systemData.skills.acrobacy.value] +
           attributeScore[combatSkill.id].total * 3 +
-          combatSkill.bonus -
-          graveWounds;
+          combatSkill.bonus +
+          globalMod;
       }
       if (combatSkill.type === 2) {
         if (ranger > 0) {
           combatSkill.rating =
             combatset1[ranger] +
             attributeScore[combatSkill.id].total * 3 +
-            combatSkill.bonus -
-            graveWounds;
+            combatSkill.bonus +
+            globalMod;
         } else if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
           combatSkill.finesseRating =
             meleeOrRanged +
             attributeScore[1].total * 3 +
-            combatSkill.bonus -
-            graveWounds;
+            combatSkill.bonus +
+            globalMod;
         } else {
           combatSkill.rating =
             meleeOrRanged +
             attributeScore[combatSkill.id].total * 3 +
-            combatSkill.bonus -
-            graveWounds;
+            combatSkill.bonus +
+            globalMod;
         }
       }
       if (combatSkill.type === 3) {
@@ -404,14 +434,14 @@ export class ToSActor extends Actor {
           combatSkill.rating =
             channeling2[combatSkill.value] +
             attributeScore[combatSkill.id].total * 3 +
-            combatSkill.bonus -
-            graveWounds;
+            combatSkill.bonus +
+            globalMod;
         } else {
           combatSkill.rating =
             channeling1[combatSkill.value] +
             attributeScore[combatSkill.id].total * 3 +
-            combatSkill.bonus -
-            graveWounds;
+            combatSkill.bonus +
+            globalMod;
         }
       }
     }
@@ -421,26 +451,26 @@ export class ToSActor extends Actor {
       brawler.rating =
         skillset1[brawler.value] +
         attributeScore[1].total * 3 +
-        brawler.bonus -
-        graveWounds;
+        brawler.bonus +
+        globalMod;
       if (skillset1[brawler.value] < rangedDefenseSet[melee]) {
         rangedDefenseSet[melee] +
           attributeScore[1].total * 3 +
-          brawler.bonus -
-          graveWounds;
+          brawler.bonus +
+          globalMod;
       }
     } else {
       brawler.rating =
         skillset1[brawler.value] +
         attributeScore[0].total * 3 +
-        brawler.bonus -
-        graveWounds;
+        brawler.bonus +
+        globalMod;
       if (skillset1[brawler.value] < rangedDefenseSet[melee]) {
         brawler.rating =
           rangedDefenseSet[melee] +
           attributeScore[0].total * 3 +
-          brawler.bonus -
-          graveWounds;
+          brawler.bonus +
+          globalMod;
       }
     }
 
@@ -485,7 +515,7 @@ export class ToSActor extends Actor {
       secAttribute.res.value +
       secAttribute.res.bonus;
 
-    // Calculate wounds
+    // Calculate wounds cap
     const calcWounds = [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2];
     stat.graveWounds.max =
       calcWounds[end] + stat.graveWounds.base + stat.graveWounds.bonus;
@@ -776,7 +806,15 @@ export class ToSActor extends Actor {
     const systemData = actorData.system;
     // Make modifications to data here. For example:
     for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
-      combatSkill.rating = combatSkill.value + combatSkill.bonus;
+      combatSkill.rating =
+        combatSkill.value + combatSkill.bonus + systemData.globalMod;
+    }
+
+    for (let [key, attribute] of Object.entries(systemData.attributes)) {
+      attribute.mod =
+        (attribute.value ?? 0) +
+        (attribute.modBonus ?? 0) +
+        (systemData.globalMod ?? 0);
     }
 
     const hp = systemData.stats.health;
@@ -829,6 +867,23 @@ export class ToSActor extends Actor {
     // Store thresholds in actor data if needed
     actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
     actorData.criticalFailureThreshold = this.criticalFailureThreshold;
+
+    systemData.stats.health.value = Math.min(
+      systemData.stats.health.value,
+      systemData.stats.health.max,
+    );
+    systemData.stats.stamina.value = Math.min(
+      systemData.stats.stamina.value,
+      systemData.stats.stamina.max,
+    );
+    systemData.stats.toxicity.value = Math.min(
+      systemData.stats.toxicity.value,
+      systemData.stats.toxicity.max,
+    );
+    systemData.stats.mana.value = Math.min(
+      systemData.stats.mana.value,
+      systemData.stats.mana.max,
+    );
   }
 
   /**

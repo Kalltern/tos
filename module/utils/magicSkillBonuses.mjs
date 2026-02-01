@@ -532,6 +532,7 @@ export async function finalizeRollsAndPostChat(
     perception: "per",
   };
   let concatRollAndDescription = spell.system.description;
+  console.log(`Spell Description:`, concatRollAndDescription);
   let attributeTestRoll = null;
   if (
     spellAttributeTestName &&
@@ -656,39 +657,93 @@ export async function finalizeRollsAndPostChat(
     attackRoll.total + (actor.system.combatSkills.channeling.attack || 0);
   const rawTemplate = concatRollAndDescription;
   const compiled = Handlebars.compile(rawTemplate);
+  console.log(`rawTemplate`, rawTemplate);
+  console.log(`compiled`, compiled);
   const renderedDescription = compiled(rollData);
+  const tags = rollData.difficulty
+    ? `<span class="action-tag difficulty ">Difficulty ${rollData.difficulty} </span>
+      <span class="action-tag range ">Range ${spell.system.range} </span>
+      <span class="action-tag range ">${spell.system.spellClass} Spell</span>`
+    : "";
+  const dmgtypes = (() => {
+    const hasType =
+      spell.system.dmgType1 ||
+      spell.system.dmgType2 ||
+      spell.system.dmgType3 ||
+      spell.system.dmgType4;
+
+    if (!hasType) return "";
+
+    const parts = [
+      spell.system.dmgType1,
+      spell.system.bool2,
+      spell.system.dmgType2,
+      spell.system.bool3,
+      spell.system.dmgType3,
+      spell.system.bool4,
+      spell.system.dmgType4,
+    ].filter(Boolean);
+
+    return `
+    <tr><td>Damage types:</td></tr>
+    <tr><td>${parts.join(" ")}</td></tr>
+  `;
+  })();
   let rollName = spell.name;
-  const penetration =
-    spell.system.penetration > 0
-      ? `<table style="width: 100%; text-align: center; font-size: 15px;"><tr><th>Penetration</th><th>Critical Score</th></tr><tr><td>${spell.system.penetration}</td><td>${critScore} (D20: ${critScoreResult})</td></tr></tr></table><hr>`
-      : `<table style="width: 100%; text-align: center; font-size: 15px;"><tr><th>Critical Score</th></tr><tr><td>${critScore} (D20: ${critScoreResult})</td></tr></table><hr>`;
+  const hasEffects = effectsRollResults.trim().length > 0;
+  const effectsTable = hasEffects
+    ? `
+  <table style="width: 100%; text-align: center; font-size: 15px;">
+    <tr><th>Effects</th></tr>
+    <tr><td>${effectsRollResults}</td></tr>
+  </table>
+  <hr>
+  `
+    : "";
+
+  const hasPenetration = spell.system.penetration > 0;
+  const hasCrit = critSuccess === true;
+  const showTable = hasPenetration || hasCrit;
+  const headers = [
+    hasPenetration ? "<th>Penetration</th>" : "",
+    hasCrit ? "<th>Critical Score</th>" : "",
+  ].join("");
+  const values = [
+    hasPenetration ? `<td>${spell.system.penetration}</td>` : "",
+    hasCrit ? `<td>${critScore} (D20: ${critScoreResult})</td>` : "",
+  ].join("");
+  const critPenTable = showTable
+    ? `
+<table style="width: 100%; text-align: center; font-size: 15px;">
+  <tr>${headers}</tr>
+  <tr>${values}</tr>
+</table>
+<hr>
+`
+    : "";
+
+  const rolls = [attackRoll];
+
+  if (
+    damageRoll instanceof Roll &&
+    damageRoll.formula.replace(/\s+/g, "") !== "0d0"
+  ) {
+    rolls.push(damageRoll);
+  }
 
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker(),
-    rolls: [attackRoll, damageRoll],
+    rolls: rolls,
     flavor: `
-        <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
+          <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
             <img src="${spell.img}" title="${
               spell.name
             }" width="36" height="36">
             <span>${spell.name}</span>
         </div>
+        ${tags}
         <hr>
         <table style="width: 100%; text-align: center;font-size: 15px;">
-            <tr><th>Description:</th></tr>
-            <tr><td>|${spell.system.spellClass} spell|<br>
-                Difficulty:${rollData.difficulty}<br>${renderedDescription}</td>
-            </tr>
-            <tr><td>Magic attack: ${attack} Range: ${
-              spell.system.range
-            }</td></tr>
-            <tr><td>Damage types:</td></tr>
-            <tr><td>${spell.system.dmgType1} ${spell.system.bool2}
-                ${spell.system.dmgType2} ${spell.system.bool3}
-                ${spell.system.dmgType3} ${spell.system.bool4}
-                ${spell.system.dmgType4}</td></tr>
-        </table>
-        <hr>
         <p style="text-align: center; font-size: 20px;"><b>
             ${
               critSuccess
@@ -698,17 +753,21 @@ export async function finalizeRollsAndPostChat(
                   : ""
             }
         </b></p>
+            <tr><th>Description:</th></tr>
+            <tr><td><br>${renderedDescription}</td></tr>
+            <tr><td>Magic attack: ${attack}</td></tr>
+            ${dmgtypes}
+        </table>
+        <hr>
+
         <table style="width: 100%; text-align: center;font-size: 15px;">
             <tr><th>Normal</th><th>Crit</th></tr>
             <tr><td>${damageTotal}</td><td>${critDamageTotal}</td></tr>
         </table>
         <hr>
-        ${penetration}
-        <table style="width: 100%; text-align: center;font-size: 15px;">
-            <tr><th>Effects</th></tr>
-            <tr><td>${effectsRollResults}</td></tr>
-        </table>
-        <hr>`,
+        ${critPenTable}
+        ${effectsTable}
+        `,
     flags: {
       tos: {
         rollName,
@@ -721,7 +780,7 @@ export async function finalizeRollsAndPostChat(
         type: "attack",
         normal: {
           damage: damageTotal,
-          penetration: penetration,
+          penetration: spell.system.penetration,
         },
 
         critical: {

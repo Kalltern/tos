@@ -881,37 +881,44 @@
         "str": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         },
         "dex": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         },
         "end": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         },
         "int": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         },
         "wil": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         },
         "cha": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         },
         "per": {
           "value": 50,
           "critbonus": 0,
-          "critfailpenalty": 0
+          "critfailpenalty": 0,
+          "modBonus": 0
         }
       },
       "secondaryAttributes": {

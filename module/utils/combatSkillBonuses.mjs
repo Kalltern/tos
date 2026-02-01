@@ -745,7 +745,9 @@ export async function getEffectRolls(
     if (sharpBleedRoll.total <= bleedChance) sharpStacks++;
     totalBleeds += sharpStacks;
     sharpBleedRolls.push(sharpBleedRoll.total);
-  } // --- 5. Combine All Bleed Rolls and Final Return ---
+  }
+
+  // --- 5. Combine All Bleed Rolls and Final Return ---
 
   const abilityBleed = abilityEffects["bleed"] || 0;
   let bleedChanceDisplay;
