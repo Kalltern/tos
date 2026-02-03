@@ -10,4 +10,5 @@ npm-debug.log
 *.lock
 jsconfig.json
 foundry
-/packs/quickplay-spells*
+/packs/quickplay-spells
+
