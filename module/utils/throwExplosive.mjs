@@ -96,6 +96,56 @@ export async function throwExplosive() {
     await damageRoll.evaluate();
     const damageTotal = Math.floor(damageRoll.total);
 
+    const damageLine = `
+<div style="
+  display:grid;
+  column-gap: 24px;
+  font-size:16px;
+  max-width: fit-content;
+  margin: 0 auto;
+">
+
+  <div style="
+    display:grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+  ">
+    <div>Damage:</div>
+    <div style="text-align:center;">
+      ${damageTotal}
+    </div>
+
+    <div>Penetration:</div>
+    <div style="text-align:center;">
+      ${consumable.system.penetration}
+    </div>
+
+<div></div>
+</div>
+`;
+    const attackHTML = await attackRoll.render();
+    const damageHTML = await damageRoll.render();
+    const content = `
+<div class="${damageHTML ? "dual-roll" : "single-roll"}">
+
+  <div class="roll-column">
+    <div class="roll-label">Margin of Success</div>
+    ${attackHTML}
+  </div>
+
+  ${
+    damageHTML
+      ? `
+  <div class="roll-column">
+    <div class="roll-label">Damage Roll</div>
+    ${damageHTML}
+  </div>
+  `
+      : ""
+  }
+
+</div>
+`;
     const effectResults = await applyConsumableEffects(consumable);
     const rollName = `Threw ${consumable.name}`;
     const flavor = `
@@ -111,21 +161,24 @@ export async function throwExplosive() {
         ? "Critical Success!"
         : critFailure
           ? "Critical Failure!"
-          : "Damage"
+          : ""
       : ""
   }
 </b></p>
-
+${damageLine}
+<hr>
 <table style="width:100%; text-align:center; font-size:15px;">
   <tr>
     <th>Explosive Effects</th>
     <td>${effectResults}</td>
   </tr>
 </table>
+<hr>
 `;
 
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker(),
+      content,
       rolls: attackRoll ? [attackRoll, damageRoll] : [damageRoll],
       flavor,
 

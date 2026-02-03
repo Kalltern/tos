@@ -375,6 +375,7 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
           <img src="${weapon.img}" width="36" height="36">
           <span>${rollName}</span>
         </div>
+        <hr>
         <p style="text-align:center;font-size:20px;"><b>
           ${
             critSuccess
@@ -384,8 +385,7 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
                 : ""
           }
         </b></p>
-        ${armorTable}
-        <hr>
+        ${armorTable}        
       `,
       flags: {
         tos: {

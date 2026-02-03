@@ -115,23 +115,57 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   static _buildSpellTooltip(spell) {
     const data = spell.getTooltipData();
 
-    return `
-    <strong>${data.name}</strong>
-    <hr>
+    const dmgTypes = [
+      { type: data.dmgType1, flag: data.bool2 },
+      { type: data.dmgType2, flag: data.bool3 },
+      { type: data.dmgType3, flag: data.bool4 },
+      { type: data.dmgType4 },
+    ];
+
+    const effects = [
+      { type: data.effectType1, extra: data.effects.extra1 },
+      { type: data.effectType2, extra: data.effects.extra2 },
+      { type: data.effectType3, extra: data.effects.extra3 },
+    ];
+    const validDamageTypes = dmgTypes.filter((element) => element.type);
+    const validEffectTypes = effects.filter((element) => element.type);
+    const damageHTML = validDamageTypes
+      .map((element) => {
+        return `
+      ${element.type}${element.flag ? " " + element.flag : ""}
+    `;
+      })
+      .join("");
+
+    const effectHTML = validEffectTypes
+      .map((element) => {
+        return `
+      ${element.type}${element.extra ? " " + element.extra + "%" : ""}
+    `;
+      })
+      .join("");
+    const damageSection = damageHTML
+      ? `
+    <hr>      
     <tr><td>Damage types:</td></tr>
     <tr><td>
-    ${data.dmgType1} ${data.bool2}
-    ${data.dmgType2} ${data.bool3}
-    ${data.dmgType3} ${data.bool4}
-    ${data.dmgType4}
-    </td></tr>
-    <hr>
+    ${damageHTML}
+    </td></tr>`
+      : "";
+    const effectSection = effectHTML
+      ? `
+    <hr>      
     <tr><td>Effect types:</td></tr>
     <tr><td>
-    ${data.effectType1} ${data.effects.extra1}
-    ${data.effectType2} ${data.effects.extra2}
-    ${data.effectType3} ${data.effects.extra3}
-    </td></tr>
+    ${effectHTML}
+    </td></tr>`
+      : "";
+
+    return `
+    <strong>${data.name}</strong>
+    
+    ${damageSection}
+    ${effectSection}
     <hr>
     <div><b>Difficulty:</b> ${data.difficulty}</div>
     <div><b>Cost:</b> ${data.cost}${data.perRound ? ` / ${data.perRound}` : ""}</div>
@@ -294,6 +328,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       case "skills":
       case "abilities":
       case "spells":
+        context.tab = context.tabs[partId];
+        context.activeSpellSubtab = this.tabGroups["spells-subtabs"] ?? null;
       case "miracles":
       case "inventory":
       case "config":
@@ -338,10 +374,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // If you have sub-tabs this is necessary to change
     const tabGroup = "primary";
     const tabSpellGroup = "spells-subtabs";
-
     // Default tab for first time it's rendered this session
     if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = "biography";
-    if (!this.tabGroups[tabSpellGroup]) this.tabGroups[tabSpellGroup] = "fire";
     return parts.reduce((tabs, partId) => {
       const tab = {
         cssClass: "",
@@ -452,7 +486,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.group = tabSpellGroup;
           break;
       }
-      if (this.tabGroups[tab.group] === tab.id) tab.cssClass = "active";
+      if (this.tabGroups[tab.group] === tab.id) {
+        tab.cssClass = `${tab.cssClass} active`.trim();
+      }
+
       tabs[partId] = tab;
       return tabs;
     }, {});
@@ -535,6 +572,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    * @override
    */
   _onRender(context, options) {
+    super._onRender?.(context, options);
+
     this.#dragDrop.forEach((d) => d.bind(this.element));
     this.#disableOverrides();
     // You may want to add other special handling here

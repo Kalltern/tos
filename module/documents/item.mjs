@@ -128,6 +128,41 @@ export class ToSItem extends Item {
 
       // Potentially possible to add roll.total and roll.toMessage
     }
+
+    if (this.type === "ability") {
+      this._prepareAbilityRollData();
+    }
+  }
+
+  _prepareAbilityRollData() {
+    const raw = this.system.roll?.diceBonus;
+
+    const parsed = this._parseAbilityDiceBonus(raw);
+
+    // Roll-safe value
+    this.system.roll.diceBonusFormula = parsed.formula;
+
+    // Semantic flags
+    this.system.roll.halfDamage = parsed.half;
+  }
+
+  _parseAbilityDiceBonus(input) {
+    if (!input) {
+      return { formula: "", half: false };
+    }
+
+    let half = false;
+    let formula = input;
+
+    if (typeof formula === "string" && formula.includes("@Half")) {
+      half = true;
+      formula = formula.replace("@Half", "");
+    }
+
+    return {
+      formula: formula.trim(),
+      half,
+    };
   }
 
   /**

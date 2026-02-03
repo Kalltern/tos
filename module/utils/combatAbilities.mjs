@@ -205,7 +205,8 @@ export async function combatAbilities() {
         // defenseRoll function
         await game.tos.defenseRoll({ actor, weapon, ability });
       } else {
-        const abilityDamage = ability.system.roll.diceBonus || 0;
+        const abilityDamage = ability.system.roll.diceBonusFormula || 0;
+        const halfDamage = ability.system.roll.halfDamage;
         const abilityAttack = ability.system.attack || 0;
         const abilityBreakthrough = ability.system.breakthrough || 0;
         const abilityPenetration = ability.system.penetration || 0;
@@ -228,6 +229,7 @@ export async function combatAbilities() {
           abilityCritRange,
           abilityCritChance,
           abilityCritFail,
+          halfDamage,
         );
       }
     };
@@ -429,6 +431,7 @@ export async function combatAbilities() {
     abilityCritRange,
     abilityCritChance,
     abilityCritFail,
+    halfDamage,
   ) {
     let {
       doctrineBonus,
@@ -621,16 +624,19 @@ export async function combatAbilities() {
           normal: {
             damage: damageTotal,
             penetration: penetration,
+            halfDamage: ability?.system?.roll?.halfDamage ?? false,
           },
 
           critical: {
             damage: critDamageTotal,
             penetration: critBonusPenetration,
+            halfDamage: ability?.system?.roll?.halfDamage ?? false,
           },
 
           breakthrough: {
             damage: breakthroughRollResult,
             penetration: penetration,
+            halfDamage: ability?.system?.roll?.halfDamage ?? false,
           },
         },
       },

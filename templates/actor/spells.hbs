@@ -45,25 +45,33 @@
   </div>
 
   <!-- Sub-tab navigation -->
-  <nav class="tabs" data-group="spells-subtabs" data-action="tab">
-    {{#each (groupBySchool spells) as |group|}}
-      <a
-        class="item {{#if @first}}active{{/if}}"
-        data-group="spells-subtabs"
-        data-tab="{{group.school}}"
-        data-action="tab"
-      >
-        {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}
-      </a>
-    {{/each}}
-  </nav>
+<nav class="tabs" data-group="spells-subtabs" data-action="tab">
+  {{#each (groupBySchool spells) as |group index|}}
+    <a
+      class="item
+        {{#if (or
+          (eq group.school ../activeSpellSubtab)
+          (and (eq index 0) (not ../activeSpellSubtab))
+        )}}active{{/if}}"
+      data-group="spells-subtabs"
+      data-tab="{{group.school}}"
+    >
+      {{localize (concat "TOS.Actor.Character.schools." group.school ".label")}}
+    </a>
+  {{/each}}
+</nav>
 
- {{#each (groupBySchool spells) as |group index|}}
-  <section
-    class="tab {{group.school}} {{#if (eq index 0)}}active{{/if}}"
-    data-group="spells-subtabs"
-    data-tab="{{group.school}}"
-  >
+
+{{#each (groupBySchool spells) as |group index|}}
+<section
+  class="tab {{group.school}}
+    {{#if (or
+      (eq group.school ../activeSpellSubtab)
+      (and (eq index 0) (not ../activeSpellSubtab))
+    )}}active{{/if}}"
+  data-group="spells-subtabs"
+  data-tab="{{group.school}}"
+>
 
     {{!-- Group spells by rank within this school --}}
     {{#each (groupByRank group.spells) as |rankGroup|}}

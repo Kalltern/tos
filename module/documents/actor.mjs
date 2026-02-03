@@ -560,6 +560,9 @@ export class ToSActor extends Actor {
     stat.mind.max = wil + stat.mind.bonus + stat.mind.base;
     stat.insanity.max = wil + stat.insanity.bonus + stat.insanity.base;
 
+    // Calculate trap detection skill
+    systemData.detection = per + systemData.skills.traps.value * 2;
+
     // Calculate Health, systemData.healthBonus comes from Armor
     systemData.stats.health.max =
       end * attribute.end.rank + stat.health.base + stat.health.bonus + str;

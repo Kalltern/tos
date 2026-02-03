@@ -105,45 +105,107 @@ export async function rangedAttack() {
         critSuccess,
       );
 
+    const damageLine = `
+<div style="
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  font-size:16px;
+  max-width: fit-content;
+  margin: 0 auto;
+" class="combat-grid">
+
+  <!-- LEFT COLUMN : Normal -->
+  <div style="
+    display:grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+  ">
+    <div>Damage:</div>
+    <div style="text-align:center;">
+      ${damageTotal}
+    </div>
+
+    <div>Penetration:</div>
+    <div style="text-align:center;">
+      ${penetration}
+    </div>
+
+<div>&nbsp;</div>
+<div>&nbsp;</div>
+
+  </div>
+
+  <!-- RIGHT COLUMN : Critical -->
+  <div style="
+    display:grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 8px;
+  ">
+
+    <div>Crit Dmg:</div>
+    <div style="text-align:center;">
+      ${critDamageTotal}
+    </div>
+
+    <div>Crit Pen:</div>
+    <div style="text-align:center;">
+      ${critBonusPenetration}
+    </div>
+
+    <div>Crit score:</div>
+    <div style="text-align:center;">
+      <span
+        title="Crit range result ${critScoreResult}"
+        style="
+          text-decoration: underline dotted;
+          text-underline-offset: 2px;
+          cursor: help;
+        "
+      >
+        [ ${critScore} ]
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+    const attackHTML = await attackRoll.render();
+    const damageHTML = await damageRoll.render();
+    const content = `
+<div class="dual-roll">
+
+  <div class="roll-column">
+    <div class="roll-label">Margin of Success</div>
+    ${attackHTML}
+  </div>
+
+  <div class="roll-column">
+    <div class="roll-label">Damage Roll</div>
+    ${damageHTML}
+  </div>
+
+</div>
+`;
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker(),
+      content,
       rolls: [attackRoll, damageRoll],
       flavor: `
-<div style="display:flex; align-items:center; gap:8px; font-size:1.3em; font-weight:bold;">
-  <img src="${weapon.img}" width="36" height="36">
-  <span>Ranged attack</span>
-</div>
-
-<p style="text-align:center; font-size:20px;"><b>
-  ${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}
-</b></p>
-
-<table style="width:100%; text-align:center; font-size:15px;">
-  <tr>
-    <th>Normal</th>
-    <th>Crit</th>
-    ${weapon.system.breakthrough ? "<th>Breakthrough</th>" : ""}
-  </tr>
-  <tr>
-    <td>${damageTotal}</td>
-    <td>${critDamageTotal}</td>
-    <td>${breakthroughRollResult}</td>
-  </tr>
-</table>
+<span style="display:inline-flex; align-items:center;">
+  <img src="${weapon.img}" width="36" height="36" style="margin-right:8px;">
+  <strong style="font-size:20px;">Ranged attack</strong>
+</span>
 
 <hr>
 
-<table style="width:100%; text-align:center; font-size:15px;">
-  <tr>
-    <th>Penetration | Critical</th>
-    <th>Critical Score</th>
-  </tr>
-  <tr>
-    <td>${penetration}/${critBonusPenetration}</td>
-    <td title="Crit range result ${critScoreResult}">[${critScore}]</td>
-  </tr>
-</table>
+<p style="text-align:center; font-size:20px;">
+  <b>${
+    critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""
+  }</b>
+</p>
 
+${damageLine}
 <hr>
 
 <table style="width:100%; text-align:center; font-size:15px;">
@@ -152,6 +214,7 @@ export async function rangedAttack() {
     <td><b>${allBleedRollResults}</b> ${effectsRollResults}</td>
   </tr>
 </table>
+<hr>
 `,
       flags: {
         tos: {

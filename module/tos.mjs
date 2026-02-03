@@ -678,6 +678,7 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
       armor: armorTotal,
       hp: currentHp,
       tempHp: currentTemporaryHp,
+      halfDamage: attack[mode].halfDamage ?? false,
     });
 
     const author =
@@ -721,6 +722,7 @@ function openDamageSelectionDialog(message, targets) {
           armor: t.actor.system.armor.total,
           hp: t.actor.system.stats.health.value,
           tempHp: t.actor.system.stats.temporaryHealth.value,
+          halfDamage: attack[mode].halfDamage ?? false,
         });
 
         return `
@@ -802,37 +804,6 @@ async function handlePostDamageStatus({ actor, combatant }) {
 Hooks.on("renderChatMessage", (message, html, data) => {
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
-    // Only create Apply Damage if this is an attack message
-    if (message.flags?.attack) {
-      // Reuse or create the button container
-      let buttonContainer = html.find(".button-container");
-
-      if (buttonContainer.length === 0) {
-        buttonContainer = $(`
-        <div class="button-container"
-             style="display:flex; gap:6px; justify-content:center; margin-top:6px;">
-        </div>
-      `);
-        html.find(".message-content").append(buttonContainer);
-      }
-
-      const applyDamageButton = $(`
-      <button
-        type="button"
-        class="tos-apply-damage"
-        data-message-id="${message.id}">
-        Apply Damage
-      </button>
-    `);
-
-      buttonContainer.append(applyDamageButton);
-
-      applyDamageButton.on("click", async () => {
-        console.log("Apply Damage clicked", message);
-        await handleApplyDamage(message.id);
-      });
-    }
-
     // Add logic to check if the message is a roll message and create a reroll button
     if (message.content.includes("rolled") || message.rolls.length > 0) {
       const rerollButton = $('<button class="reroll-button">Re-Roll</button>');
@@ -885,6 +856,37 @@ Hooks.on("renderChatMessage", (message, html, data) => {
             },
           },
         });
+      });
+    }
+
+    // Only create Apply Damage if this is an attack message
+    if (message.flags?.attack) {
+      // Reuse or create the button container
+      let buttonContainer = html.find(".button-container");
+
+      if (buttonContainer.length === 0) {
+        buttonContainer = $(`
+        <div class="button-container"
+             style="display:flex; gap:6px; justify-content:center; margin-top:6px;">
+        </div>
+      `);
+        html.find(".message-content").append(buttonContainer);
+      }
+
+      const applyDamageButton = $(`
+      <button
+        type="button"
+        class="tos-apply-damage"
+        data-message-id="${message.id}">
+        Apply Damage
+      </button>
+    `);
+
+      buttonContainer.append(applyDamageButton);
+
+      applyDamageButton.on("click", async () => {
+        console.log("Apply Damage clicked", message);
+        await handleApplyDamage(message.id);
       });
     }
   }

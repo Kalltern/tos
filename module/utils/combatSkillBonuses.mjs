@@ -476,7 +476,6 @@ export async function getDamageRolls(
     cha: actor.system.attributes.cha.total,
     per: actor.system.attributes.per.total,
   };
-
   // DAMAGE ROLL
   const { sneakDamage } = await getSneakDamageFormula(actor, weapon);
   let damageFormula = `(${weapon.system.formula}`;
@@ -648,8 +647,10 @@ export async function getEffectRolls(
         await d100Roll.evaluate();
         const roundedModifiedValue = Math.floor(modifiedEffectValue);
         const successText =
-          d100Roll.total <= roundedModifiedValue ? " SUCCESS" : "";
-        effectsRollResults += `<p><b>${effectName}:</b> ${roundedModifiedValue}>${d100Roll.total}${successText}</p>`;
+          d100Roll.total <= roundedModifiedValue
+            ? `<i class="fa-sharp-duotone fa-solid fa-star-christmas" style="--fa-primary-color: #c4c700; --fa-secondary-color: #5c5400;"></i> SUCCESS`
+            : ``;
+        effectsRollResults += `<p><b>| Stun: </b>${d100Roll.total} | < ${roundedModifiedValue}% ${successText}</p>`;
       } else if (effectName === "bleed") {
         modifiedEffectValue =
           modifiedEffectValue +
@@ -717,11 +718,11 @@ export async function getEffectRolls(
     const d100Roll = new Roll("1d100");
     await d100Roll.evaluate();
     const roundedModifiedValue = Math.floor(modifiedEffectValue);
-    const successText =
-      d100Roll.total <= roundedModifiedValue ? " SUCCESS" : "";
+
+    const successText = d100Roll.total <= roundedModifiedValue ? "SUCCESS" : "";
 
     // The 'name' variable here will be the user-typed custom name if applicable
-    effectsRollResults += `<p><b>${name}:</b> ${d100Roll.total} < ${roundedModifiedValue}${successText}</p>`;
+    effectsRollResults += `<p><b>${name}:</b> ${d100Roll.total} < ${roundedModifiedValue}% ${successText}</p>`;
   }
 
   // --- 4. Sharp Bleed Logic ---
@@ -762,10 +763,10 @@ export async function getEffectRolls(
   }
   let allBleedRollResults = "";
   if (totalBleeds > 0 || bleedChanceDisplay > 0) {
-    allBleedRollResults = `Bleed: ${[
+    allBleedRollResults = `| Bleed: ${[
       ...regularBleedRolls,
       ...sharpBleedRolls,
-    ].join(" | Sharp: ")} < ${bleedChanceDisplay}% |
+    ].join("  Sharp: ")} | < ${bleedChanceDisplay}% 
     <i class="fa-regular fa-droplet fa-lg" style="color: #bd0000;"></i>  ${totalBleeds}`;
   }
 
@@ -776,7 +777,14 @@ export async function getEffectRolls(
   };
 }
 
-export function evaluateDmgVsArmor({ damage, penetration, armor, hp, tempHp }) {
+export function evaluateDmgVsArmor({
+  damage,
+  penetration,
+  armor,
+  hp,
+  tempHp,
+  halfDamage = false,
+}) {
   let finalDamage;
   if (damage <= penetration) {
     finalDamage = damage;
@@ -784,10 +792,14 @@ export function evaluateDmgVsArmor({ damage, penetration, armor, hp, tempHp }) {
     const effective = Math.max(damage - armor, 0);
     finalDamage = effective < penetration ? penetration : effective;
   }
+  console.log("halfDamage", halfDamage);
+  if (halfDamage) {
+    finalDamage = Math.floor(finalDamage / 2);
+  }
 
-  const tempHpLoss = Math.min(tempHp, finalDamage);
+  const tempHpLoss = Math.floor(Math.min(tempHp, finalDamage));
   const remainingDamage = finalDamage - tempHpLoss;
-  const hpLoss = Math.min(hp, remainingDamage);
+  const hpLoss = Math.floor(Math.min(hp, remainingDamage));
   const totalHpLoss = hpLoss + tempHpLoss;
 
   return {

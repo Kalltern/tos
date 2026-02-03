@@ -561,8 +561,14 @@ export async function finalizeRollsAndPostChat(
     await modifierRoll.evaluate({ async: true });
 
     const attributeString = `
-  |${spellAttributeTestName} Test ${modifierRoll.total}%|<br>
-  Margin of Success: ${attributeRoll.total}<br>
+  <span
+    title="Test chance ${modifierRoll.total}%&#10;Rolled: ${attributeRoll.result}"
+    style="display:inline-block;"
+  >
+    ${spellAttributeTestName} Test Margin of Success: [${attributeRoll.total}]
+  </span>
+
+  <br><br>
 `;
 
     concatRollAndDescription += attributeString;
@@ -616,7 +622,12 @@ export async function finalizeRollsAndPostChat(
       if (!finalEffectName || key.startsWith("effectName")) continue;
 
       // Add actor-specific bonus
-      const actorBonus = actorEffects[finalEffectName] || 0;
+      const normalizedActorEffects = Object.fromEntries(
+        Object.entries(actorEffects).map(([k, v]) => [k.toLowerCase(), v]),
+      );
+      const actorBonus =
+        normalizedActorEffects[finalEffectName.toLowerCase()] || 0;
+
       const totalEffectValue = effectValue + actorBonus;
 
       // Roll 1d100
@@ -625,11 +636,9 @@ export async function finalizeRollsAndPostChat(
 
       const successText = d100Roll.total <= totalEffectValue ? " SUCCESS" : "";
 
-      effectsRollResults += `<p><b>${finalEffectName}:</b> ${d100Roll.total} < ${totalEffectValue}${successText}</p>`;
+      effectsRollResults += `<p><b>${finalEffectName}:</b> ${d100Roll.total} < ${totalEffectValue}% ${successText}</p>`;
     }
   }
-
-  console.log("Final effectsRollResults:", effectsRollResults);
 
   // --- CRITICAL SCORE ROLL ---
   const critScoreRoll = new Roll(`1d20`);
@@ -657,14 +666,40 @@ export async function finalizeRollsAndPostChat(
     attackRoll.total + (actor.system.combatSkills.channeling.attack || 0);
   const rawTemplate = concatRollAndDescription;
   const compiled = Handlebars.compile(rawTemplate);
-  console.log(`rawTemplate`, rawTemplate);
-  console.log(`compiled`, compiled);
   const renderedDescription = compiled(rollData);
   const tags = rollData.difficulty
     ? `<span class="action-tag difficulty ">Difficulty ${rollData.difficulty} </span>
       <span class="action-tag range ">Range ${spell.system.range} </span>
-      <span class="action-tag range ">${spell.system.spellClass} Spell</span>`
+      <span class="action-tag spellClass ">${spell.system.spellClass} Spell</span>
+      <span class="action-tag rank ">${spell.system.rank} rank</span>
+      <span class="action-tag magicAttack ">Magic ATK ${attack}</span>
+      <span class="action-tag actionCost ">Actions:${spell.system.actionCost}</span>
+      `
     : "";
+
+  const hasDamage = typeof damageTotal === "number" && damageTotal > 0;
+  const hasCritDamage = critSuccess === true;
+  const showDamageTable = hasDamage;
+  const damageHeaders = [
+    "<th>Normal</th>",
+    hasCritDamage && hasDamage ? "<th>Crit</th>" : "",
+  ].join("");
+
+  const damageValues = [
+    `<td>${damageTotal}</td>`,
+    hasCritDamage && hasDamage ? `<td>${critDamageTotal}</td>` : "",
+  ].join("");
+
+  const damageTable = showDamageTable
+    ? `
+<table style="width: 100%; text-align: center; font-size: 15px;">
+  <tr>${damageHeaders}</tr>
+  <tr>${damageValues}</tr>
+</table>
+<hr>
+`
+    : "";
+
   const dmgtypes = (() => {
     const hasType =
       spell.system.dmgType1 ||
@@ -710,7 +745,9 @@ export async function finalizeRollsAndPostChat(
   ].join("");
   const values = [
     hasPenetration ? `<td>${spell.system.penetration}</td>` : "",
-    hasCrit ? `<td>${critScore} (D20: ${critScoreResult})</td>` : "",
+    hasCrit
+      ? `<td title="Crit range result ${critScoreResult}">[${critScore}]</td>`
+      : "",
   ].join("");
   const critPenTable = showTable
     ? `
@@ -731,8 +768,32 @@ export async function finalizeRollsAndPostChat(
     rolls.push(damageRoll);
   }
 
+  const attackHTML = await attackRoll.render();
+  const damageHTML = await damageRoll.render();
+  const content = `
+<div class="${damageHTML ? "dual-roll" : "single-roll"}">
+
+  <div class="roll-column">
+    <div class="roll-label">Margin of Success</div>
+    ${attackHTML}
+  </div>
+
+  ${
+    damageHTML
+      ? `
+  <div class="roll-column">
+    <div class="roll-label">Damage Roll</div>
+    ${damageHTML}
+  </div>
+  `
+      : ""
+  }
+
+</div>
+`;
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker(),
+    content,
     rolls: rolls,
     flavor: `
           <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
@@ -759,12 +820,7 @@ export async function finalizeRollsAndPostChat(
             ${dmgtypes}
         </table>
         <hr>
-
-        <table style="width: 100%; text-align: center;font-size: 15px;">
-            <tr><th>Normal</th><th>Crit</th></tr>
-            <tr><td>${damageTotal}</td><td>${critDamageTotal}</td></tr>
-        </table>
-        <hr>
+        ${damageTable}
         ${critPenTable}
         ${effectsTable}
         `,
