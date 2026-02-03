@@ -1180,7 +1180,7 @@
       "resources": [
         {
           "mode": "",
-          "amount": 0,
+          "amount": "",
           "type": ""
         }
       ],
@@ -1278,7 +1278,7 @@
       "resources": [
         {
           "mode": "",
-          "amount": 0,
+          "amount": "",
           "type": ""
         }
       ],

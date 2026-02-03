@@ -53,6 +53,7 @@ export class ToSItem extends Item {
         };
       }
     }
+
     if (this.system.roll) {
       const { diceNum, diceSize, diceBonus } = this.system.roll;
 
