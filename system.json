@@ -26,7 +26,7 @@
       "thumbnail": "systems/tos/assets/anvil-impact.png"
     }
   ],
-  "version": "0.6.4a",
+  "version": "0.6.4c",
   "compatibility": {
     "minimum": "12.331",
     "verified": "13.351"
@@ -40,8 +40,12 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [],
-  "packFolders": [],
+  "packs": [
+    {
+      "name": "Quickplay spells",
+      "label": "Quickplay spells",
+      "path": "packs/quickplay-spells",
+      "type": "Item",
       "system": "tos"
     }
   ],
