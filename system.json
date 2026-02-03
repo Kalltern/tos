@@ -42,7 +42,7 @@
   ],
   "packs": [
     {
-      "name": "Quickplay spells",
+      "name": "quickplay-spells",
       "label": "Quickplay spells",
       "path": "packs/quickplay-spells",
       "type": "Item",
@@ -51,8 +51,8 @@
   ],
   "packFolders": [
     {
-      "name": "ToS - Spells",
-      "packs": ["spells"]
+      "name": "ToS - Quickplay",
+      "packs": ["quickplay-spells"]
     }
   ],
   "socket": true,
