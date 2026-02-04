@@ -1,0 +1,189 @@
+<section
+  class="tab config {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="config"
+  >
+   <div class="attributes flexrow configstats">
+      {{#each system.attributes as |attribute key|}}
+        <div class="attribute flexcolumn flex-group-center">
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll="(@attributes.{{key}}.mod)-1d100"
+            data-roll-type="attribute"
+            data-label="{{localize (lookup @root.config.attributes key)}}"
+          >
+            {{localize (lookup @root.config.attributes key)}}
+          </label>
+          <input
+            type="text"
+            name="system.attributes.{{key}}.value"
+            value="{{attribute.value}}"
+            class="attribute-score"
+            data-dtype="Number"
+               />
+        </div>
+      {{/each}}
+    </div>
+    <div class="attributes flexrow configstats">
+      {{#each system.secondaryAttributes as |attribute key|}}
+        <div class="attribute flexcolumn flex-group-center">
+          <label
+            class="resource-label rollable"
+            data-action="roll"
+            data-roll="(@secondaryAttributes.{{key}}.mod)-1d100"
+            data-label="{{localize
+              (lookup @root.config.secondaryAttributes key)
+            }}"
+          >
+            {{localize (lookup @root.config.secondaryAttributes key)}}
+          </label>
+          <input
+            type="text"
+            name="system.secondaryAttributes.{{key}}.value"
+            value="{{attribute.value}}"
+            class="attribute-score"
+            data-dtype="Number"
+          />
+
+        </div>
+      {{/each}}
+    </div>
+<div class="grid grid-10col configstats">
+      <div class="grid-span-4"></div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "Endurance Rank"
+          }}</label>
+        <input
+          type="text"
+          name="system.attributes.end.rank"
+          value="{{system.attributes.end.rank}}"
+          data-dtype="Number"
+          data-class="stat-input"
+        />
+  </div>
+  <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "Treated wounds"
+          }}</label>
+        <input
+          type="text"
+          name="system.stats.graveWounds.treated"
+          value="{{system.stats.graveWounds.treated}}"
+          data-dtype="Number"
+          data-class="stat-input"
+        />
+  </div>
+    <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "Detection"
+          }}</label>
+        <input
+          type="text"
+          name="system.detection"
+          value="{{system.detection}}"
+          data-dtype="Number"
+          data-class="stat-input"
+        />
+  </div>
+</div>
+<hr>
+  <section class="config-container grid grid-3col"> 
+    
+{{#each system.combatSkills as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.combatSkills.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+{{/each}}
+
+{{#each system.weaponSkills as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.weaponSkills.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+  {{/each}}
+
+{{#each system.doctrines as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.doctrines.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+   {{/each}}
+
+{{#each system.schools as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.schools.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+  {{/each}}     
+  
+{{#each system.skills as |skill key|}}
+         <label class="toggle-label">
+          <input 
+            type="checkbox" 
+            name="system.skills.{{key}}.visible"
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+   {{/each}}
+</section>
+  <ol class="items-list">
+    <li class="item flexrow items-header">
+      <div class="item-name">{{localize "race"}}</div>
+        </li>
+ 
+    {{#each race as |item id|}}
+      <li
+        class="item flexrow"
+        data-item-id="{{item._id}}"
+        data-drag="true"
+        data-document-class="Item"
+      >
+        <div class="item-name">
+          <div class="item-image">
+            <a class="rollable" data-roll-type="item" data-action="roll">
+              <img
+                src="{{item.img}}"
+                title="{{item.name}}"
+                width="24"
+                height="24"
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+           <div class="item-controls">
+           {{#if @root.editable}}
+            <a
+              class="item-control item-delete"
+              title="{{localize 'DOCUMENT.Delete' type="race"}}"
+              data-action="deleteDoc"
+            >
+              <i class="fas fa-trash"></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+    {{/each}}
+  </ol>
+ 
+</section>

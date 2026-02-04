@@ -1,0 +1,170 @@
+{
+  "name": "Regeneration",
+  "type": "spell",
+  "img": "icons/magic/nature/leaf-glow-green.webp",
+  "system": {
+    "description": "<p>Recovers 2d4 + 2 health per turn. <br />All bleeding lasts only one turn. <br />Can be maintained up to 30m away.<br />Regeneration effects do not stack. </p>",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [
+      "bleeding",
+      "burning",
+      "chain",
+      "disorientation",
+      "dispel",
+      "flammable",
+      "frozen",
+      "concussion",
+      "paralyzed",
+      "poisoned",
+      "rooted",
+      "slowed",
+      "stun",
+      "vulnerable",
+      "weakened",
+      "wet"
+    ],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": -10,
+    "cost": 8,
+    "perRound": 2,
+    "option": "magic",
+    "type": "earth",
+    "rank": "expert",
+    "actionCost": "1 | C",
+    "range": "8",
+    "spellClass": "lesser",
+    "roll": {
+      "diceNum": 2,
+      "diceSize": "4",
+      "diceBonus": "2"
+    },
+    "penetration": 0,
+    "dmgType1": "",
+    "bool2": "",
+    "dmgType2": "",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "0",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null
+    },
+    "attributeTest": "",
+    "testModifier": "",
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": ""
+  },
+  "effects": [],
+  "folder": "ELAMhHkr77jkNbi6",
+  "flags": {
+    "scene-packer": {
+      "hash": "4f61d637413bef2b02b8f780aa731e1e39da4524"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.earth-spells.Item.M3eQkl9qk6kZcxMH",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135133307,
+    "modifiedTime": 1770135133307,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "QzBJV6s794SlFuYt",
+  "sort": 0,
+  "_key": "!items!QzBJV6s794SlFuYt"
+}

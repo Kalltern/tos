@@ -1,0 +1,487 @@
+<section
+  class="tab skills {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="skills"
+>
+<div class="scrollable-tab">
+
+<section class=" grid-skills"> 
+  
+
+
+
+</section>
+
+  <section class="skills-container ">
+
+    {{! Left Column }}
+    <div class="skills-column skills-checkbox-container">
+      <div class="combat-skills">
+      <h5>Combat</h5>
+      {{#each system.combatSkills as |skill key|}}
+  {{#if (eq skill.isSkill 1)}}
+  
+    <label class="toggle-label hidden">
+      <input 
+        type="checkbox" 
+        class="toggle-skill-visibility" 
+        data-skill="{{key}}" 
+        {{#if skill.visible}}checked{{/if}}>
+        {{key}}
+    </label>       
+
+    <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+      <label
+        class="skill-label flexlarge align-left skill-name"  
+        data-roll="{{#if (eq key 'combat')}}{{#if skill.finesseRating}}{{#if (gt skill.finesseRating skill.rating)}}{{skill.finesseRating}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}-1d100"
+        data-roll-type="combat-skill"
+        data-label="{{key}}"
+      >
+        {{localize (concat 'TOS.Actor.Character.combatSkills.' key '.label')}}
+      </label>
+
+      <input
+        type="text"
+        name="system.combatSkills.{{key}}.value"
+        value="{{skill.value}}"
+        class="skill-value"
+        data-dtype="Number"
+      />
+      
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{#if (eq key 'combat')}}{{#if skill.finesseRating}}{{#if (gt skill.finesseRating skill.rating)}}{{skill.finesseRating}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}{{else}}{{skill.rating}}{{/if}}"
+              readonly
+            />
+      
+    </div>
+
+  {{/if}}
+{{/each}}
+
+        {{#each system.weaponSkills as |skill key|}}
+         <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+        <div class="skill-entry {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label flexlarge align-left skill-name"  
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.weaponSkills.' key '.label')}}
+          </label>
+          <input
+            type="text"
+            name="system.weaponSkills.{{key}}.value"
+            value="{{skill.value}}"
+            class="skill-value"
+            data-dtype="Number"
+          />
+           </div>
+  {{/each}}
+     {{#each system.doctrines as |skill key|}}
+         <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>  
+                 <div class="skill-entry {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.doctrines.' key '.label')}}
+          </label>
+          <input
+            type="text"
+            name="system.doctrines.{{key}}.value"
+            value="{{skill.value}}"
+            class="skill-value"
+            data-dtype="Number"
+          />
+           </div>
+  {{/each}}
+   {{#each system.schools as |skill key|}}
+         <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+        <div class="skill-entry {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.schools.' key '.label')}}
+          </label>
+          <input
+            type="text"
+            name="system.schools.{{key}}.value"
+            value="{{skill.value}}"
+            class="skill-value"
+            data-dtype="Number"
+          />
+           </div>
+  {{/each}}
+   {{#each system.combatSkills as |skill key|}}
+    {{#if (eq skill.isSkill 0)}}
+         <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+        <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="combat-skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.combatSkills.' key '.label')}}
+          </label>
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+        </div>
+    
+  {{/if}}
+  {{/each}}
+  </div>
+{{#if (hasVisibleSkillsOfId system.skills 0)}}  
+      <h5>{{localize "TOS.Actor.Character.Attribute.Str.long"}}</h5>
+{{/if}}     
+      {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 0)}}
+      <div class="skill-toggle-wrapper">
+         <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+             {{key}}
+        </label>       
+        <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+          <input
+            type="text"
+            name="system.skills.{{key}}.value"
+            value="{{skill.value}}"
+            class="skill-value"
+            data-dtype="Number"
+          />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+
+
+        </div>
+      </div>
+    {{/if}}
+  {{/each}}
+
+{{#if (hasVisibleSkillsOfId system.skills 1)}}
+      <h5>{{localize "TOS.Actor.Character.Attribute.Dex.long"}}</h5>
+{{/if}}      
+      {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 1)}}
+        <div class="skill-toggle-wrapper">
+        <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+           <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+            <input
+              type="text"
+              name="system.skills.{{key}}.value"
+              value="{{skill.value}}"
+              class="skill-value"
+              data-dtype="Number"
+            />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+          </div>
+        </div>
+        {{/if}}
+      {{/each}}
+      
+{{#if (hasVisibleSkillsOfId system.skills 2)}}
+      <h5>{{localize "TOS.Actor.Character.Attribute.End.long"}}</h5>
+{{/if}}      
+      {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 2)}}
+        <div class="skill-toggle-wrapper">
+        <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+           <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+            <input
+              type="text"
+              name="system.skills.{{key}}.value"
+              value="{{skill.value}}"
+              class="skill-value"
+              data-dtype="Number"
+            />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+          </div>
+          </div>
+        {{/if}}
+      {{/each}}
+            
+    </div>
+    {{! Right Column }}
+    <div class="skills-column">
+{{#if (hasVisibleSkillsOfId system.skills 3)}}  
+      <h5>{{localize "TOS.Actor.Character.Attribute.Int.long"}}</h5>
+{{/if}}      
+      {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 3)}}
+                  <div class="skill-toggle-wrapper">
+        <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+           <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+            <input
+              type="text"
+              name="system.skills.{{key}}.value"
+              value="{{skill.value}}"
+              class="skill-value"
+              data-dtype="Number"
+            />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+          </div>
+          </div>
+        {{/if}}
+      {{/each}}
+
+{{#if (hasVisibleSkillsOfId system.skills 4)}}
+      <h5>{{localize "TOS.Actor.Character.Attribute.Wil.long"}}</h5>
+{{/if}}      
+        {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 4)}}
+                 <div class="skill-toggle-wrapper">
+        <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+           <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+            <input
+              type="text"
+              name="system.skills.{{key}}.value"
+              value="{{skill.value}}"
+              class="skill-value"
+              data-dtype="Number"
+            />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+          </div>
+          </div>
+        {{/if}}
+      {{/each}}
+{{#if (hasVisibleSkillsOfId system.skills 5)}}
+      <h5>{{localize "TOS.Actor.Character.Attribute.Cha.long"}}</h5>
+{{/if}}      
+      {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 5)}}
+                 <div class="skill-toggle-wrapper">
+        <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+           <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+             {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+         
+            <input
+              type="text"
+              name="system.skills.{{key}}.value"
+              value="{{skill.value}}"
+              class="skill-value"
+              data-dtype="Number"
+            />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+          </div>
+           </div>
+        {{/if}}
+      {{/each}}
+{{#if (hasVisibleSkillsOfId system.skills 6)}}
+      <h5>{{localize "TOS.Actor.Character.Attribute.Per.long"}}</h5>
+{{/if}}      
+      {{#each system.skills as |skill key|}}
+        {{#if (eq skill.id 6)}}
+                  <div class="skill-toggle-wrapper">
+        <label class="toggle-label hidden">
+          <input 
+            type="checkbox" 
+            class="toggle-skill-visibility" 
+            data-skill="{{key}}" 
+            {{#if skill.visible}}checked{{/if}}>
+          {{key}}
+        </label>
+           <div class="skill-entry flexrow {{#unless skill.visible}}hidden-skill{{/unless}}">
+          <label
+            class="skill-label rollable flexlarge align-left skill-name"  
+            data-action="roll"
+            data-roll="{{skill.rating}}-1d100"
+            data-roll-type="skill"
+            data-label="{{key}}"
+          >
+            {{localize (concat 'TOS.Actor.Character.skills.' key '.label')}}
+          </label>
+            <input
+              type="text"
+              name="system.skills.{{key}}.value"
+              value="{{skill.value}}"
+              class="skill-value"
+              data-dtype="Number"
+            />
+            <input
+              type="text"
+              class="skill-rating"
+              data-dtype="Number"
+              value="{{skill.rating}}"
+              readonly
+            />
+            </div>
+          </div>
+        {{/if}}
+      {{/each}}
+    </div>
+  
+  </section>
+  </div>
+</section>

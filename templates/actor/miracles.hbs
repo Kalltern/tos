@@ -1,0 +1,314 @@
+{{! Spells Tab }}
+<section
+  class='tab miracles {{tab.cssClass}}'
+  data-group='primary'
+  data-tab='miracles'
+>
+<h2 class="flex-group-center">
+Divine blessings
+</h2>
+
+<div class='grid grid-9col'>
+      <div class="grid-span-1">
+        <label class="resource-label">
+ {{localize "TOS.Item.Spell.FIELDS.holyPower.label"}}
+          </label>
+        <input
+          class="spell-value"
+          type="text"
+          name="system.stats.holyEnergy.power"
+          value="{{system.stats.holyEnergy.power}}"
+          data-dtype="Number"
+        {{#unless (eq actor.type "npc")}}readonly{{/unless}}
+        />
+ </div>
+    <div class="grid-span-2">
+ <label for="shepherdsWill">{{localize "TOS.Item.Spell.FIELDS.shepherdsWill.label"}}</label>
+<select name="system.shepherdsWill.skill" id="shepherdsWill">
+    <option value="">-- Select a blessing --</option>
+    {{#each system.shepherdsWill.shepherdOptions as |shepherdsWill|}}
+        <option value="{{shepherdsWill}}" {{#if (eq ../system.shepherdsWill.skill shepherdsWill)}}selected{{/if}}>
+            {{shepherdsWill}}
+        </option>
+    {{/each}}
+</select>
+ </div>
+ <section class="main grid-span-9">
+      <ol class="items-list">
+        <li class="item flexrow items-header">
+          <div class="item-name">{{localize "Blessings"}}</div>
+          <div class="item-controls">
+            {{#if @root.editable}}
+              <a
+                class="item-control item-create"
+                title="Create item"
+                data-action="createDoc"
+                data-document-class="Item"
+                data-type="feature"
+              >
+                <i class="fas fa-plus"></i>
+                {{localize "DOCUMENT.New" type="feature"}}
+              </a>
+            {{/if}}
+          </div>
+        </li>
+        {{#each features as |item id|}}
+        {{#if (eq item.system.option "priest")}}
+          <li
+            class="item flexrow"
+            data-item-id="{{item._id}}"
+            data-drag="true"
+            data-document-class="Item"
+          >
+            <div class="item-name">
+              <div class="item-image">
+                <a class="rollable" data-roll-type="item" data-action="roll">
+                  <img
+                    src="{{item.img}}"
+                    title="{{item.name}}"
+                    width="24"
+                    height="24"
+                  />
+                </a>
+              </div>
+              <div>{{item.name}}</div>
+            </div>
+            <div class="item-controls">
+              <a
+                class="item-control item-edit"
+                title="{{localize 'DOCUMENT.Update' type="feature"}}"
+                data-action="viewDoc"
+              >
+                <i class="fas fa-edit"></i>
+              </a>
+              {{#if @root.editable}}
+                <a
+                  class="item-control item-delete"
+                  title="{{localize 'DOCUMENT.Delete' type="feature"}}"
+                  data-action="deleteDoc"
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+              {{/if}}
+            </div>
+          </li>
+         {{/if}}
+        {{/each}}
+      </ol>
+    </section>
+       
+    
+</div>
+<h2
+class="flex-group-center">
+Miracles
+</h2>
+  <ol class='items-list' data-school='{{group.school}}'>
+    <li class='item flexrow items-header'>
+      <div class="item-name">{{localize "Novice"}}</div>
+            <div class='item-name'>
+      {{localize "TOS.Item.Spell.FIELDS.domain.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerCost.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerActions.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerRange.label"}}
+      </div>
+
+    </li>
+
+    {{#each spells as |item|}}
+   {{#if (eq item.system.rank "novice")}}
+      <li
+        class='item flexrow'
+        data-item-id='{{item._id}}'
+        data-drag='true'
+        data-document-class='Item'
+      >
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-roll-type='item' data-action='roll'>
+              <img
+                src='{{item.img}}'
+                title='{{item.name}}'
+                width='24'
+                height='24'
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+
+          <div class="item-formula item-prop-dificulty">{{item.system.domain}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.cost}}{{#if item.system.perRound}} / {{item.system.perRound}} {{/if}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.actionCost}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.range}}</div>
+
+
+        <div class='item-controls'>
+          <a
+            class='item-control item-edit'
+            title='{{localize "DOCUMENT.Update" type='spell'}}'
+            data-action='viewDoc'
+          >
+            <i class='fas fa-edit'></i>
+          </a>
+          {{#if @root.editable}}
+            <a
+              class='item-control item-delete'
+              title='{{localize "DOCUMENT.Delete" type='spell'}}'
+              data-action='deleteDoc'
+            >
+              <i class='fas fa-trash'></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+       {{/if}}
+    {{/each}}
+  </ol>
+
+  <ol class='items-list' data-school='{{group.school}}'>
+    <li class='item flexrow items-header'>
+      <div class="item-name">{{localize "Acolyte"}}</div>
+            <div class='item-name'>
+      {{localize "TOS.Item.Spell.FIELDS.domain.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerCost.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerActions.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerRange.label"}}
+      </div>
+
+    </li>
+
+   {{#each spells as |item|}}
+   {{#if (eq item.system.rank "acolyte")}}
+      <li
+        class='item flexrow'
+        data-item-id='{{item._id}}'
+        data-drag='true'
+        data-document-class='Item'
+      >
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-roll-type='item' data-action='roll'>
+              <img
+                src='{{item.img}}'
+                title='{{item.name}}'
+                width='24'
+                height='24'
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+
+          <div class="item-formula item-prop-dificulty">{{item.system.domain}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.cost}}{{#if item.system.perRound}} / {{item.system.perRound}} {{/if}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.actionCost}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.range}}</div>
+
+
+        <div class='item-controls'>
+          <a
+            class='item-control item-edit'
+            title='{{localize "DOCUMENT.Update" type='spell'}}'
+            data-action='viewDoc'
+          >
+            <i class='fas fa-edit'></i>
+          </a>
+          {{#if @root.editable}}
+            <a
+              class='item-control item-delete'
+              title='{{localize "DOCUMENT.Delete" type='spell'}}'
+              data-action='deleteDoc'
+            >
+              <i class='fas fa-trash'></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+       {{/if}}
+    {{/each}}
+  </ol>
+
+  <ol class='items-list' data-school='{{group.school}}'>
+    <li class='item flexrow items-header'>
+      <div class="item-name">{{localize "Cleric"}}</div>
+            <div class='item-name'>
+      {{localize "TOS.Item.Spell.FIELDS.domain.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerCost.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerActions.label"}}
+      </div>
+            <div class='item-name'>
+        {{localize "TOS.Item.Spell.FIELDS.headerRange.label"}}
+      </div>
+
+    </li>
+
+     {{#each spells as |item|}}
+   {{#if (eq item.system.rank "cleric")}}
+      <li
+        class='item flexrow'
+        data-item-id='{{item._id}}'
+        data-drag='true'
+        data-document-class='Item'
+      >
+        <div class='item-name flexrow'>
+          <div class='item-image'>
+            <a class='rollable' data-roll-type='item' data-action='roll'>
+              <img
+                src='{{item.img}}'
+                title='{{item.name}}'
+                width='24'
+                height='24'
+              />
+            </a>
+          </div>
+          <div>{{item.name}}</div>
+        </div>
+
+          <div class="item-formula item-prop-dificulty">{{item.system.domain}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.cost}}{{#if item.system.perRound}} / {{item.system.perRound}} {{/if}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.actionCost}}</div>
+          <div class="item-formula item-prop-spell">{{item.system.range}}</div>
+
+
+        <div class='item-controls'>
+          <a
+            class='item-control item-edit'
+            title='{{localize "DOCUMENT.Update" type='spell'}}'
+            data-action='viewDoc'
+          >
+            <i class='fas fa-edit'></i>
+          </a>
+          {{#if @root.editable}}
+            <a
+              class='item-control item-delete'
+              title='{{localize "DOCUMENT.Delete" type='spell'}}'
+              data-action='deleteDoc'
+            >
+              <i class='fas fa-trash'></i>
+            </a>
+          {{/if}}
+        </div>
+      </li>
+       {{/if}}
+    {{/each}}
+  </ol>
+
+
+</section>

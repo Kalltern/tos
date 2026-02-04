@@ -1,0 +1,146 @@
+{
+  "name": "Corruption",
+  "type": "spell",
+  "img": "icons/magic/unholy/orb-glowing-purple.webp",
+  "system": {
+    "description": "At the cost of 1d4 Health, increases Corruption by 15. These Health points cannot be healed by magic or miracles. Can only be used once per round.",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": [
+      {
+        "mode": "",
+        "amount": "",
+        "type": ""
+      }
+    ],
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": false,
+    "difficulty": 0,
+    "cost": 4,
+    "perRound": 0,
+    "option": "magic",
+    "type": "darkness",
+    "rank": "expert",
+    "actionCost": "Free action",
+    "range": "caster",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 1,
+      "diceSize": "4",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "",
+    "bool2": "",
+    "dmgType2": "",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "0",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": ""
+  },
+  "effects": [],
+  "folder": "XCC7CG5LovD3hSXR",
+  "flags": {
+    "scene-packer": {
+      "hash": "a9384d0d672371a9f82edc8634f043eac64d5373"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.dark-spells.Item.DaDhXBXbYNlwTsoJ",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135131840,
+    "modifiedTime": 1770135131840,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "4Gz3ZvQRBMhhCWzR",
+  "sort": 0,
+  "_key": "!items!4Gz3ZvQRBMhhCWzR"
+}

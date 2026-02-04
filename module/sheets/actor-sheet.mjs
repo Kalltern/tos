@@ -7,10 +7,11 @@ const { api, sheets } = foundry.applications;
  * @extends {ActorSheetV2}
  */
 export class ToSActorSheet extends api.HandlebarsApplicationMixin(
-  sheets.ActorSheetV2
+  sheets.ActorSheetV2,
 ) {
   constructor(options = {}) {
     super(options);
+    console.log("Actor sheet loaded");
     this.#dragDrop = this.#createDragDropHandlers();
   }
 
@@ -18,16 +19,23 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   static DEFAULT_OPTIONS = {
     classes: ["tos", "actor"],
     position: {
-      width: 650,
-      height: 800,
+      width: 860,
+      height: 1200,
     },
     actions: {
       onEditImage: this._onEditImage,
       viewDoc: this._viewDoc,
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
+      addConsumable: this._addConsumable,
+      subtractConsumable: this._subtractConsumable,
       toggleEffect: this._toggleEffect,
       roll: this._onRoll,
+      toggleEquipped: this._toggleEquipped,
+      myAction: this._myAction,
+      toggleReroll: this._toggleReroll,
+      toggleSchool: this._toggleSchool,
+      buildSpellTooltip: this._buildSpellTooltip,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -35,6 +43,182 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       submitOnChange: true,
     },
   };
+
+  static _toggleReroll(event) {
+    // Ensure we get the element with the correct data attributes
+    const target = event.target.closest("[data-action='toggleReroll']");
+
+    if (!target) {
+      console.debug("Click did not occur on a valid reroll icon.");
+      return;
+    }
+
+    console.debug("Event Target:", target);
+
+    const itemId = target.dataset.itemId; // Get item ID
+    const index = parseInt(target.dataset.index); // Get icon index
+    const actor = this.actor;
+
+    console.debug("Item ID:", itemId);
+    console.debug("Index:", index);
+
+    if (!itemId || isNaN(index)) {
+      console.debug("Invalid itemId or index.");
+      return;
+    }
+
+    // Find the item by its ID
+    const item = actor.items.get(itemId);
+    if (!item) {
+      console.debug("Item not found for ID:", itemId);
+      return;
+    }
+
+    console.debug("Item found:", item);
+
+    // Toggle the active state for the reroll
+    const rerollActive = item.system.reroll.active || [];
+    console.debug("Current rerollActive state:", rerollActive);
+
+    rerollActive[index] = !rerollActive[index]; // Toggle state
+    console.debug("Updated rerollActive state:", rerollActive);
+
+    // Save the updated reroll state to the item
+    item
+      .update({
+        "system.reroll.active": rerollActive,
+      })
+      .then(() => {
+        console.debug("Reroll state saved for item:", itemId);
+      })
+      .catch((error) => {
+        console.error("Failed to update reroll state:", error);
+      });
+
+    // Update the icon's visual state
+    target.classList.toggle("active", rerollActive[index]);
+    console.debug(
+      "Icon class toggled:",
+      rerollActive[index] ? "active" : "inactive",
+    );
+  }
+
+  static _myAction(event) {
+    const isChecked = event.target.checked; // Get the state of the checkbox
+    console.log(
+      `My custom action triggered, checkbox is ${
+        isChecked ? "checked" : "unchecked"
+      }`,
+    );
+  }
+
+  static _buildSpellTooltip(spell) {
+    const data = spell.getTooltipData();
+
+    const dmgTypes = [
+      { type: data.dmgType1, flag: data.bool2 },
+      { type: data.dmgType2, flag: data.bool3 },
+      { type: data.dmgType3, flag: data.bool4 },
+      { type: data.dmgType4 },
+    ];
+
+    const effects = [
+      { type: data.effectType1, extra: data.effects.extra1 },
+      { type: data.effectType2, extra: data.effects.extra2 },
+      { type: data.effectType3, extra: data.effects.extra3 },
+    ];
+    const validDamageTypes = dmgTypes.filter((element) => element.type);
+    const validEffectTypes = effects.filter((element) => element.type);
+    const damageHTML = validDamageTypes
+      .map((element) => {
+        return `
+      ${element.type}${element.flag ? " " + element.flag : ""}
+    `;
+      })
+      .join("");
+
+    const effectHTML = validEffectTypes
+      .map((element) => {
+        return `
+      ${element.type}${element.extra ? " " + element.extra + "%" : ""}
+    `;
+      })
+      .join("");
+    const damageSection = damageHTML
+      ? `
+    <hr>      
+    <tr><td>Damage types:</td></tr>
+    <tr><td>
+    ${damageHTML}
+    </td></tr>`
+      : "";
+    const effectSection = effectHTML
+      ? `
+    <hr>      
+    <tr><td>Effect types:</td></tr>
+    <tr><td>
+    ${effectHTML}
+    </td></tr>`
+      : "";
+
+    return `
+    <strong>${data.name}</strong>
+    
+    ${damageSection}
+    ${effectSection}
+    <hr>
+    <div><b>Difficulty:</b> ${data.difficulty}</div>
+    <div><b>Cost:</b> ${data.cost}${data.perRound ? ` / ${data.perRound}` : ""}</div>
+    <div><b>Actions:</b> ${data.actionCost}</div>
+    <div><b>Range:</b> ${data.range}</div>
+    ${data.description ? `<hr>${data.description}` : ""}
+  `;
+  }
+
+  static _toggleSchool(event) {
+    const header = event.target;
+    const list = header.closest(".items-list");
+    list.classList.toggle("collapsed");
+    header.classList.toggle("collapsed");
+  }
+
+  static _toggleEquipped(event) {
+    const target = event.target;
+    const isChecked = target.checked;
+    const itemId = target.dataset.itemId; // Get the item ID from the data attribute
+    const actor = this.actor;
+
+    console.log("Item ID:", itemId); // Log the item ID
+
+    // Fetch the item using the ID
+    const item = actor.items.get(itemId); // Use the ID to fetch the actual item object
+
+    if (item) {
+      // Update the item's 'equipped' status
+      item.update({ "system.equipped": isChecked });
+
+      console.log(`Item is now ${isChecked ? "equipped" : "unequipped"}`);
+
+      // Handle the item's effects (enable/disable based on equip status)
+      if (item.effects) {
+        // Loop through each individual effect
+        for (let effect of item.effects) {
+          // Disable effect if unequipped, enable it if equipped
+          effect.disabled = !isChecked; // Set disabled state based on equip status
+
+          // Update the individual effect
+          effect.update({ disabled: effect.disabled });
+          console.log(
+            `Effect ${effect.name} updated: ${
+              isChecked ? "equipped" : "unequipped"
+            }`,
+          );
+        }
+      }
+    } else {
+      console.log("Item not found!");
+    }
+  }
 
   /** @override */
   static PARTS = {
@@ -48,37 +232,64 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     testtab: {
       template: "systems/tos/templates/actor/testtab.hbs",
     },
+    skills: {
+      template: "systems/tos/templates/actor/skills.hbs",
+    },
     features: {
       template: "systems/tos/templates/actor/features.hbs",
     },
     biography: {
       template: "systems/tos/templates/actor/biography.hbs",
     },
-    gear: {
-      template: "systems/tos/templates/actor/gear.hbs",
+    inventory: {
+      template: "systems/tos/templates/actor/inventory.hbs",
+    },
+    abilities: {
+      template: "systems/tos/templates/actor/abilities.hbs",
     },
     spells: {
       template: "systems/tos/templates/actor/spells.hbs",
     },
+    miracles: {
+      template: "systems/tos/templates/actor/miracles.hbs",
+    },
     effects: {
       template: "systems/tos/templates/actor/effects.hbs",
+    },
+    config: {
+      template: "systems/tos/templates/actor/config.hbs",
     },
   };
 
   /** @override */
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
-    // Not all parts always render
-    options.parts = ["header", "tabs", "biography", "testtab"];
+    // Not all parts always render, add "testtab" for testing
+    options.parts = ["header", "tabs", "biography"];
     // Don't show the other tabs if only limited view
     if (this.document.limited) return;
     // Control which parts show based on document subtype
     switch (this.document.type) {
       case "character":
-        options.parts.push("features", "gear", "spells", "effects");
+        options.parts.push(
+          "skills",
+          "features",
+          "inventory",
+          "abilities",
+          "spells",
+          "miracles",
+          "effects",
+          "config",
+        );
         break;
       case "npc":
-        options.parts.push("gear", "effects");
+        options.parts.push(
+          "inventory",
+          "abilities",
+          "spells",
+          "miracles",
+          "effects",
+        );
         break;
     }
   }
@@ -114,8 +325,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     switch (partId) {
       case "features":
       case "testtab":
+      case "skills":
+      case "abilities":
       case "spells":
-      case "gear":
+        context.tab = context.tabs[partId];
+        context.activeSpellSubtab = this.tabGroups["spells-subtabs"] ?? null;
+      case "miracles":
+      case "inventory":
+      case "config":
         context.tab = context.tabs[partId];
         break;
       case "biography":
@@ -131,7 +348,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
             rollData: this.actor.getRollData(),
             // Relative UUID resolution
             relativeTo: this.actor,
-          }
+          },
         );
         break;
       case "effects":
@@ -140,7 +357,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         context.effects = prepareActiveEffectCategories(
           // A generator that returns all effects stored on the actor
           // as well as any items
-          this.actor.allApplicableEffects()
+          this.actor.allApplicableEffects(),
         );
         break;
     }
@@ -156,6 +373,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   _getTabs(parts) {
     // If you have sub-tabs this is necessary to change
     const tabGroup = "primary";
+    const tabSpellGroup = "spells-subtabs";
     // Default tab for first time it's rendered this session
     if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = "biography";
     return parts.reduce((tabs, partId) => {
@@ -181,24 +399,97 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           tab.id = "testtab";
           tab.label += "TestTab";
           break;
+        case "config":
+          tab.id = "config";
+          tab.label += "Config";
+          break;
+        case "skills":
+          tab.id = "skills";
+          tab.label += "Skills";
+          break;
         case "features":
           tab.id = "features";
           tab.label += "Features";
           break;
-        case "gear":
-          tab.id = "gear";
-          tab.label += "Gear";
+        case "abilities":
+          tab.id = "abilities";
+          tab.label += "Abilities";
+          break;
+        case "inventory":
+          tab.id = "inventory";
+          tab.label += "Inventory";
           break;
         case "spells":
           tab.id = "spells";
           tab.label += "Spells";
+
+          // Check if magicPotential exists and is greater than 0
+          if (
+            !this.actor.system.magicPotential ||
+            this.actor.system.magicPotential <= 0
+          ) {
+            tab.cssClass += " hidden"; // Add 'hidden' class to tab
+          }
+          break;
+        case "miracles":
+          tab.id = "miracles";
+          tab.label += "Miracles";
+          // Check if Priest exists and is greater than 0
+          if (!this.actor.system.priest || this.actor.system.priest <= 0) {
+            tab.cssClass += " hidden"; // Add 'hidden' class to tab
+          }
           break;
         case "effects":
           tab.id = "effects";
           tab.label += "Effects";
           break;
+
+        case "fire":
+          tab.id = "fire";
+          tab.label += "Fire";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "earth":
+          tab.id = "earth";
+          tab.label += "Earth";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "water":
+          tab.id = "water";
+          tab.label += "Water";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "air":
+          tab.id = "air";
+          tab.label += "Air";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "spirit":
+          tab.id = "spirit";
+          tab.label += "Spirit";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "body":
+          tab.id = "body";
+          tab.label += "Body";
+          tab.group = tabSpellGroup;
+          break;
+
+        case "dark":
+          tab.id = "dark";
+          tab.label += "Dark";
+          tab.group = tabSpellGroup;
+          break;
       }
-      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
+      if (this.tabGroups[tab.group] === tab.id) {
+        tab.cssClass = `${tab.cssClass} active`.trim();
+      }
+
       tabs[partId] = tab;
       return tabs;
     }, {});
@@ -214,47 +505,62 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     // You can just use `this.document.itemTypes` instead
     // if you don't need to subdivide a given type like
     // this sheet does with spells
-    const gear = [];
     const features = [];
-    const spells = {
-      0: [],
-      1: [],
-      2: [],
-      3: [],
-      4: [],
-      5: [],
-      6: [],
-      7: [],
-      8: [],
-      9: [],
-    };
+    const weapon = [];
+    const race = [];
+    const gear = [];
+    const ability = [];
+    const consumables = [];
+    const items = [];
+    const spells = [];
 
     // Iterate through items, allocating to containers
     for (let i of this.document.items) {
-      // Append to gear.
-      if (i.type === "gear") {
-        gear.push(i);
+      // Append to weapon.
+      if (i.type === "weapon") {
+        weapon.push(i);
       }
       // Append to features.
       else if (i.type === "feature") {
         features.push(i);
       }
+      // Append to gear.
+      else if (i.type === "gear") {
+        gear.push(i);
+      }
+      // Append to consumable.
+      else if (i.type === "consumable") {
+        consumables.push(i);
+      }
+      // Append to item.
+      else if (i.type === "item") {
+        items.push(i);
+      }
+      // Append to abilities.
+      else if (i.type === "ability") {
+        ability.push(i);
+      }
       // Append to spells.
       else if (i.type === "spell") {
-        if (i.system.spellLevel != undefined) {
-          spells[i.system.spellLevel].push(i);
-        }
+        spells.push(i);
+      }
+      // Append to race.
+      else if (i.type === "race") {
+        race.push(i);
       }
     }
 
-    for (const s of Object.values(spells)) {
-      s.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    }
-
     // Sort then assign
+    context.weapon = weapon.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.gear = gear.sort((a, b) => (a.sort || 0) - (b.sort || 0));
     context.features = features.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-    context.spells = spells;
+    context.consumables = consumables.sort(
+      (a, b) => (a.sort || 0) - (b.sort || 0),
+    );
+    context.items = items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.ability = ability.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.spells = spells.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+    context.race = race.sort((a, b) => (a.sort || 0) - (b.sort || 0));
   }
 
   /**
@@ -266,11 +572,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    * @override
    */
   _onRender(context, options) {
+    super._onRender?.(context, options);
+
     this.#dragDrop.forEach((d) => d.bind(this.element));
     this.#disableOverrides();
     // You may want to add other special handling here
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
     // That you may want to implement yourself.
+    // Use standard DOM method to select input elements
   }
 
   /**************
@@ -278,6 +587,40 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    *   ACTIONS
    *
    **************/
+
+  // Render spell tooltips
+  render(force, options) {
+    super.render(force, options);
+    if (!this.element) return;
+    this._activateSpellTooltips();
+  }
+
+  _activateSpellTooltips() {
+    const tooltip = this.element.querySelector("#spell-tooltip");
+    if (!tooltip) return;
+
+    for (const icon of this.element.querySelectorAll(".spell-icon")) {
+      if (icon.dataset.tooltipBound) continue; // prevent duplicates
+      icon.dataset.tooltipBound = "true";
+
+      icon.addEventListener("mouseenter", (ev) => {
+        const spell = this.actor.items.get(ev.currentTarget.dataset.itemId);
+        if (!spell) return;
+
+        tooltip.innerHTML = this._buildSpellTooltip(spell);
+        tooltip.classList.remove("hidden");
+      });
+
+      icon.addEventListener("mousemove", (ev) => {
+        tooltip.style.left = `${ev.clientX + 12}px`;
+        tooltip.style.top = `${ev.clientY + 12}px`;
+      });
+
+      icon.addEventListener("mouseleave", () => {
+        tooltip.classList.add("hidden");
+      });
+    }
+  }
 
   /**
    * Handle changing a Document's image.
@@ -331,6 +674,30 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   static async _deleteDoc(event, target) {
     const doc = this._getEmbeddedDocument(target);
     await doc.delete();
+  }
+
+  /**
+   * Handles item add and subtract
+   *
+   * @this ToSActorSheet
+   * @param {PointerEvent} event   The originating click event
+   * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
+   * @protected
+   */
+  static async _addConsumable(event, target) {
+    const doc = this._getEmbeddedDocument(target);
+    const currentQty = doc.system.quantity;
+    await doc.update({ "system.quantity": currentQty + 1 });
+  }
+
+  static async _subtractConsumable(event, target) {
+    const doc = this._getEmbeddedDocument(target);
+    const currentQty = doc.system.quantity;
+    if (currentQty <= 1) {
+      await doc.delete();
+    } else {
+      await doc.update({ "system.quantity": currentQty - 1 });
+    }
   }
 
   /**
@@ -398,19 +765,130 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
         if (item) return item.roll();
     }
 
-    // Handle rolls that supply the formula directly.
     if (dataset.roll) {
-      let label = dataset.label ? `[ability] ${dataset.label}` : "";
-      let roll = new Roll(dataset.roll, this.actor.getRollData());
-      await roll.toMessage({
-        speaker: ChatMessage.getSpeaker({ actor: this.actor }),
-        flavor: label,
-        rollMode: game.settings.get("core", "rollMode"),
-      });
+      const attributeMap = {
+        Strength: "Str",
+        Dexterity: "Dex",
+        Endurance: "End",
+        Intelligence: "Int",
+        Will: "Wil",
+        Charism: "Cha",
+        Perception: "Per",
+        Speed: "Spd",
+        Luck: "Lck",
+        Resolve: "Res",
+        Faith: "Fth",
+        Sinfulness: "Sin",
+        Visage: "Vis",
+        Initiative: "Ini",
+      };
+      // Determine if this is a skill or attribute. Combat skills unrollable without macro, left here in case of change
+      const isSkillRoll =
+        dataset.rollType === "skill" ||
+        dataset.rollType === "combat-skill" ||
+        dataset.rollType === "attribute" ||
+        dataset.rollType === "secondaryAttribute";
+
+      const skillKey = dataset.label;
+      // Use dataset.label directly as the key for localization
+      const mappedKey =
+        dataset.rollType === "attribute" || "secondaryAttribute"
+          ? attributeMap[skillKey] || skillKey
+          : skillKey;
+
+      // Use game.i18n to get the localized label for the skill, looking under the correct path in your structure
+      let label = dataset.label
+        ? ` ${game.i18n.localize(
+            dataset.rollType === "combat-skill"
+              ? `TOS.Actor.Character.skills.${skillKey}.label`
+              : dataset.rollType === "attribute"
+                ? `TOS.Actor.Character.Attribute.${
+                    skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                  }.long`
+                : dataset.rollType === "secondaryAttribute"
+                  ? `TOS.Actor.Character.SecondaryAttribute.${
+                      skillKey.charAt(0).toUpperCase() + skillKey.slice(1)
+                    }.long`
+                  : `TOS.Actor.Character.skills.${skillKey}.label`,
+          )}`
+        : "";
+      const rollName = label;
+
+      const roll = new Roll(dataset.roll, this.actor.getRollData());
+      await roll.evaluate();
+
+      const d100Result = roll.dice[0]?.total; // Extract the d100 result
+      let skillData = null;
+      // Only evaluate critical status if it's a skill or combat skill roll
+      if (isSkillRoll) {
+        // Retrieve the skill data based on the roll type
+
+        console.log("Roll Type:", dataset.rollType);
+        console.log("Skill Key:", skillKey);
+        skillData =
+          dataset.rollType === "skill"
+            ? this.actor.system.skills[skillKey]
+            : dataset.rollType === "combat-skill"
+              ? this.actor.system.combatSkills[skillKey]
+              : dataset.rollType === "attribute"
+                ? this.actor.system.attributes[skillKey] // Handle attributes
+                : dataset.rollType === "secondaryAttribute";
+
+        if (skillData) {
+          const criticalMessage = this.evaluateCriticalSuccess(
+            d100Result,
+            skillData.criticalSuccessThreshold, // Use the skill-specific threshold
+            skillData.criticalFailureThreshold, // Use the skill-specific threshold
+          );
+          console.log(
+            "Rolled:",
+            d100Result,
+            "Crit chance:",
+            skillData.criticalSuccessThreshold, // Use the skill-specific threshold
+            "Crit fail chance:",
+            skillData.criticalFailureThreshold,
+          );
+
+          // Modify the label to include critical success/failure indication
+          if (criticalMessage) {
+            label += `<hr><p style="text-align: center; font-size: 20px;"><b>${criticalMessage}</b></p>`;
+          }
+          console.log(`Critical Message: ${criticalMessage}`);
+        } else {
+          console.error("No skill data found for:", skillKey);
+        }
+      }
+
+      if (skillData) {
+        // Deconstruct the critical thresholds from skillData
+        const { criticalSuccessThreshold, criticalFailureThreshold } =
+          skillData;
+
+        // Now, pass only the deconstructed values in the flags
+        await roll.toMessage({
+          flavor: `<p style="text-align: center; font-size: 20px;"><b>${label}</b></p>`,
+          rollMode: game.settings.get("core", "rollMode"),
+          flags: {
+            rollName,
+            criticalSuccessThreshold, // Store critical success threshold
+            criticalFailureThreshold, // Store critical failure threshold
+          },
+        });
+      } else {
+        console.error("No skill data found for:", skillKey);
+      }
       return roll;
     }
   }
 
+  evaluateCriticalSuccess(d100Result, successThreshold, failureThreshold) {
+    if (d100Result <= successThreshold) {
+      return "Critical Success"; // Return this message for a critical success
+    } else if (d100Result >= failureThreshold) {
+      return "Critical Failure"; // Return this message for a critical failure
+    }
+    return ""; // Return an empty string for normal outcomes
+  }
   /** Helper Functions */
 
   /**
@@ -468,7 +946,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   _onDragStart(event) {
     const docRow = event.currentTarget.closest("li");
     if ("link" in event.target.dataset) return;
-
     // Chained operation
     let dragData = this._getEmbeddedDocument(docRow)?.toDragData();
 
@@ -610,9 +1087,31 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (!this.actor.isOwner) return false;
     const item = await Item.implementation.fromDropData(data);
 
+    // Prevent adding multiple races
+    if (item.type === "race") {
+      let existingRace = this.actor.items.find((i) => i.type === "race");
+      if (existingRace) {
+        ui.notifications.warn("This character already has a race!");
+        return false; // Stop item from being added
+      }
+    }
     // Handle item sorting within the same Actor
     if (this.actor.uuid === item.parent?.uuid)
       return this._onSortItem(event, item);
+    // Check if the item is a consumable
+    if (item.type === "consumable") {
+      // Look for an existing stackable consumable with the same name
+      let existingItem = this.actor.items.find(
+        (i) => i.name === item.name && i.type === "consumable",
+      );
+
+      if (existingItem) {
+        // Increase the quantity instead of creating a new item
+        let newQuantity =
+          (existingItem.system.quantity || 1) + (item.system.quantity || 1);
+        return existingItem.update({ "system.quantity": newQuantity });
+      }
+    }
 
     // Create the owned item
     return this._onDropItemCreate(item, event);
@@ -634,7 +1133,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       folder.contents.map(async (item) => {
         if (!(document instanceof Item)) item = await fromUuid(item.uuid);
         return item;
-      })
+      }),
     );
     return this._onDropItemCreate(droppedItemData, event);
   }
@@ -759,3 +1258,49 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
 }
+
+Hooks.on("renderActorSheetV2", (sheet, html) => {
+  const tooltip = html.querySelector("#spell-tooltip");
+  if (!tooltip) return;
+
+  html.querySelectorAll(".spell-icon").forEach((icon) => {
+    icon.addEventListener("mouseenter", (ev) => {
+      const itemId = ev.currentTarget.dataset.itemId;
+      const spell = sheet.actor.items.get(itemId);
+      if (!spell) return;
+
+      tooltip.innerHTML = sheet.constructor._buildSpellTooltip(spell);
+      tooltip.classList.remove("hidden");
+
+      const iconRect = ev.currentTarget.getBoundingClientRect();
+      const sheetRect = html.getBoundingClientRect();
+
+      const OFFSET_X = 25;
+      const OFFSET_Y = -150;
+      const PADDING = 38; // set if you want breathing room
+
+      // ⬇️ STORE top
+      let top = iconRect.top - sheetRect.top + OFFSET_Y;
+      let left = iconRect.right - sheetRect.left + OFFSET_X;
+
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+
+      // ⬇️ MEASURE
+      const tooltipHeight = tooltip.offsetHeight;
+      const sheetHeight = html.clientHeight;
+
+      // ⬇️ HARD RULE: bottom must not pass sheet bottom
+      const maxTop = sheetHeight - tooltipHeight - PADDING;
+
+      if (top > maxTop) {
+        top = maxTop;
+        tooltip.style.top = `${top}px`;
+      }
+    });
+
+    icon.addEventListener("mouseleave", () => {
+      tooltip.classList.add("hidden");
+    });
+  });
+});

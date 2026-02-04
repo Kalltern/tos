@@ -1,0 +1,153 @@
+{
+  "name": "Lightning strike",
+  "type": "spell",
+  "img": "icons/magic/lightning/fist-unarmed-strike-blue-green.webp",
+  "system": {
+    "description": "Enhances the next attack or throw and changes its damage type to Magical + Lightning. Chaining +30%. Cannot be combined with other forms of attack enhancement.",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": 20,
+    "cost": 2,
+    "perRound": 0,
+    "option": "magic",
+    "type": "air",
+    "rank": "apprentice",
+    "actionCost": "Free action",
+    "range": "Caster",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 0,
+      "diceSize": "0",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "magic",
+    "bool2": "and",
+    "dmgType2": "lightning",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "30",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": 30,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "Chain",
+    "effectType2": "",
+    "effectType3": "",
+    "attributeTest": "",
+    "testModifier": ""
+  },
+  "effects": [],
+  "folder": "xCW0JHp8U8kjsvRC",
+  "flags": {
+    "scene-packer": {
+      "hash": "3498e1dff1d3f7fdbe81303c9e54b8b1f285eef7"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.air-spells.Item.YoiM6rFj0nC2URTB",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135130797,
+    "modifiedTime": 1770135130797,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "XF2EjqsIKRtDKezx",
+  "sort": 0,
+  "_key": "!items!XF2EjqsIKRtDKezx"
+}

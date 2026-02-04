@@ -26,10 +26,10 @@
       "thumbnail": "systems/tos/assets/anvil-impact.png"
     }
   ],
-  "version": "3.0.0",
+  "version": "0.6.4c",
   "compatibility": {
-    "minimum": "12.328",
-    "verified": "12.330"
+    "minimum": "12.331",
+    "verified": "13.351"
   },
   "esmodules": ["module/tos.mjs"],
   "styles": ["css/tos.css"],
@@ -40,18 +40,28 @@
       "path": "lang/en.json"
     }
   ],
-  "packs": [],
-  "packFolders": [],
-  "socket": false,
-  "manifest": "Replace this with a link to the /latest release system.json so people can receive updates after they've installed the system",
-  "download": "This must link to a .zip file of the current version",
+  "packs": [
+    {
+      "name": "quickplay-spells",
+      "label": "Quickplay spells",
+      "type": "Item",
+      "system": "tos"
+    }
+  ],
+  "packFolders": [
+    {
+      "name": "ToS - Quickplay",
+      "packs": ["quickplay-spells"]
+    }
+  ],
+  "socket": true,
+  "manifest": "https://raw.githubusercontent.com/Kalltern/tos/refs/heads/main/system.json",
+  "download": "https://github.com/Kalltern/tos/releases/latest/download/tos.zip",
   "background": "systems/tos/assets/anvil-impact.png",
   "grid": {
     "type": 1,
     "distance": 1.5,
-    "units": "m",
+    "units": "Meters",
     "diagonals": 0
-  },
-  "primaryTokenAttribute": "health",
-  "secondaryTokenAttribute": "mana"
+  }
 }

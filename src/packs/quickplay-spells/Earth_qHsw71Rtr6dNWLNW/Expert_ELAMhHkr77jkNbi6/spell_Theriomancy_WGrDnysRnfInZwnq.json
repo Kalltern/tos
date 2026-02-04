@@ -1,0 +1,170 @@
+{
+  "name": "Theriomancy",
+  "type": "spell",
+  "img": "icons/magic/nature/wolf-paw-glow-orange.webp",
+  "system": {
+    "description": "Transforms the caster into an animal of similar size to their own. Multiple forms can be learned. The animal determines doctrine type, bonuses to health, combat, attributes, and damage. Doctrine level depends on magical doctrine; base combat uses channeling. Reverting retains current health. If health drops to 0, revert with 1 health and the incapacitated effect.",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [
+      "bleeding",
+      "burning",
+      "chain",
+      "disorientation",
+      "dispel",
+      "flammable",
+      "frozen",
+      "concussion",
+      "paralyzed",
+      "poisoned",
+      "rooted",
+      "slowed",
+      "stun",
+      "vulnerable",
+      "weakened",
+      "wet"
+    ],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": false,
+    "difficulty": -20,
+    "cost": 12,
+    "perRound": 0,
+    "option": "magic",
+    "type": "earth",
+    "rank": "expert",
+    "actionCost": "1",
+    "range": "Caster",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 0,
+      "diceSize": "0",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "",
+    "bool2": "",
+    "dmgType2": "",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": 0,
+      "effect2": 0,
+      "effect3": 0,
+      "effect4": 0,
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null
+    },
+    "attributeTest": "",
+    "testModifier": "",
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": ""
+  },
+  "effects": [],
+  "folder": "ELAMhHkr77jkNbi6",
+  "flags": {
+    "scene-packer": {
+      "hash": "21cfc0569652f555cf6b95cbf3c80be4919519d6"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.earth-spells.Item.O3N5ZKcQhJYkNXBB",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135133307,
+    "modifiedTime": 1770135133307,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "WGrDnysRnfInZwnq",
+  "sort": 0,
+  "_key": "!items!WGrDnysRnfInZwnq"
+}

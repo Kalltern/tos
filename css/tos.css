@@ -24,11 +24,75 @@
   font-family: "Roboto", sans-serif;
 }
 
+.chat-message {
+  margin: 3px;
+  padding: 5px;
+  font-size: var(--font-size-14);
+  color: var(--color-text-light-primary);
+  background: #0b0a13fa;
+  border: 2px solid #6c6c6782;
+  border-radius: 5px;
+}
+
+.chat-message.whisper {
+  background: #131121;
+  border: 2px solid #545469;
+}
+
+.message.whisper table tr td {
+  background-color: #131121;
+}
+
+.chat-message img {
+  border: 1.5px solid #b5b3a487;
+  border-radius: 20px;
+  margin-bottom: 1px;
+}
+
+.chat-message .message-header .flavor-text,
+.chat-message .message-header,
+.chat-message .message-header .whisper-to {
+  color: var(--color-text-light-primary);
+}
+
+.dice-roll .dice-formula,
+.dice-roll .dice-total {
+  border: #201b1b;
+  box-shadow: 0 0 2px #ffffff inset;
+}
+
+#chat-form textarea {
+  width: 100%;
+  height: 100%;
+  resize: none;
+  font-family: var(--font-primary);
+  color: var(--color-text-light-primary);
+  background: url(../ui/parchment_dark.jpg) repeat;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #c2b096;
+  border-bottom: 1px solid #c2b096;
+}
+
+table tr td:first-child,
+table tr td:nth-child(2),
+table tr td:nth-child(3) {
+  background-color: #1412238a;
+}
+
 .rollable:hover,
 .rollable:focus {
   color: var(--tos-c-black);
   text-shadow: 0 0 10px red;
   cursor: pointer;
+}
+
+.prosemirror,
+#prosemirror-dropdown,
+prose-mirror {
+  min-height: 300px;
 }
 
 .grid,
@@ -39,6 +103,7 @@
   gap: 10px;
   margin: 10px 0;
   padding: 0;
+  text-align: center;
 }
 
 .grid-3col {
@@ -69,6 +134,8 @@
 .grid-8col {
   grid-column: span 8 / span 8;
   grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 10px; /* Space between grid items */
+  text-align: center; /* Centers the label text */
 }
 
 .grid-9col {
@@ -135,6 +202,13 @@
   grid-column-start: 12;
 }
 
+.grid-span-1-spell {
+  grid-column: span 1;
+  display: flex;
+  flex-direction: column; /* Places label above input */
+  align-items: center; /* Centers everything inside */
+}
+
 .grid-span-2 {
   grid-column-end: span 2;
 }
@@ -177,6 +251,17 @@
 
 .grid-span-12 {
   grid-column-end: span 12;
+}
+.grid-skills {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(200px, 1fr)
+  ); /* Collapsing empty spaces */
+  margin: 10px 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100px; /* Adjust if necessary */
 }
 
 .flex-group-center,
@@ -225,28 +310,87 @@
 }
 
 /* Styles limited to tos sheets */
+.tos .profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* Moves content to the top */
+  max-width: 230px;
+  margin-right: 10px;
+}
 .tos .item-form {
   font-family: "Roboto", sans-serif;
 }
 .tos .sheet-header {
-  display: flex; /* Use flexbox for the header */
-  flex-direction: row; /* Align items in a row */
-  flex-wrap: wrap; /* Allow wrapping */
-  justify-content: flex-start; /* Start alignment */
-  margin-bottom: 10px; /* Space below the header */
+  height: 390px; /* Adjust the height as needed */
+  overflow: hidden; /* Ensures content does not exceed the height */
+  flex: 0 auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
-
 .tos .sheet-header .profile-img {
-  flex: 0 0 100px; /* Fixed size for profile image */
-  height: 100px; /* Maintain height */
-  margin-right: 10px; /* Space to the right */
+  flex: 0 0 165px; /* Keeps the image size fixed */
+  height: 216px;
+  margin-bottom: 10px; /* Adds space below the image */
+  align-self: flex-start; /* Ensures it stays at the top */
+  border-color: #00000000;
 }
 
 .tos .sheet-header .header-fields {
-  flex: 1; /* Allow the fields to take remaining space */
-  display: flex;
-  flex-direction: column; /* Stack fields vertically */
+  flex: 1;
+  margin-bottom: 75px;
+  margin-left: 5px;
 }
+.tos .sheet-npc-header {
+  height: 440px; /* NPC-specific height */
+}
+.header-fields .grid .grid-2col input {
+  text-align: center;
+}
+
+.header-fields input {
+  text-align: center;
+}
+.header-fields input:not([readonly]):not([type="checkbox"]),
+.configstats input[type="text"],
+.skills-container input:not([readonly]):not([type="checkbox"]) {
+  border-width: 1.5px;
+  border-color: #2e312e;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #252323,
+    #0b0c0c 65%,
+    #121212 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px #292929,
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+  border-color: #292c2b;
+}
+.skill-rating,
+.skills-container input[readonly] {
+  color: silver;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #112021,
+    #101623 65%,
+    #080c14 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px rgb(22 18 18),
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+/* Center the grid items inside their grid cell */
+.header-fields .grid-2col > div {
+  text-align: center;
+}
+
 .tos .sheet-tabs {
   flex: 0;
 }
@@ -270,84 +414,197 @@
 .tos .resource-label {
   font-weight: bold;
 }
-.tos .resources {
-  display: flex; /* Use flex for resources */
-  flex-wrap: wrap; /* Allow wrapping */
-  justify-content: flex-start; /* Align items to start */
-}
-.tos .abilities {
-  display: flex;
-  flex-wrap: nowrap; /* Prevent wrapping to keep everything in one row */
-  justify-content: flex-start; /* Align items to the start */
-  overflow-x: auto; /* Allow horizontal scrolling if necessary */
-  max-width: 100%; /* Allow full width usage */
-  margin: 0 auto; /* Center the abilities if desired */
+.skill-name,
+.skill-label.rollable {
+  flex: 1 0 auto; /* Allow label to grow without shrinking */
+  max-width: 140px; /* Optional: Keep the max-width */
+  width: 100%;
+  padding: 0.4rem; /* Optional: Adjust padding */
+  text-align: center; /* Ensure text is left-aligned */
 }
 
-.tos .ability {
-  flex: 0 0 50px; /* Fixed width for each ability */
-  margin: 5px; /* Space between abilities */
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.skill-label {
+  margin-right: 10px;
 }
 
-.tos .ability label {
-  margin-bottom: 4px; /* Space between label and input */
-}
-
-.tos .ability-score,
-.tos .ability-mod {
-  width: 40px; /* Fixed width */
-  padding: 2px; /* Adjust padding */
+.tos .attribute-armor {
+  flex-direction: column; /* Stack label above input and modifier */
+  align-items: center; /* Center items horizontally */
+  margin: 0 2px; /* Reduced horizontal spacing between attributes */
+  flex: 1 1 0; /* Allow attributes to grow and shrink */
+  max-width: 45px; /* Set a max width to keep them compact */
   text-align: center;
-  font-size: 14px; /* Smaller font size */
-}
-.skill-item {
-  display: flex; /* Use flexbox for alignment */
-  align-items: center; /* Center items vertically */
-  margin-bottom: 10px; /* Space between each skill item */
 }
 
-.skill-item label {
-  margin-right: 5px; /* Space between label and value */
+.tos .attributes {
+  justify-content: flex-start; /* Adjust as necessary */
+  flex-wrap: wrap; /* Allow wrapping if needed */
+  margin-top: 10px; /* Space above attributes */
 }
 
-.skill-value {
-  width: 50px; /* Set a fixed width for the value input */
-  margin-right: 5px; /* Space between value and rating */
+.tos .attribute {
+  flex-direction: column; /* Stack label above input and modifier */
+  align-items: center; /* Center items horizontally */
+  margin: 0 2px; /* Reduced horizontal spacing between attributes */
+  flex: 1 1 0; /* Allow attributes to grow and shrink */
+  max-width: 90px; /* Set a max width to keep them compact */
+  text-align: center;
 }
 
-.skill-mod {
-  margin-left: 5px; /* Space between closing bracket and rating */
+.tos .attribute-score,
+.tos .attribute-mod {
+  width: 40px; /* Fixed width for input and modifier */
+  max-width: 40px; /* Prevent it from growing wider */
+  text-align: center; /* Center text in input and span */
+}
+
+.tos .attribute-score,
+.tos .attribute-armor input[readonly] {
+  color: rgb(219 199 169);
+  background: radial-gradient(
+    circle at 30% 30%,
+    #191412,
+    #241d1a 65%,
+    #141313 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px rgb(22 18 18),
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+.tos .attribute-score:not([readonly]) {
+  color: rgb(219 199 169);
+  background: radial-gradient(
+    circle at 30% 30%,
+    #222328,
+    #161b26 65%,
+    #10141e 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px rgb(22 18 18),
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+.tos .attribute-mod {
+  color: #b59462;
+  background: radial-gradient(
+    circle at 30% 30%,
+    #191412,
+    #241d1a 65%,
+    #141313 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px rgb(22 18 18),
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
 }
 .tos .items-header {
+  display: flex;
   height: 28px;
   margin: 2px 0;
-  padding: 0;
+  padding: 0 4px;
   align-items: center;
   background: rgba(0, 0, 0, 0.05);
   border: 2px groove var(--tos-c-groove);
   font-weight: bold;
 }
+
 .tos .items-header > * {
-  font-size: 14px;
+  font-size: 13px;
   text-align: center;
-}
-.tos .items-header .item-name {
-  font-weight: bold;
-  padding-left: 5px;
-  text-align: left;
   display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+.tos .inventory-weapons .item-formula {
+  flex: 3;
+}
+
+.tos .inventory-gear .item {
+  display: flex;
+  align-items: center;
+}
+
+.tos .inventory-gear .armor-layer {
+  flex: 1;
+  text-align: left;
+}
+
+.tos .inventory-gear .gear-equipped {
+  flex: 1;
+  padding-right: 9px;
+}
+
+.tos .inventory-gear .armor-value {
+  flex: 1;
+  margin-right: 55px;
+}
+
+.tos .inventory-consumable .item-formula {
+  flex: 1;
+}
+
+.tos .inventory-consumable .item-quantity {
+  flex: 1;
+  margin-right: 80px;
+}
+
+.tos .items-header .item-name {
+  flex: 4;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 6px;
+}
+
+.tos .items-header .ability-name {
+  width: 260px;
+  text-align: left;
+  justify-content: flex-start;
+  padding-left: 6px;
+  flex: 0 0 auto;
+}
+
+.tos .items-header .ability-type,
+.tos .items-header .ability-cost,
+.tos .items-header .ability-damage,
+.tos .items-header .ability-test {
+  width: 113.73px;
+  flex: 0 0 auto;
+}
+
+.tos .items-header .item-prop {
+  flex: 1;
+}
+
+.tos .items-header .item-controls {
+  flex: 0 0 auto; /* fixed width for icons */
+  justify-content: flex-end;
+}
+
 .tos .items-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  overflow-y: auto;
+  overflow-y: hidden;
   scrollbar-width: thin;
   color: var(--tos-c-tan);
+  opacity: 1;
+  transition:
+    max-height 0.25s ease-out,
+    opacity 0.25s ease-out;
 }
+.tos .items-list.collapsed {
+  max-height: 30px;
+  opacity: 1;
+}
+
+.tos .items-list.collapsed > .items-header {
+  opacity: 1;
+}
+
 .tos .items-list .item-list {
   list-style: none;
   margin: 0;
@@ -370,7 +627,6 @@
 }
 .tos .items-list .item-controls {
   display: flex;
-  flex: 0 0 100px;
   justify-content: flex-end;
 }
 .tos .items-list .item-controls a {
@@ -379,15 +635,23 @@
   margin: 0 6px;
 }
 .tos .items-list .item {
+  display: flex;
   align-items: center;
-  padding: 0 2px;
+  padding: 2px 4px;
   border-bottom: 1px solid var(--tos-c-faint);
 }
 .tos .items-list .item:last-child {
   border-bottom: none;
 }
 .tos .items-list .item .item-name {
+  flex: 2.5;
+  max-width: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--tos-c-dark);
+  display: flex;
+  align-items: center;
 }
 .tos .items-list .item .item-name .item-image {
   flex: 0 0 30px;
@@ -397,10 +661,43 @@
   margin-right: 5px;
 }
 .tos .items-list .item-prop {
+  flex: 1;
   text-align: center;
+  font-size: 12px;
   border-left: 1px solid #c9c7b8;
   border-right: 1px solid #c9c7b8;
+  padding: 0 4px;
+}
+
+.tos .item-prop-difficulty {
+  text-align: center;
+  border-right: 1px solid #c9c7b8;
+  border-left: 1px solid #c9c7b8;
   font-size: 12px;
+  padding-left: 15px; /* Adjust as needed */
+}
+.item.flexrow.spell {
+  font-size: 12px;
+  padding: 2px 5px;
+  text-align: center;
+  min-width: 15px; /* Set a minimum width to prevent overflow */
+}
+
+/* Remove left border from all except the first one */
+.tos .items-list .item-prop:first-child {
+  border-left: none;
+}
+
+/* Remove right border from the last one */
+.tos .items-list .item-prop:last-child {
+  border-right: none;
+}
+.tos .item-toggle-equipped {
+  width: 16px;
+  height: 15px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
 }
 .tos .items-list .items-header {
   height: 28px;
@@ -416,12 +713,19 @@
   text-align: center;
 }
 .tos .items-list .items-header .item-name {
-  padding-left: 5px;
   text-align: left;
 }
+.item-name.spellDifficulty {
+  text-indent: 3rem;
+}
+.item-name.spellCost {
+  text-indent: 0.8rem;
+}
 .tos .item-formula {
-  flex: 0 0 200px;
-  padding: 0 8px;
+  display: flex;
+  justify-content: center; /* Center content */
+  align-items: center; /* Align vertically */
+  flex: 2.1; /* Allow cells to scale */
 }
 .tos .effects-header {
   height: 28px;
@@ -535,4 +839,476 @@
 }
 .tos .effects .item .effect-controls {
   border: none;
+}
+
+.skills-container {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.skills-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.skill-entry {
+  display: flex;
+  align-items: center;
+  margin-bottom: -5px;
+}
+.skill-value {
+  width: 4rem; /* Adjust the width as needed */
+  margin-right: 5px;
+  max-width: 38px; /* Optional: Set a maximum width */
+  padding: 0.4rem; /* Adjust padding for a more compact input */
+  text-align: center; /* Center the text for better appearance */
+  font-size: 0.9rem; /* Adjust font size if the text appears too large */
+  max-height: 20px;
+  background-color: #232323;
+}
+.spell-value {
+  width: 2.5rem; /* Small box for max 2-digit numbers */
+  text-align: center; /* Centers text inside */
+  font-size: 1rem; /* Ensures readability */
+  padding: 2px; /* Small padding for cleaner look */
+}
+.skill-rating {
+  max-width: 40px;
+  max-height: 20px;
+  text-align: center;
+}
+.tab.skills {
+  text-align: center;
+}
+@media (max-height: 1080px) {
+  .tab.features,
+  .tab.abilities,
+  .tab.inventory,
+  .tab.skills,
+  .tab.miracles,
+  .tab.spells,
+  .tab.config {
+    max-height: 510px !important; /* Height for 1920x1080 resolution */
+  }
+}
+
+@media (min-height: 1081px) {
+  .tab.features,
+  .tab.abilities,
+  .tab.inventory,
+  .tab.skills,
+  .tab.miracles,
+  .tab.spells,
+  .tab.config {
+    max-height: 700px !important; /* Height for higher resolutions */
+  }
+}
+
+.skill-entry.hidden-skill,
+.hidden,
+.skills-container .hidden-skill {
+  display: none !important;
+  margin-bottom: 0 !important;
+}
+
+.toggle-skill-visibility {
+  display: inline-block !important; /* Forces checkboxes to always be shown */
+}
+.config-checkbox {
+  display: block !important;
+}
+
+.tab.features,
+.tab.abilities,
+.tab.inventory,
+.tab.skills,
+.tab.miracles,
+.tab.spells,
+.tab.config {
+  flex-direction: column;
+  flex-grow: 1;
+  overflow-y: auto; /* Scrollbar for long content */
+}
+
+.button-container {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  justify-items: center;
+}
+
+.button-container button,
+.button-container a.button {
+  color: #6f6a5f;
+}
+
+.button-container a.button:hover,
+.button-container button:hover {
+  color: #ffffff;
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adjust gap between items as needed */
+}
+
+.checkbox-row label {
+  margin-right: 5px; /* Space between label and checkbox */
+}
+
+/* Container for stats row */
+.stat-row {
+  display: flex;
+  justify-content: space-evenly; /* Evenly distribute stats in a single row */
+  align-items: center; /* Center align the items vertically */
+  width: 100%; /* Ensure the row takes full available width */
+  flex-wrap: wrap; /* Allow wrapping when there are more than 7 items */
+}
+
+/* Each stat block (Health, Stamina, etc.) */
+.attribute {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 0 1 100px; /* Set each stat box to 70px width */
+  max-width: 100px; /* Ensure no box exceeds 70px */
+}
+
+/* Label for each stat */
+label {
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.stats-resource-label {
+  display: flex;
+  align-items: flex-end; /* push text to bottom */
+  min-height: 35px;
+  justify-content: center;
+}
+
+.attribute.flexcolumn.flex-group-center.input.attribute-mod {
+  width: 80px;
+  height: 70px;
+  background: linear-gradient(145deg, #3a4a6a, #1c2333);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+/* Container for current and max value inputs */
+.stat-values {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 5px; /* Space between current and max value inputs */
+  align-items: center;
+}
+
+/* Ensure inputs are properly aligned */
+.stat-input {
+  width: 50px; /* Set input box width */
+  text-align: center; /* Center the text inside the input */
+  padding: 0; /* Remove padding for better alignment */
+}
+input[data-class="stat-input"] {
+  text-align: center;
+}
+.stat-input.stat-current.resource {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #323337,
+    #101623 65%,
+    #080c14 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px rgb(22 18 18),
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+.stat-input.stat-max {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #191412,
+    #241d1a 65%,
+    #141313 100%
+  );
+  box-shadow:
+    inset 0 -2px 3px #292929,
+    inset 0 3px 5px rgb(0 0 0 / 70%),
+    0 1px 2px rgb(0 0 0);
+}
+
+.stat-input.stat-current.resource,
+.stat-input.stat-max.resource {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-width: 2px;
+  padding: 0;
+}
+
+.stat-input.stat-current.resource.health {
+  color: #b11414;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.health {
+  color: #d90000;
+  border-color: #650000;
+}
+
+.stat-input.stat-current.resource.stamina {
+  color: #b3a63f;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.stamina {
+  color: #c3ad00;
+  border-color: #6f6300;
+}
+
+.stat-input.stat-current.resource.toxicity {
+  color: #35a53f;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.toxicity {
+  color: #35a53f;
+  border-color: #175b1d;
+}
+
+.stat-input.stat-current.resource.mana {
+  color: #2a65d7;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.mana {
+  color: #005dd5;
+  border-color: #01318b;
+}
+
+.stat-input.stat-current.resource.holyEnergy {
+  color: #b59bcc;
+  border-color: #2e312e;
+}
+.stat-input.stat-max.resource.holyEnergy {
+  color: #b59bcc;
+  border-color: #513c5e;
+}
+
+body.theme-dark input:not([readonly]):not([type="checkbox"]) {
+  border-color: #2e312e;
+}
+
+.attributes.flexrow {
+  margin-bottom: 3px;
+}
+
+.reroll-container {
+  display: flex;
+  justify-content: flex-end; /* Align icons at the right of the container */
+  width: 100%; /* Ensure the container takes the full width */
+  padding: 5px 0; /* Optional: adjust padding as needed */
+}
+
+.reroll-container:nth-child(odd) {
+  background: #3131311f;
+}
+
+.reroll-container:nth-child(even) {
+  background: #00000038;
+}
+
+.reroll-container span {
+  font-size: 1rem; /* Adjust as needed */
+  font-weight: bold;
+  margin-right: auto; /* Keep the span on the left side */
+}
+
+/* Style for the reroll icon */
+.reroll-icon {
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    filter 0.3s ease,
+    background-color 0.3s ease;
+  font-size: 1.5rem; /* Adjust for bigger icons */
+  align-items: center; /* Vertically center the icon */
+  display: flex; /* Horizontally center the icon */
+  margin: 0; /* Ensure no margin between icons */
+}
+/* Active (shining) state */
+.reroll-icon.active {
+  color: rgb(243, 195, 92); /* Icon color changes to white for contrast */
+}
+
+/* Inactive state */
+.reroll-icon:not(.active) {
+  background-color: transparent; /* Transparent when inactive */
+  color: inherit; /* Default color */
+}
+
+.spell-tooltip {
+  position: absolute;
+  z-index: 100;
+  background: #1e1e1e;
+  color: #eee;
+  border: 1px solid #555;
+  padding: 0.5rem;
+  max-width: 300px;
+  pointer-events: none;
+}
+
+.spell-tooltip.hidden {
+  display: none;
+}
+
+.action-tags {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.action-tag {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+/* Optional flavor for difficulty */
+.action-tag.difficulty {
+  background: rgba(173, 28, 2, 0.25);
+  border-color: rgba(160, 60, 60, 0.6);
+}
+
+.action-tag.range {
+  background: rgba(23, 241, 71, 0.25);
+  border-color: rgba(160, 60, 60, 0.6);
+}
+
+.action-tag.spellClass {
+  background: rgba(58, 207, 182, 0.25);
+  border-color: rgba(160, 60, 60, 0.6);
+}
+
+.action-tag.rank {
+  background: rgba(229, 255, 0, 0.329);
+  border-color: rgba(160, 60, 60, 0.6);
+}
+
+.action-tag.magicAttack {
+  background: rgba(37, 68, 158, 0.67);
+  border-color: rgba(160, 60, 60, 0.6);
+}
+
+.action-tag.actionCost {
+  background: rgba(163, 163, 163, 0.486);
+  border-color: rgba(160, 60, 60, 0.6);
+}
+
+.message-content {
+  position: relative;
+}
+
+.action-tags--corner {
+  position: absolute;
+  bottom: 0.25rem;
+  right: 0.25rem;
+  justify-content: flex-end;
+}
+
+.action-tags--header {
+  margin-bottom: 0.25rem;
+  justify-content: flex-end;
+}
+
+/* =========================
+   Chat adjustments
+   ========================= */
+
+/* 1) Global line-height tightening (biggest win) */
+.chat-message {
+  line-height: 1.25;
+}
+
+/* 2) Neutralize paragraph vertical bloat */
+.chat-message p {
+  margin: 0.2em 0;
+}
+
+/* 3) Reduce list spacing (bullets are tall by default) */
+.chat-message ul {
+  margin: 0.2em 0;
+  padding-left: 1.2em;
+}
+
+.chat-message li {
+  margin: 0.15em 0;
+}
+
+/* 4) Slim horizontal rules without removing them */
+.chat-message hr {
+  margin: 0.4em 0;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* 5) Clamp generic block spacing (tables, divs, etc.) */
+.chat-message table {
+  margin: 0.3em 0;
+}
+
+.chat-message th,
+.chat-message td {
+  padding: 0.25em 0.4em;
+}
+
+.chat-message .num3 {
+  display: inline-block;
+  width: 3ch;
+  text-align: right;
+}
+
+.chat-message .num2 {
+  display: inline-block;
+  width: 2ch;
+  text-align: right;
+}
+
+.chat-message .combat-grid {
+  position: relative;
+}
+
+.chat-message .combat-grid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgb(123 117 110);
+  pointer-events: none;
+}
+.dual-roll {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.dual-roll .roll-column {
+  text-align: center;
+}
+
+.roll-label {
+  font-size: 0.75rem; /* small */
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  margin-bottom: 0.25rem;
 }

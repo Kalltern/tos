@@ -1,0 +1,153 @@
+{
+  "name": "Ice weapon",
+  "type": "spell",
+  "img": "icons/magic/water/projectile-arrow-water-ice-blue.webp",
+  "system": {
+    "description": "<p>Enchants an existing weapon (or quiver) for {{math spellPower \"*\" 5}} minutes. The weapon now deals physical/Magical/Frost damage, +2 damage, +1 armor penetration, +15% Slow chance. <br />Recasting cancels or replaces the previous effect. Incompatible with other enchantements. <br />Maximum Freeze chance 0%.</p>",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": -10,
+    "cost": 6,
+    "perRound": 0,
+    "option": "magic",
+    "type": "water",
+    "rank": "expert",
+    "actionCost": "1",
+    "range": "5",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 0,
+      "diceSize": "0",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "magic",
+    "bool2": "or",
+    "dmgType2": "frost",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "15",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": 15,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "Slowed",
+    "effectType2": "",
+    "effectType3": "",
+    "attributeTest": "",
+    "testModifier": ""
+  },
+  "effects": [],
+  "folder": "GaSIkEMI2Yi6RoKu",
+  "flags": {
+    "scene-packer": {
+      "hash": "e59462dcad8686574ca914e1bb2df33a84fa830c"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.water-spells.Item.8EJguA8WaKSPNVYO",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135135456,
+    "modifiedTime": 1770135135456,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "6YNNdCbLOL7SSkK7",
+  "sort": 0,
+  "_key": "!items!6YNNdCbLOL7SSkK7"
+}

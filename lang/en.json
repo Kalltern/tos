@@ -1,30 +1,32 @@
 {
   "TOS": {
-    "Ability": {
-      "Str": { "long": "Strength", "abbr": "str" },
-      "End": { "long": "Endurance", "abbr": "end" },
-      "Dex": { "long": "Dexterity", "abbr": "dex" },
-      "Int": { "long": "Intelligence", "abbr": "int" },
-      "Wil": { "long": "Will", "abbr": "wil" },
-      "Cha": { "long": "Charisma", "abbr": "cha" },
-      "Per": { "long": "Perception", "abbr": "per" }
-    },
     "SheetLabels": {
       "Actor": "ToS Actor Sheet",
       "Item": "ToS Item Sheet"
+    },
+    "Config": {
+      "Initiative": {
+        "name": "Dynamic Initiative",
+        "label": "This enables Initiative to be reset and rolled again automatically when entering next round"
+      }
     },
     "Actor": {
       "Tabs": {
         "Biography": "Biography",
         "TestTab": "TestTab",
+        "Skills": "Skills",
         "Features": "Features",
-        "Gear": "Gear",
+        "Inventory": "Inventory",
         "Spells": "Spells",
-        "Effects": "Effects"
+        "Miracles": "Miracles",
+        "Abilities": "Abilities",
+        "Effects": "Effects",
+        "Config": "Config"
       },
       "base": {
         "FIELDS": {
-          "biography": { "label": "Biography" }
+          "biography": { "label": "Biography" },
+          "actionCost": { "label": "Action cost" }
         }
       },
       "Character": {
@@ -33,15 +35,160 @@
             "value": { "label": "Health" },
             "max": { "label": "Maximum Health" }
           },
+          "graveWounds": {
+            "value": { "label": "Wounds" },
+            "max": { "label": "Maximum Wounds" },
+            "treated": { "label": "Treated Wounds" }
+          },
+          "stamina": {
+            "value": { "label": "Stamina" },
+            "max": { "label": "Maximum Stamina" }
+          },
+          "toxicity": {
+            "value": { "label": "Toxicity" },
+            "max": { "label": "Maximum Toxicity" }
+          },
           "mana": {
             "value": { "label": "Mana" },
             "max": { "label": "Maximum Mana" }
+          },
+          "mind": {
+            "value": { "label": "Mind" },
+            "max": { "label": "Maximum Mind" }
+          },
+          "insanity": {
+            "value": { "label": "Insanity" },
+            "max": { "label": "Maximum Insanity" }
+          },
+          "corruption": {
+            "value": { "label": "Corruption" },
+            "max": { "label": "Maximum Corruption" }
+          },
+          "fatigue": {
+            "value": { "label": "Fatigue" },
+            "max": { "label": "Maximum Fatigue" }
+          },
+          "holyEnergy": {
+            "value": { "label": "Holy Energy" },
+            "max": { "label": "Maximum Holy Energy" }
           }
+        },
+        "Attribute": {
+          "Str": { "long": "Strength", "abbr": "str" },
+          "End": { "long": "Endurance", "abbr": "end" },
+          "Dex": { "long": "Dexterity", "abbr": "dex" },
+          "Int": { "long": "Intelligence", "abbr": "int" },
+          "Wil": { "long": "Will", "abbr": "wil" },
+          "Cha": { "long": "Charisma", "abbr": "cha" },
+          "Per": { "long": "Perception", "abbr": "per" }
+        },
+        "SecondaryAttribute": {
+          "Spd": { "long": "Speed", "abbr": "spd" },
+          "Lck": { "long": "Luck", "abbr": "lck" },
+          "Res": { "long": "Resolve", "abbr": "res" },
+          "Fth": { "long": "Faith", "abbr": "fth" },
+          "Sin": { "long": "Sinfulness", "abbr": "sin" },
+          "Vis": { "long": "Visage", "abbr": "vis" },
+          "Ini": { "long": "Initiative", "abbr": "ini" }
+        },
+        "skills": {
+          "athletics": { "label": "Athletics" },
+          "muscles": { "label": "Muscles" },
+          "smithing": { "label": "Smithing" },
+          "brawler": { "label": "Brawler" },
+          "acrobacy": { "label": "Acrobacy" },
+          "craft": { "label": "Craft" },
+          "dancing": { "label": "Dancing" },
+          "lockpicking": { "label": "Lockpicking" },
+          "nimbleness": { "label": "Nimbleness" },
+          "pickpocketing": { "label": "Pickpocketing" },
+          "riding": { "label": "Riding" },
+          "sailing": { "label": "Sailing" },
+          "stealth": { "label": "Stealth" },
+          "drinking": { "label": "Drinking" },
+          "alchemy": { "label": "Alchemy" },
+          "arcana": { "label": "Arcana" },
+          "art": { "label": "Art" },
+          "engineering": { "label": "Engineering" },
+          "firstAid": { "label": "First Aid" },
+          "logic": { "label": "Logic" },
+          "research": { "label": "Research" },
+          "tactics": { "label": "Tactics" },
+          "augury": { "label": "Augury" },
+          "dreamwalker": { "label": "Dreamwalker" },
+          "meditation": { "label": "Meditation" },
+          "rituals": { "label": "Rituals" },
+          "acting": { "label": "Acting" },
+          "animalHandling": { "label": "Animal Handling" },
+          "deception": { "label": "Deception" },
+          "intimidation": { "label": "Intimidation" },
+          "leadership": { "label": "Leadership" },
+          "music": { "label": "Music" },
+          "painting": { "label": "Painting" },
+          "persuasion": { "label": "Persuasion" },
+          "seduction": { "label": "Temptation" },
+          "herbalism": { "label": "Herbalism" },
+          "insight": { "label": "Insight" },
+          "traps": { "label": "Traps" },
+          "survival": { "label": "Survival" }
+        },
+        "combatSkills": {
+          "throwing": { "label": "Throwing" },
+          "meleeDefense": { "label": "Melee Defense" },
+          "rangedDefense": { "label": "Ranged Defense" },
+          "dodge": { "label": "Dodge" },
+          "combat": { "label": "Combat" },
+          "archery": { "label": "Archery" },
+          "channeling": { "label": "Channeling" },
+          "ranger": { "label": "Ranger" },
+          "damageBonus": { "label": "Damage Bonus" }
+        },
+        "doctrines": {
+          "swordsman": { "label": "Swordsman" },
+          "shieldbearer": { "label": "Shieldbearer" },
+          "reaver": { "label": "Reaver" },
+          "pikeman": { "label": "Pikeman" },
+          "dimakerus": { "label": "Dimakerus" },
+          "duelist": { "label": "Duelist" },
+          "monk": { "label": "Monk" },
+          "rogue": { "label": "Rogue" },
+          "rider": { "label": "Rider" },
+          "archer": { "label": "Archer" },
+          "arbalest": { "label": "Arbalest" },
+          "peltast": { "label": "Peltast" },
+          "juggler": { "label": "Juggler" },
+          "musketeer": { "label": "Musketeer" },
+          "cordinas": { "label": "Cordinas" },
+          "elymas": { "label": "Elymas" },
+          "incantator": { "label": "Incantator" },
+          "veneficus": { "label": "Veneficus" },
+          "elementalist": { "label": "Elementalist" }
+        },
+        "weaponSkills": {
+          "swords": { "label": "Swords" },
+          "axes": { "label": "Axes" },
+          "blunt": { "label": "Blunt" },
+          "polearms": { "label": "Polearms" }
+        },
+        "schools": {
+          "fire": { "label": "Fire" },
+          "water": { "label": "Water" },
+          "earth": { "label": "Earth" },
+          "air": { "label": "Air" },
+          "spirit": { "label": "Spirit" },
+          "body": { "label": "Body" },
+          "darkness": { "label": "Darkness" },
+          "blood": { "label": "Blood" },
+          "gnosis": { "label": "Gnosis" },
+          "spellPower": { "label": "Spell Power" }
         }
       },
       "NPC": {
         "FIELDS": {
-          "cr": { "label": "CR" }
+          "cr": { "label": "CR" },
+          "mov": { "label": "Movement" },
+          "mage": { "label": "Mage" },
+          "priest": { "label": "Priest" }
         },
         "xp": { "label": "XP" }
       }
@@ -50,24 +197,111 @@
       "Tabs": {
         "Attributes": "Attributes",
         "Description": "Description",
-        "Effects": "Effects"
+        "Doctrines": "Doctrines",
+        "Effects": "Effects",
+        "combatEffects": "Combat Effects"
+      },
+      "Weapon": {
+        "FIELDS": {
+          "rollFormula": { "label": "Roll Formula" },
+          "diceNum": { "label": "Number of dices" },
+          "dieSize": { "label": "Die Size" },
+          "rollMod": { "label": "Roll Modifier" },
+          "finesse": { "label": "Finesse" },
+          "sharp": { "label": "Sharp" },
+          "thrown": { "label": "Thrown" },
+          "stun": { "label": "Stun" },
+          "bleed": { "label": "Bleed" },
+          "attack": { "label": "Attack" },
+          "defense": { "label": "Defense" },
+          "critRange": { "label": "Crit range" },
+          "critChance": { "label": "Crit chance" },
+          "critFail": { "label": "Crit fail" },
+          "critDefense": { "label": "Crit defense" },
+          "critDodge": { "label": "Crit dodge" },
+          "dodge": { "label": "Dodge" },
+          "weight": { "label": "Weight" },
+          "penetration": { "label": "Penetration" },
+          "breakthrough": { "label": "Breakthrough" },
+          "sneakDamage": { "label": "Sneak Damage" },
+          "extra1": { "label": "Extra Effect 1" },
+          "extra2": { "label": "Extra Effect 2" },
+          "extra3": { "label": "Extra Effect 3" }
+        }
       },
       "Gear": {
         "FIELDS": {
-          "rollFormula": { "label": "Roll Formula" },
-          "numDice": { "label": "Number of Dice" },
-          "dieSize": { "label": "Die Size" },
-          "rollMod": { "label": "Roll Modifier" },
-          "quantity": { "label": "Quantity" },
-          "weight": { "label": "Weight" }
+          "armor": { "label": "Armor" },
+          "armorTotal": { "label": "Armor total" },
+          "weight": { "label": "Weight" },
+          "acidArmor": { "label": "Acid" },
+          "fireArmor": { "label": "Fire" },
+          "frostArmor": { "label": "Frost" },
+          "lightningArmor": { "label": "Lightning" },
+          "magicArmor": { "label": "Magic" },
+          "equipped": { "label": "Equipped" },
+          "layer": { "label": "Armor layer" },
+          "helmet": { "label": "Has head" },
+          "shield": { "label": "Is a shield" },
+          "durability": { "label": "Durability" },
+          "swimPenalty": { "label": "Swim penalty" },
+          "dodgePenalty": { "label": "Dodge penalty" },
+          "castPenalty": { "label": "Cast penalty" },
+          "acroPenalty": { "label": "Acro. penalty" },
+          "stealthPenalty": { "label": "Stealth penalty" },
+          "iniPenalty": { "label": "Ini. penalty" },
+          "maxSpeed": { "label": "Max speed" },
+          "rangedDefense": { "label": "Ranged defense" },
+          "defense": { "label": "Defense bonus" },
+          "healthBonus": { "label": "Health bonus" },
+          "critDefense": { "label": "Critical defense" },
+          "rangedCritDefense": { "label": "Ranged Crit Def" },
+          "archeryPenalty": { "label": "Archery penalty" },
+          "perPenalty": { "label": "Per. penalty" }
+        }
+      },
+      "Consumable": {
+        "FIELDS": {
+          "toxicity": { "label": "Toxicity" },
+          "bleed": { "label": "Stop bleed %" },
+          "aimed": { "label": "Single target" },
+          "burn": { "label": "Burn" },
+          "freeze": { "label": "Freeze" },
+          "stun": { "label": "Stun" },
+          "quantity": { "label": "Quantity" }
+        }
+      },
+      "Ability": {
+        "FIELDS": {
+          "modifier": { "label": "Modifier" },
+          "costType": { "label": "Cost type" },
+          "actionCost": { "label": "Action Cost" },
+          "damage": { "label": "Damage" },
+          "attributeTest": { "label": "Test" },
+          "weaponAbility": { "label": "Weapon required" },
+          "resourceCost": { "label": "Resource Cost" }
         }
       },
       "Spell": {
         "FIELDS": {
-          "level": { "label": "Spell Level" }
-        },
-        "SpellLVL": "Level {level} Spells",
-        "AddLVL": "Add LVL {level}"
+          "isOffensive": { "label": "Offensive" },
+          "difficulty": { "label": "Difficulty" },
+          "cost": { "label": "Cost" },
+          "perRound": { "label": "Cost per round" },
+          "headerRank": { "label": "Rank" },
+          "headerCost": { "label": "Cost / Per round" },
+          "headerActions": { "label": "Action cost | C" },
+          "headerRange": { "label": "Range" },
+          "holyPower": { "label": "Holy power" },
+          "domain": { "label": "Domain" },
+          "shepherdsWill": { "label": "Shepherd's will" },
+          "headerType": { "label": "Damage Type" },
+          "wild": { "label": "Wild" },
+          "apprentice": { "label": "Apprentice" },
+          "expert": { "label": "Expert" },
+          "master": { "label": "Master" },
+          "grandmaster": { "label": "Grandmaster" }
+        }
       }
     },
     "Effect": {
@@ -75,7 +309,15 @@
       "Toggle": "Toggle Effect",
       "Temporary": "Temporary Effects",
       "Passive": "Passive Effects",
-      "Inactive": "Inactive Effects"
+      "Inactive": "Inactive Effects",
+      "Custom": {
+        "name1": "Extra Effect Name 1 ",
+        "name2": "Extra Effect Name 2 ",
+        "name3": "Extra Effect Name 3 "
+      },
+      "type1": "Extra Effect Type 1",
+      "type2": "Extra Effect Type 2",
+      "type3": "Extra Effect Type 3"
     }
   },
   "TYPES": {
@@ -84,7 +326,12 @@
       "npc": "NPC"
     },
     "Item": {
+      "weapon": "Weapon",
+      "item": "Item",
       "gear": "Gear",
+      "race": "Race",
+      "consumable": "Consumable",
+      "ability": "Ability",
       "feature": "Feature",
       "spell": "Spell"
     }

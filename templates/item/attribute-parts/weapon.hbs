@@ -1,0 +1,160 @@
+{{! Attributes Tab }}
+<section
+  class="tab attributes {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="attributes"
+>
+  {{! As you add new fields, add them in here! }}
+
+  <div class="resource">
+    <label class="resource-label">{{localize
+        "TOS.Item.Weapon.FIELDS.rollFormula.label"
+      }}:</label>
+    <span>{{system.formula}}</span>
+
+    <div class="grid grid-4col">
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.attack.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.attack"
+          value="{{system.attack}}"
+          data-dtype="Number"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.defense"
+          value="{{system.defense}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critRange.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critRange"
+          value="{{system.critRange}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critChance.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critChance"
+          value="{{system.critChance}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critFail.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critFail"
+          value="{{system.critFail}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critDefense"
+          value="{{system.critDefense}}"
+          data-dtype="Number"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critDodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critDodge"
+          value="{{system.critDodge}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.dodge"
+          value="{{system.dodge}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.breakthrough.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.breakthrough"
+          value="{{system.breakthrough}}"
+          data-dtype="String"
+          placeholder="e.g. 2d6"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.sneakDamage.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.sneakDamage"
+          value="{{system.sneakDamage}}"
+          data-dtype="String"
+          placeholder="e.g. 2d6"
+        />
+      </div>
+      <div class="grid-span-2"></div>
+      <div class="checkbox-row">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.finesse.label"
+          }}</label>
+        <input
+          type="checkbox"
+          name="system.finesse"
+          {{checked system.finesse}}
+        />
+
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.sharp.label"
+          }}</label>
+        <input type="checkbox" name="system.sharp" {{checked system.sharp}} />
+
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.thrown.label"
+          }}</label>
+        <input type="checkbox" name="system.thrown" {{checked system.thrown}} />
+      </div>
+
+    </div>
+
+  </div>
+</section>

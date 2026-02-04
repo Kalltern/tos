@@ -1,0 +1,171 @@
+{
+  "name": "Conjure fire",
+  "type": "spell",
+  "img": "icons/magic/fire/flame-burning-yellow-orange.webp",
+  "system": {
+    "description": "<p>Conjures one of the following in caster's free hand:</p><ul><li><p>A small fire in the hand for 1d6 health</p></li><li><p>A medium fire for 2d6 health</p></li><li><p>A large fire for 5d6 health.</p></li></ul><p>The spell 'Fire Attack' consumes this fire.</p>",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [
+      "bleeding",
+      "burning",
+      "chain",
+      "disorientation",
+      "dispel",
+      "flammable",
+      "frozen",
+      "concussion",
+      "paralyzed",
+      "poisoned",
+      "rooted",
+      "slowed",
+      "stun",
+      "vulnerable",
+      "weakened",
+      "wet"
+    ],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": false,
+    "difficulty": 20,
+    "cost": 2,
+    "perRound": 0,
+    "option": "magic",
+    "type": "fire",
+    "rank": "wild",
+    "actionCost": "Free action",
+    "range": "Caster",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 0,
+      "diceSize": "0",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "",
+    "bool2": "",
+    "dmgType2": "",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": 0,
+      "effect2": 0,
+      "effect3": 0,
+      "effect4": 0,
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null,
+      "effectName2": ""
+    },
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": "",
+    "attributeTest": "",
+    "testModifier": ""
+  },
+  "effects": [],
+  "folder": "bAWY9kbglzWtgc23",
+  "flags": {
+    "scene-packer": {
+      "hash": "f327e30292478191a7957f91cccad08f331abd81"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.fire-spells.Item.nbcLxMuROHwJlnKn",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135134468,
+    "modifiedTime": 1770135134468,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "QAutYWIxntGhdU2m",
+  "sort": 0,
+  "_key": "!items!QAutYWIxntGhdU2m"
+}

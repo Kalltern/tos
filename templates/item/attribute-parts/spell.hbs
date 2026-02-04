@@ -5,13 +5,219 @@
   data-tab='attributes'
 >
   {{! As you add new fields, add them in here! }}
-  <div class='resource'>
-    <label class='resource-label'>{{localize 'TOS.Item.Spell.FIELDS.level.label'}}</label>
-    <input
-      type='text'
-      name='system.spellLevel'
-      value='{{system.spellLevel}}'
-      data-dtype='Number'
-    />
+  <div class='grid grid-4col'>
+
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.headerActions.label"
+          }}</label>
+        
+        <input
+          type="text"
+          placeholder="e.g. 5 | C"
+          name="system.actionCost"
+          value="{{system.actionCost}}"
+          data-dtype="String"
+        />
+         </div>
+
+                <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.headerRange.label"
+          }}</label>
+        
+        <input
+          type="text"
+          placeholder="6/Caster/Touch"
+          name="system.range"
+          value="{{system.range}}"
+          data-dtype="String"
+        />
+         </div>
+{{#if (eq item.system.option "magic")}}
+        <div class="grid-span-1">
+          <label for="spell-class">Class:</label>
+          <select name="system.spellClass" id="spell-class">
+  <option value="1"></option>
+  {{#each system.classOptions as |spellClass|}}
+    <option value="{{spellClass}}" {{#if (eq ../system.spellClass spellClass)}}selected{{/if}}>
+      {{spellClass}}
+    </option>
+  {{/each}}
+</select>
+</div>
+{{/if}}
+
+{{#if (eq item.system.option "divine")}}
+                <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.domain.label"
+          }}</label>
+        
+        <input
+          type="text"
+          name="system.domain"
+          value="{{system.domain}}"
+          data-dtype="String"
+        />
+         </div>
+{{/if}}
+         <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.perRound.label"
+          }}</label>
+        
+        <input
+          type="text"
+          name="system.perRound"
+          value="{{system.perRound}}"
+          data-dtype="Number"
+        />
+         </div>
+
+
+<div class="grid-span-4">
+<label class="resource-label">{{localize
+     "TOS.Item.Spell.FIELDS.headerType.label"
+  }}</label></div>
+
+<select name="system.dmgType1" id="dmg-type-1">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType1 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.bool2" id="effect-bool-2">
+  <option value="">-- Select a type --</option>
+  {{#each system.effectOptions as |bool|}}
+    <option value="{{bool}}" {{#if (eq ../system.bool2 bool)}}selected{{/if}}>
+      {{bool}}
+    </option>
+  {{/each}}
+</select> 
+
+<select name="system.dmgType2" id="dmg-type-2">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType2 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.bool3" id="effect-bool-3">
+  <option value="">-- Select a type --</option>
+  {{#each system.effectOptions as |bool|}}
+    <option value="{{bool}}" {{#if (eq ../system.bool3 bool)}}selected{{/if}}>
+      {{bool}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.dmgType3" id="dmg-type-3">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType3 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.bool4" id="effect-bool-4">
+  <option value="">-- Select a type --</option>
+  {{#each system.effectOptions as |bool|}}
+    <option value="{{bool}}" {{#if (eq ../system.bool4 bool)}}selected{{/if}}>
+      {{bool}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.dmgType4" id="dmg-type-4">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType4 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+<div class="grid-span-4">
+<label class="resource-label">Other Resource costs</label>
+</div>
+
+<div class="grid-span-2">
+<label class="resource-label">Resource type</label>
+<select name="system.resources.0.type" id="resource0Type">
+  <option value="">-- Select a type --</option>
+  {{#each system.resourceOptions.types as |resourceType|}}
+    <option value="{{resourceType}}" {{#if (eq ../system.resources.0.type resourceType)}}selected{{/if}}>
+      {{resourceType}}
+    </option>
+  {{/each}}
+</select>
+</div>
+
+<div class="grid-span-1">
+<label class="resource-label">Mode</label>
+<select name="system.resources.0.mode" id="resource0Mode">
+  <option value="">-- Select a type --</option>
+  {{#each system.resourceOptions.modes as |AddOrBurn|}}
+    <option value="{{AddOrBurn}}" {{#if (eq ../system.resources.0.mode AddOrBurn)}}selected{{/if}}>
+      {{AddOrBurn}}
+    </option>
+  {{/each}}
+</select>
+</div>
+
+<div class="grid-span-1">
+  <label class="resource-label">Amount</label>
+  <input
+    type="text"
+    name="system.resources.0.amount"
+    value="{{system.resources.0.amount}}"
+    data-dtype="Number"
+  />
+</div>
+
+<div class="grid-span-2">
+  <select name="system.resources.1.type" id="resource1Type">
+    <option value="">-- Select a type --</option>
+    {{#each system.resourceOptions.types as |resourceType|}}
+      <option
+        value="{{resourceType}}"
+        {{#if (eq ../system.resources.1.type resourceType)}}selected{{/if}}
+      >
+        {{resourceType}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="grid-span-1">
+  <select name="system.resources.1.mode" id="resource1Mode">
+    <option value="">-- Select a type --</option>
+    {{#each system.resourceOptions.modes as |AddOrBurn|}}
+      <option
+        value="{{AddOrBurn}}"
+        {{#if (eq ../system.resources.1.mode AddOrBurn)}}selected{{/if}}
+      >
+        {{AddOrBurn}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="grid-span-1">
+  <input
+    type="text"
+    name="system.resources.1.amount"
+    value="{{system.resources.1.amount}}"
+    data-dtype="Number"
+  />
+</div>
+
   </div>
 </section>

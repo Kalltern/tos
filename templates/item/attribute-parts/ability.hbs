@@ -1,0 +1,264 @@
+{{! Attributes Tab }}
+<section
+  class='tab attributes {{tab.cssClass}}'
+  data-group='primary'
+  data-tab='attributes'
+>
+  {{! As you add new fields, add them in here! }}
+  <div class='grid grid-4col'>
+
+           <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.headerActions.label"
+          }}</label>
+        
+        <input
+          type="text"
+          placeholder="e.g. 2 | R"
+          name="system.actionCost"
+          value="{{system.actionCost}}"
+          data-dtype="String"
+        />
+         </div>
+
+                <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Spell.FIELDS.perRound.label"
+          }}</label>
+        
+        <input
+          type="text"
+          name="system.perRound"
+          value="{{system.perRound}}"
+          data-dtype="Number"
+        />
+         </div>
+          {{#if (eq system.class "defense") }} 
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.defense"
+          value="{{system.defense}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Gear.FIELDS.rangedDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.rangedDefense"
+          value="{{system.rangedDefense}}"
+          data-dtype="Number"
+        />
+      </div>
+
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.dodge"
+          value="{{system.dodge}}"
+          data-dtype="Number"
+        />
+      </div>
+       {{/if}}
+      {{#unless (eq system.class "defense")}}
+            <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.breakthrough.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.breakthrough"
+          value="{{system.breakthrough}}"
+          data-dtype="String"
+          placeholder="e.g. 2d6"
+        />
+      </div>
+
+
+        <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.attack.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.attack"
+          value="{{system.attack}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critRange.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critRange"
+          value="{{system.critRange}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critChance.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critChance"
+          value="{{system.critChance}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critFail.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.critFail"
+          value="{{system.critFail}}"
+          data-dtype="Number"
+        />
+      </div>
+
+<div class="grid-span-4">
+<label class="resource-label">{{localize
+     "TOS.Item.Spell.FIELDS.headerType.label"
+  }}</label></div>
+
+<select name="system.dmgType1" id="dmg-type-1">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType1 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.bool2" id="effect-bool-2">
+  <option value="">-- Select a type --</option>
+  {{#each system.effectOptions as |bool|}}
+    <option value="{{bool}}" {{#if (eq ../system.bool2 bool)}}selected{{/if}}>
+      {{bool}}
+    </option>
+  {{/each}}
+</select> 
+
+<select name="system.dmgType2" id="dmg-type-2">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType2 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.bool3" id="effect-bool-3">
+  <option value="">-- Select a type --</option>
+  {{#each system.effectOptions as |bool|}}
+    <option value="{{bool}}" {{#if (eq ../system.bool3 bool)}}selected{{/if}}>
+      {{bool}}
+    </option>
+  {{/each}}
+</select>
+
+<select name="system.dmgType3" id="dmg-type-3">
+  <option value="">-- Select a type --</option>
+  {{#each system.dmgTypes as |dmgType|}}
+    <option value="{{dmgType}}" {{#if (eq ../system.dmgType3 dmgType)}}selected{{/if}}>
+      {{dmgType}}
+    </option>
+  {{/each}}
+</select>
+
+
+<div class="grid-span-4">
+<label class="resource-label">Other Resource costs</label>
+</div>
+
+<div class="grid-span-2">
+<label class="resource-label">Resource type</label>
+<select name="system.resources.0.type" id="resource0Type">
+  <option value="">-- Select a type --</option>
+  {{#each system.resourceOptions.types as |resourceType|}}
+    <option value="{{resourceType}}" {{#if (eq ../system.resources.0.type resourceType)}}selected{{/if}}>
+      {{resourceType}}
+    </option>
+  {{/each}}
+</select>
+</div>
+
+<div class="grid-span-1">
+<label class="resource-label">Mode</label>
+<select name="system.resources.0.mode" id="resource0Mode">
+  <option value="">-- Select a type --</option>
+  {{#each system.resourceOptions.modes as |AddOrBurn|}}
+    <option value="{{AddOrBurn}}" {{#if (eq ../system.resources.0.mode AddOrBurn)}}selected{{/if}}>
+      {{AddOrBurn}}
+    </option>
+  {{/each}}
+</select>
+</div>
+
+<div class="grid-span-1">
+  <label class="resource-label">Amount</label>
+  <input
+    type="text"
+    name="system.resources.0.amount"
+    value="{{system.resources.0.amount}}"
+    data-dtype="Number"
+  />
+</div>
+
+<div class="grid-span-2">
+  <select name="system.resources.1.type" id="resource1Type">
+    <option value="">-- Select a type --</option>
+    {{#each system.resourceOptions.types as |resourceType|}}
+      <option
+        value="{{resourceType}}"
+        {{#if (eq ../system.resources.1.type resourceType)}}selected{{/if}}
+      >
+        {{resourceType}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="grid-span-1">
+  <select name="system.resources.1.mode" id="resource1Mode">
+    <option value="">-- Select a type --</option>
+    {{#each system.resourceOptions.modes as |AddOrBurn|}}
+      <option
+        value="{{AddOrBurn}}"
+        {{#if (eq ../system.resources.1.mode AddOrBurn)}}selected{{/if}}
+      >
+        {{AddOrBurn}}
+      </option>
+    {{/each}}
+  </select>
+</div>
+
+<div class="grid-span-1">
+  <input
+    type="text"
+    name="system.resources.1.amount"
+    value="{{system.resources.1.amount}}"
+    data-dtype="Number"
+  />
+</div>
+
+  {{/unless}}
+  </div>
+</section>

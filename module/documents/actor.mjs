@@ -16,6 +16,10 @@ export class ToSActor extends Actor {
   prepareBaseData() {
     // Data modifications in this step occur before processing embedded
     // documents or derived data.
+    const system = this.system;
+
+    system.globalBonus ??= 0;
+    system.globalPenalty ??= 0;
   }
 
   /**
@@ -23,15 +27,90 @@ export class ToSActor extends Actor {
    * Augment the actor source data with additional dynamic data. Typically,
    * you'll want to handle most of your calculated/derived data in this step.
    * Data calculated in this step should generally not exist in template.json
-   * (such as ability modifiers rather than ability scores) and should be
+   * (such as attribute modifiers rather than attribute scores) and should be
    * available both inside and outside of character sheets (such as if an actor
    * is queried and has a roll executed directly from it).
    */
+  _prepareGlobalMod() {
+    const system = this.system;
+
+    system.globalMod = 0;
+    // Grave wounds
+    const gw = system.stats?.graveWounds ?? {};
+    const graveWounds = 5 * (gw.value ?? 0) - 3 * (gw.treated ?? 0);
+    if (graveWounds > 0) {
+      system.globalMod -= graveWounds;
+    }
+
+    // Fatigue
+    const fatigue = system.stats?.fatigue?.value ?? 0;
+    if (fatigue >= 3) {
+      system.globalMod -= 10;
+    }
+    system.globalMod += system.globalBonus ?? 0;
+    system.globalMod -= system.globalPenalty ?? 0;
+  }
   prepareDerivedData() {
     const actorData = this;
     const systemData = actorData.system;
+    const tempHp = systemData.stats.temporaryHealth;
+    // Reset global penalties
+
+    tempHp.value = Number(tempHp.value) || 0;
+    tempHp.max = Number(tempHp.max) || 0;
+
     const flags = actorData.flags.tos || {};
 
+    systemData.rerolls = {};
+    let skill = systemData.skills;
+    let combatSkill = systemData.combatSkills;
+    let secondaryAttribute = systemData.secondaryAttributes;
+    // Iterate through gear
+    const elementalTypes = ["acid", "fire", "frost", "lightning", "magic"];
+    for (const type of elementalTypes) {
+      systemData.armor[type].bonus = 0;
+    }
+    let totalArmor = 0;
+    for (const item of this.items) {
+      for (const type of elementalTypes) {
+        systemData.armor[type].bonus += item.system?.armor?.[type].value ?? 0;
+      }
+      if (item.type === "gear" && item.system.equipped) {
+        if (actorData.type === "character") {
+          skill.acrobacy.bonus += item.system.acroPenalty ?? 0;
+          skill.athletics.swimming += item.system.swimPenalty ?? 0;
+          skill.stealth.bonus += item.system.stealthPenalty ?? 0;
+          secondaryAttribute.ini.bonus += item.system.iniPenalty ?? 0;
+          secondaryAttribute.spd.max += item.system.maxSpeed ?? 0;
+        }
+        totalArmor += item.system.armor.value;
+        combatSkill.meleeDefense.critbonus += item.system.critDefense ?? 0;
+        combatSkill.rangedDefense.critbonus +=
+          item.system.rangedCritDefense ?? 0;
+        combatSkill.dodge.bonus += item.system.dodgePenalty ?? 0;
+        combatSkill.channeling.bonus += item.system.castPenalty ?? 0;
+        combatSkill.rangedDefense.bonus += item.system.rangedDefense ?? 0;
+        combatSkill.meleeDefense.bonus += item.system.defense ?? 0;
+
+        systemData.stats.health.bonus += item.system.healthBonus ?? 0;
+      }
+    }
+
+    for (const type of elementalTypes) {
+      const armor = systemData.armor[type];
+      armor.total = armor.value + armor.bonus;
+    }
+    systemData.armor.total = totalArmor + systemData.armor.natural;
+    // Iterate through gear (only helmets)
+    for (const item of this.items) {
+      let combatSkill = systemData.combatSkills;
+      if (item.type === "gear" && item.system.equipped && item.system.helmet) {
+        combatSkill.archery.rating += item.system.archeryPenalty ?? 0;
+        systemData.dodgePenalty += item.system.perPenalty ?? 0;
+      }
+    }
+
+    this._prepareGlobalMod();
     // Make separate methods for each Actor type (character, npc, etc.) to keep
     // things organized.
     this._prepareCharacterData(actorData);
@@ -46,54 +125,680 @@ export class ToSActor extends Actor {
 
     // Make modifications to data here. For example:
     const systemData = actorData.system; //everything else
-    // Loop through ability scores, and add their modifiers to our sheet output.
-    for (let [key, ability] of Object.entries(systemData.abilities)) {
-      // Calculate the ability rating using ToS rules.
-      ability.mod = Math.floor(15 + ability.value * 10);
+    // Loop through attribute scores, and add their modifiers to our sheet output.
+    for (let [key, attribute] of Object.entries(systemData.attributes)) {
+      attribute.total = attribute.value + attribute.bonus;
     }
-    // Debugging: Log the abilities
-    console.log(systemData.abilities);
-    // Calculate endurance
-    const endurance = systemData.abilities.end.value; // Ensure endurance exists
-    console.log("Endurance value:", endurance); // Log endurance value
-    // Set health correctly under stats
-    systemData.stats.health.max += endurance * 5; // Set health based on endurance
+    for (let [key, attribute] of Object.entries(
+      systemData.secondaryAttributes,
+    )) {
+      // Calculate the attribute rating using ToS rules.
+      attribute.total = attribute.value + (attribute.bonus ?? 0);
+    }
+    for (let [key, stat] of Object.entries(systemData.stats)) {
+      // Calculate the attribute rating using ToS rules.
+      stat.max = stat.base + (stat.bonus ?? 0);
+    }
 
-    //Loop through skill groups and add their ratings depending on their level and ability score
+    //Loop through skill groups and add their ratings depending on their level and attribute score
     const skillset1 = [0, 15, 25, 30, 35, 45, 50, 55, 65, 75, 85];
     const skillset2 = [0, 5, 10, 15, 20, 30]; // muscles, nimbleness
-    const skillset3 = [0, 25, 40, 55, 70, 85]; //riding and sailing
-    const skillset4 = [0, 40, 65, 90]; //dancing, meditation
+    const skillset3 = [0, 25, 40, 55, 70, 85]; //riding and sailing and herbalism
+    const skillset4 = [0, 40, 65, 90]; //dancing
     const skillset5 = [0, 10, 20, 30, 40, 50]; //drinking
     const skillset6 = [0, 5, 10, 15, 20, 25]; //social
-    const skillset7 = [0, 20, 30, 40, 50, 60]; //survival
-    const abilityScore = Object.keys(systemData.abilities).map(
-      (key) => systemData.abilities[key].value
+    const skillset7 = [0, 20, 30, 40, 50, 60]; //survival, meditation
+    const combatset1 = [0, 15, 20, 30, 35, 45, 50, 60, 65, 75, 80]; // combat + archery
+    const channeling1 = [0, 20, 25, 30, 35, 45, 50, 55, 65, 70, 80];
+    const channeling2 = [0, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70];
+    const throwing = [0, 20, 25, 30, 35, 40, 45, 50, 55, 65, 70];
+    const dodge = [0, 20, 25, 35, 40, 50, 55, 60, 65, 75, 85];
+    const rangedDefenseSet = [0, 10, 20, 25, 30, 35, 40, 45, 50, 55, 60];
+    const rangerGroup = [0, 15, 19, 28, 32, 42, 46, 56, 60, 70, 75];
+    const ranger = systemData.combatSkills.ranger.value;
+    const hasFinesse = systemData.finesse;
+    const rangeddef = systemData.combatSkills.rangedDefense;
+    const stat = systemData.stats;
+    const globalMod = systemData.globalMod;
+    const visage = systemData.secondaryAttributes.vis.total;
+    const sin = systemData.secondaryAttributes.sin.total;
+    const archery = systemData.combatSkills.archery;
+    const combat = systemData.combatSkills.combat;
+    const melee = combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
+    const brawler = systemData.skills.brawler;
+    const meleeOrRanged = Math.max(throwing[melee], combatset1[archery.value]);
+    const attributeScore = Object.entries(systemData.attributes).map(
+      ([key, attribute]) => ({
+        total: attribute.value + (attribute.bonus ?? 0), // Combine value and bonus
+      }),
     );
 
     // Iterate through skills
     for (let [key, skill] of Object.entries(systemData.skills)) {
       // Ensure skill type is valid and matches your criteria
       if (skill.type === 1) {
-        // Use skill.id to find the corresponding ability
-        skill.rating += skillset1[skill.value] + abilityScore[skill.id] * 3;
+        // Use skill.id to find the corresponding attribute
+        if (key === "athletics") {
+          skill.swimming +=
+            skillset1[skill.value] +
+            attributeScore[skill.id].total * 3 +
+            skill.bonus +
+            globalMod;
+        }
+
+        skill.rating =
+          skillset1[skill.value] +
+          attributeScore[skill.id].total * 3 +
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 2) {
-        skill.rating += skillset2[skill.value] + abilityScore[skill.id] * 3;
+        skill.rating = skillset2[skill.value];
       } else if (skill.type === 3) {
-        skill.rating += skillset3[skill.value] + abilityScore[skill.id] * 3;
+        skill.rating =
+          skillset3[skill.value] +
+          attributeScore[skill.id].total * 3 +
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 4) {
-        skill.rating += skillset4[skill.value] + abilityScore[skill.id] * 3;
+        skill.rating =
+          skillset4[skill.value] +
+          attributeScore[skill.id].total * 3 +
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 5) {
-        skill.rating += skillset5[skill.value] + abilityScore[skill.id] * 3;
+        skill.rating =
+          skillset5[skill.value] +
+          attributeScore[skill.id].total * 3 +
+          skill.bonus +
+          globalMod;
       } else if (skill.type === 6) {
-        skill.rating += skillset6[skill.value] + abilityScore[skill.id] * 6;
+        if (key === "deception") {
+          skill.rating =
+            skillset6[skill.value] +
+            attributeScore[skill.id].total * 5 +
+            attributeScore[3].total * 3 +
+            visage +
+            skill.bonus +
+            globalMod;
+        }
+        if (key === "intimidation") {
+          skill.rating =
+            skillset6[skill.value] +
+            attributeScore[skill.id].total * 5 +
+            attributeScore[0].total * 3 +
+            -Math.min(0, visage * 2) +
+            skill.bonus +
+            globalMod;
+        }
+        if (key === "persuasion") {
+          skill.rating =
+            skillset6[skill.value] +
+            attributeScore[skill.id].total * 5 +
+            attributeScore[4].total * 3 +
+            visage +
+            skill.bonus +
+            globalMod;
+        }
+        if (key === "seduction") {
+          skill.rating =
+            skillset6[skill.value] +
+            attributeScore[skill.id].total * 5 +
+            Math.max(attributeScore[6].total, visage) * 3 +
+            sin +
+            skill.bonus +
+            globalMod;
+        }
+        if (key === "insight") {
+          skill.rating =
+            skillset6[skill.value] +
+            attributeScore[skill.id].total * 5 +
+            attributeScore[5].total * 4 +
+            skill.bonus +
+            globalMod;
+        }
       } else if (skill.type === 7) {
-        skill.rating += skillset7[skill.value] + abilityScore[skill.id] * 3;
+        skill.rating =
+          skillset7[skill.value] +
+          attributeScore[skill.id].total * 3 +
+          skill.bonus +
+          globalMod;
+      }
+    }
+    // Calculate the attribute rating using ToS rules. Rework calculations for stun effects
+    for (let [key, attribute] of Object.entries(systemData.attributes)) {
+      attribute.mod = Math.floor(
+        15 +
+          attribute.modBonus +
+          (systemData.globalMod ?? 0) +
+          (attribute.bonus + attribute.value) * 10,
+      );
+      if (key === "str") {
+        attribute.mod = Math.floor(
+          15 +
+            attribute.modBonus +
+            (systemData.globalMod ?? 0) +
+            systemData.skills.muscles.rating +
+            (attribute.bonus + attribute.value) * 10,
+        );
+      }
+      if (key === "dex") {
+        attribute.mod = Math.floor(
+          15 +
+            attribute.modBonus +
+            (systemData.globalMod ?? 0) +
+            systemData.skills.nimbleness.rating +
+            (attribute.bonus + attribute.value) * 10,
+        );
       }
     }
 
-    // Debugging: Log the skills
-    console.log("Updated Skills:", systemData.skills);
+    // Iterate through combat skills
+    for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
+      // Ensure skill type is valid and matches your criteria
+      if (combatSkill.type === 0) {
+        // Looking for finesse=true to use dexterity, otherwise use strength
+        // looking for ranger=true to use ranger skills instead of classic skills
+        // Hotfixed for Finesse added
+        if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
+          if (ranger > 0) {
+            combat.finesseRating =
+              rangerGroup[ranger] +
+              attributeScore[1].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else {
+            combat.finesseRating =
+              combatset1[melee] +
+              attributeScore[1].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          }
+        }
+        if (combatSkill === combat) {
+          // Apply ranger bonus if applicable
+          if (ranger > 0) {
+            combatSkill.rating =
+              rangerGroup[ranger] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else {
+            combatSkill.rating =
+              combatset1[melee] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          }
+        }
+        if (combatSkill === rangeddef) {
+          if (archery.value > melee && archery.value != 0) {
+            combatSkill.rating =
+              rangedDefenseSet[archery.value] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else if (ranger > 0) {
+            combatSkill.rating =
+              rangedDefenseSet[ranger] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else {
+            combatSkill.rating =
+              rangedDefenseSet[melee] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          }
+        }
+
+        if (combatSkill === archery) {
+          if (ranger > 0) {
+            archery.rating =
+              combatset1[ranger] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else {
+            archery.rating =
+              combatset1[archery.value] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          }
+        }
+
+        // Assuming steelGrip and predatorySenses are properties directly on the actor
+        if (combatSkill === systemData.combatSkills.meleeDefense) {
+          // Check if the actor has steelGrip enabled
+          if (systemData.steelGrip) {
+            combatSkill.rating =
+              combatset1[melee] +
+              attributeScore[0].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          }
+          // Check if the actor has predatorySenses enabled
+          else if (systemData.predatorySenses) {
+            combatSkill.rating =
+              rangerGroup[ranger] +
+              attributeScore[6].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else if (ranger > 0) {
+            combatSkill.rating =
+              rangerGroup[ranger] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          } else {
+            combatSkill.rating =
+              combatset1[melee] +
+              attributeScore[combatSkill.id].total * 3 +
+              combatSkill.bonus +
+              globalMod;
+          }
+        }
+      }
+      if (combatSkill.type === 1) {
+        //setting ratings for dodge
+        combatSkill.rating =
+          dodge[systemData.skills.acrobacy.value] +
+          attributeScore[combatSkill.id].total * 3 +
+          combatSkill.bonus +
+          globalMod;
+      }
+      if (combatSkill.type === 2) {
+        if (ranger > 0) {
+          combatSkill.rating =
+            combatset1[ranger] +
+            attributeScore[combatSkill.id].total * 3 +
+            combatSkill.bonus +
+            globalMod;
+        } else if (hasFinesse && attributeScore[6] <= attributeScore[1]) {
+          combatSkill.finesseRating =
+            meleeOrRanged +
+            attributeScore[1].total * 3 +
+            combatSkill.bonus +
+            globalMod;
+        } else {
+          combatSkill.rating =
+            meleeOrRanged +
+            attributeScore[combatSkill.id].total * 3 +
+            combatSkill.bonus +
+            globalMod;
+        }
+      }
+      if (combatSkill.type === 3) {
+        if (combatSkill.lindar) {
+          combatSkill.rating =
+            channeling2[combatSkill.value] +
+            attributeScore[combatSkill.id].total * 3 +
+            combatSkill.bonus +
+            globalMod;
+        } else {
+          combatSkill.rating =
+            channeling1[combatSkill.value] +
+            attributeScore[combatSkill.id].total * 3 +
+            combatSkill.bonus +
+            globalMod;
+        }
+      }
+    }
+
+    //Calculate brawler
+    if (hasFinesse && attributeScore[0] <= attributeScore[1]) {
+      brawler.rating =
+        skillset1[brawler.value] +
+        attributeScore[1].total * 3 +
+        brawler.bonus +
+        globalMod;
+      if (skillset1[brawler.value] < rangedDefenseSet[melee]) {
+        rangedDefenseSet[melee] +
+          attributeScore[1].total * 3 +
+          brawler.bonus +
+          globalMod;
+      }
+    } else {
+      brawler.rating =
+        skillset1[brawler.value] +
+        attributeScore[0].total * 3 +
+        brawler.bonus +
+        globalMod;
+      if (skillset1[brawler.value] < rangedDefenseSet[melee]) {
+        brawler.rating =
+          rangedDefenseSet[melee] +
+          attributeScore[0].total * 3 +
+          brawler.bonus +
+          globalMod;
+      }
+    }
+
+    // Prepare secondary attributes and stat calculations
+    const secAttribute = systemData.secondaryAttributes;
+
+    const attribute = systemData.attributes;
+    const str = attribute.str.total;
+    const dex = attribute.dex.total;
+    const end = attribute.end.total;
+    const int = attribute.int.total;
+    const wil = attribute.wil.total;
+    const per = attribute.per.total;
+    const cha = attribute.cha.total;
+
+    // Calculate sneak damage
+    const calcRogueSneakDamage = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4];
+    systemData.sneakDamage =
+      calcRogueSneakDamage[systemData.doctrines.rogue.value] +
+      systemData.sneakDamageBonus;
+    // Calculate initiative
+    const calcIni = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5];
+    secAttribute.ini.total =
+      calcIni[per] + secAttribute.ini.value + secAttribute.ini.bonus;
+
+    // Calculate speed
+    const calcSpd = [0, 3, 3, 4, 4, 4, 5, 5, 6, 6, 6];
+    secAttribute.spd.total =
+      stat.fatigue.value >= 5
+        ? 1
+        : calcSpd[dex] +
+          secAttribute.spd.value +
+          secAttribute.spd.bonus -
+          (stat.fatigue.value >= 3 ? 1 : 0);
+
+    // Calculate resolve from endurance and will
+    const calcResEnd = [0, 0, 0, 1, 1, 2, 2, 3, 3, 3, 3];
+    const calcResWill = [0, 0, 0, 1, 2, 2, 3, 3, 3, 3, 3];
+    secAttribute.res.total =
+      calcResEnd[end] +
+      calcResWill[wil] +
+      secAttribute.res.value +
+      secAttribute.res.bonus;
+
+    // Calculate wounds cap
+    const calcWounds = [0, 0, 0, 0, 1, 1, 1, 2, 2, 2, 2];
+    stat.graveWounds.max =
+      calcWounds[end] + stat.graveWounds.base + stat.graveWounds.bonus;
+
+    // Calculate critRanges
+    const calcCritRange = [0, 0, 0, 0, 1, 1, 2, 3, 3, 3, 3];
+    systemData.critRangeMelee = calcCritRange[str] + calcCritRange[per];
+    systemData.critRangeRanged = calcCritRange[per];
+    systemData.critRangeCast = calcCritRange[int] ?? 0;
+    // Calculate misc
+    secAttribute.lck.total = secAttribute.lck.value + secAttribute.lck.bonus;
+    secAttribute.vis.total = secAttribute.vis.value + secAttribute.vis.bonus;
+    secAttribute.sin.total = secAttribute.sin.value + secAttribute.sin.bonus;
+    secAttribute.fth.total = secAttribute.fth.value + secAttribute.fth.bonus;
+    stat.corruption.max = stat.corruption.base + stat.corruption.bonus;
+    stat.fatigue.max = stat.fatigue.base + stat.fatigue.bonus;
+
+    // persuasion seduction deception intimidation insight ; shepherds will
+    if (systemData.priest) {
+      stat.holyEnergy.max =
+        stat.holyEnergy.base +
+        stat.holyEnergy.bonus +
+        secAttribute.fth.total * 5;
+      stat.holyEnergy.power =
+        secAttribute.fth.total + (stat.holyEnergy.power.bonus || 0);
+      let chosenSkill = systemData.shepherdsWill.skill;
+
+      // Check if the chosen skill is valid
+      if (systemData.shepherdsWill.shepherdOptions.includes(chosenSkill)) {
+        let skill = systemData.skills[chosenSkill];
+        if (skill.id === 5) {
+          // Replace its core attribute with Willpower (Wil)
+          skill.rating += (-cha + wil) * 6;
+        }
+        if (skill.id === 6) {
+          // Replace its core attribute with Perception (Per)
+          skill.rating += (-per + wil) * 6;
+        }
+      }
+    }
+
+    stat.mind.max = wil + stat.mind.bonus + stat.mind.base;
+    stat.insanity.max = wil + stat.insanity.bonus + stat.insanity.base;
+
+    // Calculate trap detection skill
+    systemData.detection = per + systemData.skills.traps.value * 2;
+
+    // Calculate Health, systemData.healthBonus comes from Armor
+    systemData.stats.health.max =
+      end * attribute.end.rank + stat.health.base + stat.health.bonus + str;
+
+    // Calculate toxicity
+    systemData.stats.toxicity.max =
+      end * 2 + stat.toxicity.bonus + stat.toxicity.base;
+
+    // Calculate stamina
+    systemData.stats.stamina.max =
+      end * 5 +
+      stat.stamina.bonus +
+      stat.stamina.base +
+      2 * systemData.skills.athletics.value -
+      5 * stat.fatigue.value;
+
+    // Calculate mana
+    if (systemData.magicPotential) {
+      const channeling = systemData.combatSkills.channeling.value;
+      const calcCast = [0, 0, 3, 6, 9, 9, 9, 9, 9, 9, 9];
+      const calcSchool = [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1];
+      let schoolBonus = 0;
+      const spellPowerSchool = [0, 0, 1, 2, 3, 4, 4, 5, 5, 6, 8];
+      for (const [key, school] of Object.entries(systemData.schools)) {
+        if (key !== "blood") {
+          schoolBonus += calcSchool[school.value]; // Add based on school value
+          school.spellPower =
+            spellPowerSchool[school.value] +
+            school.bonus +
+            (systemData.baseSpellPower || 0) +
+            Math.floor(int / 2);
+        }
+        if (key === "blood") {
+          schoolBonus += calcSchool[school.value]; // Add based on school value
+          school.spellPower =
+            spellPowerSchool[school.value] +
+            school.bonus +
+            Math.max(Math.floor(int / 2), Math.floor(wil / 2));
+        }
+      }
+      let magicDoctrine = systemData.doctrines;
+      const maxValue = Math.max(
+        magicDoctrine.elymas.value || 0,
+        magicDoctrine.incantator.value || 0,
+        magicDoctrine.veneficus.value || 0,
+        magicDoctrine.elementalist.value || 0,
+      );
+      const doctrineValues = {
+        elymas: magicDoctrine.elymas.value || 0,
+        incantator: magicDoctrine.incantator.value || 0,
+        elementalist: magicDoctrine.elementalist.value || 0,
+      };
+      const SKILL_TREES = {
+        elymas: {
+          attack: [{ min: 4, bonus: 5 }],
+          defense: [
+            { min: 2, bonus: 5 },
+            { min: 6, bonus: 10 },
+          ],
+        },
+        incantator: {
+          attack: [
+            { min: 2, bonus: 5 },
+            { min: 6, bonus: 10 },
+          ],
+          defense: [{ min: 4, bonus: 5 }],
+        },
+        elementalist: {
+          attack: [{ min: 5, bonus: 5 }],
+          defense: [{ min: 3, bonus: 5 }],
+        },
+      };
+
+      function calculateTreeBonus(magicDoctrineType, type, level) {
+        if (doctrineValues[magicDoctrineType] !== maxValue) return 0;
+
+        let bonus = 0;
+        const rules = SKILL_TREES[magicDoctrineType][type];
+        if (!rules) return 0;
+
+        for (const rule of rules) {
+          if (level >= rule.min && rule.bonus > bonus) {
+            bonus = rule.bonus;
+          }
+        }
+        return bonus;
+      }
+
+      // Hypothetical switching magic doctrine will not prevent from getting better skill bonus from the higher doctrine
+      const magicAttackBonus =
+        calculateTreeBonus("elymas", "attack", maxValue) +
+        calculateTreeBonus("incantator", "attack", maxValue) +
+        calculateTreeBonus("elementalist", "attack", maxValue);
+
+      const magicDefenseBonus =
+        calculateTreeBonus("elymas", "defense", maxValue) +
+        calculateTreeBonus("incantator", "defense", maxValue) +
+        calculateTreeBonus("elementalist", "defense", maxValue);
+      systemData.combatSkills.channeling.attack += magicAttackBonus;
+      systemData.combatSkills.channeling.defense += magicDefenseBonus;
+
+      const calcElymas = [1, 2.5, 2.5, 2.5, 3, 3, 3.5, 3.5, 4, 4, 4];
+      const calcIncantator = [1, 5, 5, 5, 8, 8, 10, 10, 12, 12, 12];
+      const calcElementalist = [1, 2, 2, 2, 2, 4, 4, 6, 6, 6, 8];
+      const calcVeneficus = [1, 1, 1, 1, 1, 1.5, 1.5, 1.5, 1.5, 1.5, 1.5];
+
+      if (magicDoctrine.elymas.value === maxValue) {
+        systemData.stats.mana.max = Math.floor(
+          (calcCast[channeling] +
+            int +
+            wil +
+            schoolBonus +
+            stat.mana.bonus +
+            stat.mana.base -
+            3 * stat.fatigue.value) *
+            calcElymas[magicDoctrine.elymas.value],
+        );
+      } else if (magicDoctrine.incantator.value === maxValue) {
+        systemData.stats.mana.max = Math.floor(
+          (calcCast[channeling] +
+            int +
+            wil +
+            schoolBonus +
+            stat.mana.bonus +
+            stat.mana.base -
+            3 * stat.fatigue.value) *
+            calcIncantator[magicDoctrine.incantator.value],
+        );
+      } else if (magicDoctrine.elementalist.value === maxValue) {
+        systemData.stats.mana.max = Math.floor(
+          (calcCast[channeling] +
+            int +
+            wil +
+            schoolBonus +
+            stat.mana.bonus +
+            stat.mana.base -
+            3 * stat.fatigue.value) *
+            calcElementalist[magicDoctrine.elementalist.value],
+        );
+      } else if (magicDoctrine.veneficus.value === maxValue) {
+        systemData.stats.mana.max = Math.floor(
+          (calcCast[melee] +
+            int +
+            wil +
+            schoolBonus +
+            stat.mana.bonus +
+            stat.mana.base -
+            3 * stat.fatigue.value) *
+            calcVeneficus[magicDoctrine.veneficus.value],
+        );
+      } else {
+        console.log("No matching doctrine, using default calculation.");
+        systemData.stats.mana.max =
+          calcCast[melee] +
+          int +
+          wil +
+          schoolBonus +
+          stat.mana.bonus +
+          stat.mana.base -
+          3 * stat.fatigue.value;
+      }
+
+      // prevent mana to go below 0
+      systemData.stats.mana.max = Math.max(
+        systemData.stats.mana.max,
+        systemData.stats.mana.min,
+      );
+    }
+
+    // Prevent current stat exceed max
+    systemData.stats.health.value = Math.min(
+      systemData.stats.health.value,
+      systemData.stats.health.max,
+    );
+    systemData.stats.stamina.value = Math.min(
+      systemData.stats.stamina.value,
+      systemData.stats.stamina.max,
+    );
+    systemData.stats.toxicity.value = Math.min(
+      systemData.stats.toxicity.value,
+      systemData.stats.toxicity.max,
+    );
+    systemData.stats.mana.value = Math.min(
+      systemData.stats.mana.value,
+      systemData.stats.mana.max,
+    );
+    systemData.stats.mind.value = Math.min(
+      systemData.stats.mind.value,
+      systemData.stats.mind.max,
+    );
+
+    // Define critical thresholds influenced by luck
+    const luck = secAttribute.lck.total;
+    const baseCriticalSuccess = 5; // Base critical success threshold
+    const baseCriticalFailure = 96 - stat.fatigue.value; // Base critical failure threshold
+
+    // Function to calculate thresholds for each skill type (e.g., skills, combatSkills)
+    function calculateSkillThresholds(skillsObject) {
+      for (const [key, anySkill] of Object.entries(skillsObject)) {
+        // Ensure skillData is defined and contains critical bonus properties
+        const critBonus = anySkill.critbonus || 0;
+        const critFailPenalty = anySkill.critfailpenalty || 0;
+
+        // Calculate critical success threshold for each skill
+        anySkill.criticalSuccessThreshold = Math.max(
+          1,
+          baseCriticalSuccess + Math.max(0, luck) + critBonus,
+        );
+
+        // Calculate critical failure threshold for each skill
+        anySkill.criticalFailureThreshold = Math.min(
+          100,
+          baseCriticalFailure - Math.max(0, -luck) + critFailPenalty,
+        );
+      }
+    }
+
+    // Calculate thresholds for regular skills and combat skills and attributes
+    calculateSkillThresholds(systemData.skills);
+    calculateSkillThresholds(systemData.combatSkills);
+    calculateSkillThresholds(systemData.attributes);
+
+    // Global thresholds based on luck.value
+    this.criticalSuccessThreshold = Math.max(
+      1,
+      baseCriticalSuccess + Math.max(0, luck),
+    );
+
+    this.criticalFailureThreshold = Math.min(
+      100,
+      baseCriticalFailure - Math.max(0, -luck),
+    );
+
+    // Store thresholds in actor data if needed
+    actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
+    actorData.criticalFailureThreshold = this.criticalFailureThreshold;
   }
 
   /**
@@ -101,10 +806,87 @@ export class ToSActor extends Actor {
    */
   _prepareNpcData(actorData) {
     if (actorData.type !== "npc") return;
-
-    // Make modifications to data here. For example:
     const systemData = actorData.system;
+    // Make modifications to data here. For example:
+    for (let [key, combatSkill] of Object.entries(systemData.combatSkills)) {
+      combatSkill.rating =
+        combatSkill.value + combatSkill.bonus + systemData.globalMod;
+    }
+
+    for (let [key, attribute] of Object.entries(systemData.attributes)) {
+      attribute.mod =
+        (attribute.value ?? 0) +
+        (attribute.modBonus ?? 0) +
+        (systemData.globalMod ?? 0);
+    }
+
+    const hp = systemData.stats.health;
+    const stamina = systemData.stats.stamina;
+    const holyEnergy = systemData.stats.holyEnergy;
+    const mana = systemData.stats.mana;
+
+    mana.value = Number(mana.value) || 0;
+    mana.max = Number(mana.max) || 0;
+
+    holyEnergy.value = Number(holyEnergy.value) || 0;
+    holyEnergy.max = Number(holyEnergy.max) || 0;
+
+    stamina.value = Number(stamina.value) || 0;
+    stamina.max = Number(stamina.max) || 0;
+
+    hp.value = Number(hp.value) || 0;
+    hp.max = Number(hp.max) || 0;
+
     systemData.xp = systemData.cr * systemData.cr * 100;
+
+    const baseCriticalSuccess = 5; // Base critical success threshold
+    const baseCriticalFailure = 96; // Base critical failure threshold
+
+    // Function to calculate thresholds for each skill type (e.g., skills, combatSkills)
+    function calculateSkillThresholds(skillsObject) {
+      for (const [key, anySkill] of Object.entries(skillsObject)) {
+        // Ensure skillData is defined and contains critical bonus properties
+        const critBonus = anySkill.critbonus || 0;
+        const critFailPenalty = anySkill.critfailpenalty || 0;
+
+        // Calculate critical success threshold for each skill
+        anySkill.criticalSuccessThreshold = Math.max(
+          1,
+          baseCriticalSuccess + critBonus,
+        );
+
+        // Calculate critical failure threshold for each skill
+        anySkill.criticalFailureThreshold = Math.min(
+          100,
+          baseCriticalFailure + critFailPenalty,
+        );
+      }
+    }
+
+    // Calculate thresholds for regular skills and combat skills and attributes
+    calculateSkillThresholds(systemData.combatSkills);
+    calculateSkillThresholds(systemData.attributes);
+
+    // Store thresholds in actor data if needed
+    actorData.criticalSuccessThreshold = this.criticalSuccessThreshold;
+    actorData.criticalFailureThreshold = this.criticalFailureThreshold;
+
+    systemData.stats.health.value = Math.min(
+      systemData.stats.health.value,
+      systemData.stats.health.max,
+    );
+    systemData.stats.stamina.value = Math.min(
+      systemData.stats.stamina.value,
+      systemData.stats.stamina.max,
+    );
+    systemData.stats.toxicity.value = Math.min(
+      systemData.stats.toxicity.value,
+      systemData.stats.toxicity.max,
+    );
+    systemData.stats.mana.value = Math.min(
+      systemData.stats.mana.value,
+      systemData.stats.mana.max,
+    );
   }
 
   /**
@@ -127,10 +909,10 @@ export class ToSActor extends Actor {
   _getCharacterRollData(data) {
     if (this.type !== "character") return;
 
-    // Copy the ability scores to the top level, so that rolls can use
+    // Copy the attribute scores to the top level, so that rolls can use
     // formulas like `@str.mod + 4`.
-    if (data.abilities) {
-      for (let [k, v] of Object.entries(data.abilities)) {
+    if (data.attributes) {
+      for (let [k, v] of Object.entries(data.attributes)) {
         data[k] = foundry.utils.deepClone(v);
       }
     }

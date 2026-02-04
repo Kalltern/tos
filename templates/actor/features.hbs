@@ -6,6 +6,33 @@
 >
   <section class="grid grid-3col">
     <aside class="sidebar">
+      <ol class="items-list">
+       <li class="item flexrow items-header">
+        <div class="item-name">{{localize "Rerolls"}}</div>
+          <div class="item-controls">
+          </div>
+        </li>
+{{#each features as |item|}}
+  {{#if (gt item.system.reroll.value 0)}}  <!-- Now this works -->
+    <div class="reroll-container">
+      <span>{{item.system.reroll.name}}</span>
+
+      <!-- Loop over the reroll value to create icons -->
+      {{#each (range 1 item.system.reroll.value) as |n|}}
+        <i 
+          data-item-id="{{item.id}}" 
+          data-index="{{n}}" 
+          class="reroll-icon fa-duotone fa-light fa-dice-d20  {{#if (array-lookup item.system.reroll.active n)}}active{{/if}}"
+          title="Click to toggle reroll"
+          data-action="toggleReroll">
+        </i>
+        <hr>
+      {{/each}}
+    </div>
+  {{/if}}
+{{/each}}
+
+      </ol>
       {{! The grid classes are defined in scss/global/_grid.scss. To use,
           use both the "grid" and "grid-Ncol" class where "N" can be any number
           from 1 to 12 and will create that number of columns.  }}
@@ -16,7 +43,7 @@
     <section class="main grid-span-2">
       <ol class="items-list">
         <li class="item flexrow items-header">
-          <div class="item-name">{{localize "Name"}}</div>
+          <div class="item-name">{{localize "Features"}}</div>
           <div class="item-controls">
             {{#if @root.editable}}
               <a
@@ -33,6 +60,7 @@
           </div>
         </li>
         {{#each features as |item id|}}
+        {{#if (eq item.system.option "feature")}}
           <li
             class="item flexrow"
             data-item-id="{{item._id}}"
@@ -71,6 +99,68 @@
               {{/if}}
             </div>
           </li>
+         {{/if}}
+        {{/each}}
+      </ol>
+      <ol class="items-list">
+        <li class="item flexrow items-header">
+          <div class="item-name">{{localize "Traits"}}</div>
+          <div class="item-controls">
+            {{#if @root.editable}}
+              <a
+                class="item-control item-create"
+                title="Create item"
+                data-action="createDoc"
+                data-document-class="Item"
+                data-type="feature"
+              >
+                <i class="fas fa-plus"></i>
+                {{localize "DOCUMENT.New" type="feature"}}
+              </a>
+            {{/if}}
+          </div>
+        </li>
+        {{#each features as |item id|}}
+        {{#if (eq item.system.option "trait")}}
+          <li
+            class="item flexrow"
+            data-item-id="{{item._id}}"
+            data-drag="true"
+            data-document-class="Item"
+          >
+            <div class="item-name">
+              <div class="item-image">
+                <a class="rollable" data-roll-type="item" data-action="roll">
+                  <img
+                    src="{{item.img}}"
+                    title="{{item.name}}"
+                    width="24"
+                    height="24"
+                  />
+                </a>
+              </div>
+              <div>{{item.name}}</div>
+            </div>
+            <div class="item-controls">
+              <a
+                class="item-control item-edit"
+                title="{{localize 'DOCUMENT.Update' type="feature"}}"
+                data-action="viewDoc"
+              >
+                <i class="fas fa-edit"></i>
+              </a>
+              {{#if @root.editable}}
+                <a
+                  class="item-control item-delete"
+                  title="{{localize 'DOCUMENT.Delete' type="feature"}}"
+                  data-action="deleteDoc"
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+              {{/if}}
+            </div>
+          </li>
+         {{/if}}
         {{/each}}
       </ol>
     </section>

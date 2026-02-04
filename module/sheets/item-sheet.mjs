@@ -1,4 +1,4 @@
-import { prepareActiveEffectCategories } from '../helpers/effects.mjs';
+import { prepareActiveEffectCategories } from "../helpers/effects.mjs";
 
 const { api, sheets } = foundry.applications;
 
@@ -16,7 +16,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
 
   /** @override */
   static DEFAULT_OPTIONS = {
-    classes: ['tos', 'item'],
+    classes: ["tos", "item"],
     actions: {
       onEditImage: this._onEditImage,
       viewDoc: this._viewEffect,
@@ -28,7 +28,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       submitOnChange: true,
     },
     // Custom property that's merged into `this.options`
-    dragDrop: [{ dragSelector: '[data-drag]', dropSelector: null }],
+    dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
   };
 
   /* -------------------------------------------- */
@@ -36,27 +36,47 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   static PARTS = {
     header: {
-      template: 'systems/tos/templates/item/header.hbs',
+      template: "systems/tos/templates/item/header.hbs",
     },
     tabs: {
       // Foundry-provided generic template
-      template: 'templates/generic/tab-navigation.hbs',
+      template: "templates/generic/tab-navigation.hbs",
     },
     description: {
-      template: 'systems/tos/templates/item/description.hbs',
+      template: "systems/tos/templates/item/description.hbs",
+    },
+    doctrines: {
+      template: "systems/tos/templates/item/doctrines.hbs",
+    },
+    combatEffects: {
+      template: "systems/tos/templates/item/combatEffects.hbs",
     },
     attributesFeature: {
-      template:
-        'systems/tos/templates/item/attribute-parts/feature.hbs',
+      template: "systems/tos/templates/item/attribute-parts/feature.hbs",
     },
     attributesGear: {
-      template: 'systems/tos/templates/item/attribute-parts/gear.hbs',
+      template: "systems/tos/templates/item/attribute-parts/gear.hbs",
+    },
+    attributesItem: {
+      template: "systems/tos/templates/item/attribute-parts/item.hbs",
+    },
+    attributesRace: {
+      template: "systems/tos/templates/item/attribute-parts/race.hbs",
+    },
+    attributesConsumable: {
+      template: "systems/tos/templates/item/attribute-parts/consumable.hbs",
+    },
+    attributesWeapon: {
+      template: "systems/tos/templates/item/attribute-parts/weapon.hbs",
     },
     attributesSpell: {
-      template: 'systems/tos/templates/item/attribute-parts/spell.hbs',
+      template: "systems/tos/templates/item/attribute-parts/spell.hbs",
+    },
+    attributesAbility: {
+      template: "systems/tos/templates/item/attribute-parts/ability.hbs",
     },
     effects: {
-      template: 'systems/tos/templates/item/effects.hbs',
+      template: "systems/tos/templates/item/effects.hbs",
     },
   };
 
@@ -64,19 +84,28 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
   _configureRenderOptions(options) {
     super._configureRenderOptions(options);
     // Not all parts always render
-    options.parts = ['header', 'tabs', 'description'];
+    options.parts = ["header", "tabs", "description"];
     // Don't show the other tabs if only limited view
     if (this.document.limited) return;
     // Control which parts show based on document subtype
     switch (this.document.type) {
-      case 'feature':
-        options.parts.push('attributesFeature', 'effects');
+      case "feature":
+        options.parts.push("attributesFeature", "effects");
         break;
-      case 'gear':
-        options.parts.push('attributesGear');
+      case "gear":
+        options.parts.push("attributesGear", "effects");
         break;
-      case 'spell':
-        options.parts.push('attributesSpell');
+      case "race":
+        options.parts.push("attributesRace", "effects");
+        break;
+      case "ability":
+        options.parts.push("attributesAbility", "combatEffects");
+        break;
+      case "weapon":
+        options.parts.push("attributesWeapon", "doctrines", "combatEffects");
+        break;
+      case "spell":
+        options.parts.push("attributesSpell", "combatEffects");
         break;
     }
   }
@@ -107,13 +136,20 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
   /** @override */
   async _preparePartContext(partId, context) {
     switch (partId) {
-      case 'attributesFeature':
-      case 'attributesGear':
-      case 'attributesSpell':
+      case "attributesFeature":
+      case "attributesItem":
+      case "attributesGear":
+      case "attributesRace":
+      case "attributesConsumable":
+      case "attributesAbility":
+      case "doctrines":
+      case "combatEffects":
+      case "attributesWeapon":
+      case "attributesSpell":
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
         break;
-      case 'description':
+      case "description":
         context.tab = context.tabs[partId];
         // Enrich description info for display
         // Enrichment turns text like `[[/r 1d20]]` into buttons
@@ -129,7 +165,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
           }
         );
         break;
-      case 'effects':
+      case "effects":
         context.tab = context.tabs[partId];
         // Prepare active effects for easier access
         context.effects = prepareActiveEffectCategories(this.item.effects);
@@ -146,40 +182,53 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
    */
   _getTabs(parts) {
     // If you have sub-tabs this is necessary to change
-    const tabGroup = 'primary';
+    const tabGroup = "primary";
     // Default tab for first time it's rendered this session
-    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = 'description';
+    if (!this.tabGroups[tabGroup]) this.tabGroups[tabGroup] = "description";
     return parts.reduce((tabs, partId) => {
       const tab = {
-        cssClass: '',
+        cssClass: "",
         group: tabGroup,
         // Matches tab property to
-        id: '',
+        id: "",
         // FontAwesome Icon, if you so choose
-        icon: '',
+        icon: "",
         // Run through localization
-        label: 'TOS.Item.Tabs.',
+        label: "TOS.Item.Tabs.",
       };
       switch (partId) {
-        case 'header':
-        case 'tabs':
+        case "header":
+        case "tabs":
           return tabs;
-        case 'description':
-          tab.id = 'description';
-          tab.label += 'Description';
+        case "description":
+          tab.id = "description";
+          tab.label += "Description";
           break;
-        case 'attributesFeature':
-        case 'attributesGear':
-        case 'attributesSpell':
-          tab.id = 'attributes';
-          tab.label += 'Attributes';
+        case "attributesFeature":
+        case "attributesItem":
+        case "attributesRace":
+        case "attributesAbility":
+        case "attributesConsumable":
+        case "attributesGear":
+        case "attributesWeapon":
+        case "attributesSpell":
+          tab.id = "attributes";
+          tab.label += "Attributes";
           break;
-        case 'effects':
-          tab.id = 'effects';
-          tab.label += 'Effects';
+        case "effects":
+          tab.id = "effects";
+          tab.label += "Effects";
+          break;
+        case "doctrines":
+          tab.id = "doctrines";
+          tab.label += "Doctrines";
+          break;
+        case "combatEffects":
+          tab.id = "combatEffects";
+          tab.label += "combatEffects";
           break;
       }
-      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = 'active';
+      if (this.tabGroups[tabGroup] === tab.id) tab.cssClass = "active";
       tabs[partId] = tab;
       return tabs;
     }, {});
@@ -222,7 +271,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       {};
     const fp = new FilePicker({
       current,
-      type: 'image',
+      type: "image",
       redirectToRoot: img ? [img] : [],
       callback: (path) => {
         this.document.update({ [attr]: path });
@@ -269,7 +318,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
    */
   static async _createEffect(event, target) {
     // Retrieve the configured document class for ActiveEffect
-    const aeCls = getDocumentClass('ActiveEffect');
+    const aeCls = getDocumentClass("ActiveEffect");
     // Prepare the document creation data by initializing it a default name.
     // As of v12, you can define custom Active Effect subtypes just like Item subtypes if you want
     const effectData = {
@@ -282,7 +331,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     // Loop through the dataset and add it to our effectData
     for (const [dataKey, value] of Object.entries(target.dataset)) {
       // These data attributes are reserved for the action handling
-      if (['action', 'documentClass'].includes(dataKey)) continue;
+      if (["action", "documentClass"].includes(dataKey)) continue;
       // Nested properties require dot notation in the HTML, e.g. anything with `system`
       // An example exists in spells.hbs, with `data-system.spell-level`
       // which turns into the dataKey 'system.spellLevel'
@@ -315,7 +364,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
    * @returns {HTMLLIElement} The document's row
    */
   _getEffect(target) {
-    const li = target.closest('.effect');
+    const li = target.closest(".effect");
     return this.item.effects.get(li?.dataset?.effectId);
   }
 
@@ -354,7 +403,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
    */
   _onDragStart(event) {
     const li = event.currentTarget;
-    if ('link' in event.target.dataset) return;
+    if ("link" in event.target.dataset) return;
 
     let dragData = null;
 
@@ -367,7 +416,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     if (!dragData) return;
 
     // Set data transfer
-    event.dataTransfer.setData('text/plain', JSON.stringify(dragData));
+    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
   }
 
   /**
@@ -385,18 +434,18 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
   async _onDrop(event) {
     const data = TextEditor.getDragEventData(event);
     const item = this.item;
-    const allowed = Hooks.call('dropItemSheetData', item, this, data);
+    const allowed = Hooks.call("dropItemSheetData", item, this, data);
     if (allowed === false) return;
 
     // Handle different data types
     switch (data.type) {
-      case 'ActiveEffect':
+      case "ActiveEffect":
         return this._onDropActiveEffect(event, data);
-      case 'Actor':
+      case "Actor":
         return this._onDropActor(event, data);
-      case 'Item':
+      case "Item":
         return this._onDropItem(event, data);
-      case 'Folder':
+      case "Folder":
         return this._onDropFolder(event, data);
     }
   }
@@ -411,7 +460,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
    * @protected
    */
   async _onDropActiveEffect(event, data) {
-    const aeCls = getDocumentClass('ActiveEffect');
+    const aeCls = getDocumentClass("ActiveEffect");
     const effect = await aeCls.fromDropData(data);
     if (!this.item.isOwner || !effect) return false;
 
@@ -428,7 +477,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
    */
   _onEffectSort(event, effect) {
     const effects = this.item.effects;
-    const dropTarget = event.target.closest('[data-effect-id]');
+    const dropTarget = event.target.closest("[data-effect-id]");
     if (!dropTarget) return;
     const target = effects.get(dropTarget.dataset.effectId);
 
@@ -455,7 +504,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     });
 
     // Perform the update
-    return this.item.updateEmbeddedDocuments('ActiveEffect', updateData);
+    return this.item.updateEmbeddedDocuments("ActiveEffect", updateData);
   }
 
   /* -------------------------------------------- */

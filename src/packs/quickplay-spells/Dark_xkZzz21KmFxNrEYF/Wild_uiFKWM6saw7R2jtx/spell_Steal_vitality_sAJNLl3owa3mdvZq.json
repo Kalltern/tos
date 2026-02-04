@@ -1,0 +1,146 @@
+{
+  "name": "Steal vitality",
+  "type": "spell",
+  "img": "icons/magic/unholy/projectile-missile-green.webp",
+  "system": {
+    "description": "No requirements. Deals 2d6 damage to the target and heals the caster for the damage dealt + {{spellPower}}. Ignores Armor.",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": [
+      {
+        "mode": "",
+        "amount": "",
+        "type": ""
+      }
+    ],
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": 25,
+    "cost": 1,
+    "perRound": 0,
+    "option": "magic",
+    "type": "darkness",
+    "rank": "wild",
+    "actionCost": "1",
+    "range": "Touch",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 2,
+      "diceSize": "6",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "magic",
+    "bool2": "",
+    "dmgType2": "",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "0",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": ""
+  },
+  "effects": [],
+  "folder": "uiFKWM6saw7R2jtx",
+  "flags": {
+    "scene-packer": {
+      "hash": "a74b3200c496097048fe418e0a32a1856d7603c1"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.dark-spells.Item.zsHjFC2ldfSdr22j",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135131840,
+    "modifiedTime": 1770135131840,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "sAJNLl3owa3mdvZq",
+  "sort": 0,
+  "_key": "!items!sAJNLl3owa3mdvZq"
+}

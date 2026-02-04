@@ -1,0 +1,170 @@
+{
+  "name": "Acid bolt",
+  "type": "spell",
+  "img": "icons/magic/acid/projectile-faceted-glob.webp",
+  "system": {
+    "description": "<p>60% chance to corrode armor (-4 armor). </p><p>Aftewards, it deals (6d6 + <span style=\"font-family:Signika, sans-serif\">{{spellPower}}</span>) damage to a single target.</p>",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [
+      "bleeding",
+      "burning",
+      "chain",
+      "disorientation",
+      "dispel",
+      "flammable",
+      "frozen",
+      "concussion",
+      "paralyzed",
+      "poisoned",
+      "rooted",
+      "slowed",
+      "stun",
+      "vulnerable",
+      "weakened",
+      "wet"
+    ],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": 0
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": -10,
+    "cost": 6,
+    "perRound": 0,
+    "option": "magic",
+    "type": "earth",
+    "rank": "expert",
+    "actionCost": "1",
+    "range": "40",
+    "spellClass": "lesser",
+    "roll": {
+      "diceNum": 6,
+      "diceSize": "6",
+      "diceBonus": "@spellPower"
+    },
+    "penetration": 10,
+    "dmgType1": "magic",
+    "bool2": "and",
+    "dmgType2": "acid",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": 60,
+      "effect2": 0,
+      "effect3": 0,
+      "effect4": 0,
+      "stun": null,
+      "bleed": null,
+      "extra1": 60,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "Corrosion",
+    "effectType2": "",
+    "effectType3": "",
+    "attributeTest": "",
+    "testModifier": ""
+  },
+  "effects": [],
+  "folder": "ELAMhHkr77jkNbi6",
+  "flags": {
+    "scene-packer": {
+      "hash": "03e63e66e4104cdeda8db0f4badcd97c7be4a65c"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.earth-spells.Item.LaqmD7rt2U3iq2Zt",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135133307,
+    "modifiedTime": 1770135133307,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "oDL1c5pJC3yLpKMg",
+  "sort": 0,
+  "_key": "!items!oDL1c5pJC3yLpKMg"
+}
