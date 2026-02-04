@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "JSON compiler for the ToS system",
   "scripts": {
-    "pullJSONtoLDB": "node ./tools/pullJSONtoLDB.mjs"
+    "pullJSONtoLDB": "node ./tools/pullJSONtoLDB.mjs",
+    "pushLDBtoJSON": "node ./tools/pushLDBtoJSON.mjs"
   },
   "browserslist": [
     "last 3 versions"
