@@ -1,0 +1,27 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Earth",
+  "color": null,
+  "sorting": "a",
+  "_id": "qHsw71Rtr6dNWLNW",
+  "description": "",
+  "sort": 300000,
+  "flags": {
+    "scene-packer": {
+      "hash": "bdbd2fe51301689c54b8a04efc64ffdade27abe1"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135133205,
+    "modifiedTime": 1770135133507,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "_key": "!folders!qHsw71Rtr6dNWLNW"
+}

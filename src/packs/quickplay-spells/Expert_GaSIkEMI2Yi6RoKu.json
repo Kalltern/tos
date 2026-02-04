@@ -1,0 +1,25 @@
+{
+  "type": "Item",
+  "folder": "bBDJDqsshLIbQDyE",
+  "name": "Expert",
+  "color": null,
+  "sorting": "a",
+  "_id": "GaSIkEMI2Yi6RoKu",
+  "description": "",
+  "sort": 200000,
+  "flags": {
+    "scene-packer": {
+      "hash": "99a2aa8e548d019e6a5c0ea96235dd498b91c746"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "lastModifiedBy": null
+  },
+  "_key": "!folders!GaSIkEMI2Yi6RoKu"
+}

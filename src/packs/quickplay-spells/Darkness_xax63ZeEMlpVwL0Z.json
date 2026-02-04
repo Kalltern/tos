@@ -1,0 +1,146 @@
+{
+  "name": "Darkness",
+  "type": "spell",
+  "img": "icons/magic/unholy/orb-swirling-teal.webp",
+  "system": {
+    "description": "Creates magical darkness in an area up to 7.5m radius for {{math spellPower \"*\" 10}} minutes. All creatures in the area are considered Blinded. Can be bypassed by the Darkvision spell. Dims magical light down to a 1.5m area. Corruption +4",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": [
+      {
+        "mode": "",
+        "amount": "",
+        "type": ""
+      }
+    ],
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": -20,
+    "cost": 10,
+    "perRound": 0,
+    "option": "magic",
+    "type": "darkness",
+    "rank": "expert",
+    "actionCost": "1",
+    "range": "15",
+    "spellClass": "support",
+    "roll": {
+      "diceNum": 0,
+      "diceSize": "0",
+      "diceBonus": ""
+    },
+    "penetration": 0,
+    "dmgType1": "",
+    "bool2": "",
+    "dmgType2": "",
+    "bool3": "",
+    "dmgType3": "",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "0",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": ""
+  },
+  "effects": [],
+  "folder": "XCC7CG5LovD3hSXR",
+  "flags": {
+    "scene-packer": {
+      "hash": "375bcf402d80fd64e0b26c4b358e9248e0908934"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.dark-spells.Item.KpuvihvJNuXy4FZv",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135131840,
+    "modifiedTime": 1770135131840,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "xax63ZeEMlpVwL0Z",
+  "sort": 0,
+  "_key": "!items!xax63ZeEMlpVwL0Z"
+}

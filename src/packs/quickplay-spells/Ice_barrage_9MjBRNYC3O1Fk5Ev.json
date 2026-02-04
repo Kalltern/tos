@@ -1,0 +1,153 @@
+{
+  "name": "Ice barrage",
+  "type": "spell",
+  "img": "icons/magic/water/projectile-beams-salvo-blue.webp",
+  "system": {
+    "description": "<p>Deals 10d6 + 80 + {{math spellPower \"*\" 5}} damage in a 6m area, split evenly among at least four chosen targets. Minimum range 9m.</p>",
+    "options": [
+      "divine",
+      "magic"
+    ],
+    "spellRanks": [
+      "wild",
+      "apprentice",
+      "expert",
+      "master",
+      "grandmaster"
+    ],
+    "miracleRanks": [
+      "novice",
+      "acolyte",
+      "cleric"
+    ],
+    "effectOptions": [
+      "and",
+      "or"
+    ],
+    "effectTypes": [],
+    "classOptions": [
+      "support",
+      "lesser",
+      "greater"
+    ],
+    "spellTypes": [
+      "fire",
+      "water",
+      "air",
+      "earth",
+      "spirit",
+      "body",
+      "darkness",
+      "blood",
+      "gnosis"
+    ],
+    "dmgTypes": [
+      "fire",
+      "frost",
+      "lightning",
+      "acid",
+      "poison",
+      "magic",
+      "dark",
+      "physical",
+      "psychic",
+      "blunt",
+      "piercing",
+      "slash"
+    ],
+    "testOptions": [
+      "Strength",
+      "Dexterity",
+      "Endurance",
+      "Inteligence",
+      "Will",
+      "Charisma",
+      "Perception"
+    ],
+    "resources": {
+      "0": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      },
+      "1": {
+        "type": "",
+        "mode": "",
+        "amount": null
+      }
+    },
+    "resourceOptions": {
+      "modes": [
+        "add",
+        "burn"
+      ],
+      "types": [
+        ""
+      ]
+    },
+    "isOffensive": true,
+    "difficulty": -50,
+    "cost": 16,
+    "perRound": 0,
+    "option": "magic",
+    "type": "water",
+    "rank": "expert",
+    "actionCost": "2",
+    "range": "6 - 80",
+    "spellClass": "lesser",
+    "roll": {
+      "diceNum": 10,
+      "diceSize": "6",
+      "diceBonus": "80 + @spellPower*5"
+    },
+    "penetration": 5,
+    "dmgType1": "magic",
+    "bool2": "and",
+    "dmgType2": "frost",
+    "bool3": "and",
+    "dmgType3": "piercing",
+    "bool4": "",
+    "dmgType4": "",
+    "effects": {
+      "effect1": "0",
+      "effect2": "0",
+      "effect3": "0",
+      "effect4": "0",
+      "stun": null,
+      "bleed": null,
+      "extra1": null,
+      "extra2": null,
+      "extra3": null
+    },
+    "effectType1": "",
+    "effectType2": "",
+    "effectType3": "",
+    "attributeTest": "",
+    "testModifier": ""
+  },
+  "effects": [],
+  "folder": "GaSIkEMI2Yi6RoKu",
+  "flags": {
+    "scene-packer": {
+      "hash": "5786696a46a5de2e944fe91c9288673c09c4f246"
+    }
+  },
+  "_stats": {
+    "compendiumSource": "Compendium.world.water-spells.Item.QLFbCcm2XjTSW2kc",
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135135456,
+    "modifiedTime": 1770135135456,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "ownership": {
+    "default": 0,
+    "J03KIFAyMdNdBOUD": 3
+  },
+  "_id": "9MjBRNYC3O1Fk5Ev",
+  "sort": 0,
+  "_key": "!items!9MjBRNYC3O1Fk5Ev"
+}

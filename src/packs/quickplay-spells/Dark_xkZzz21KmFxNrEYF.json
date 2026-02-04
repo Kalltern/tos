@@ -1,0 +1,27 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Dark",
+  "color": null,
+  "sorting": "a",
+  "_id": "xkZzz21KmFxNrEYF",
+  "description": "",
+  "sort": 200000,
+  "flags": {
+    "scene-packer": {
+      "hash": "7717e741911e1074bc9c22642c3b65085f6ff0cc"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135131758,
+    "modifiedTime": 1770135131997,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "_key": "!folders!xkZzz21KmFxNrEYF"
+}

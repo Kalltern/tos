@@ -1,0 +1,27 @@
+{
+  "type": "Item",
+  "folder": null,
+  "name": "Fire",
+  "color": null,
+  "sorting": "a",
+  "_id": "hmGnUHNLA1Ykwyr6",
+  "description": "",
+  "sort": 400000,
+  "flags": {
+    "scene-packer": {
+      "hash": "2d1b5e6ad0e19efed120bfceb4a04bdcd44c19c1"
+    }
+  },
+  "_stats": {
+    "compendiumSource": null,
+    "duplicateSource": null,
+    "exportSource": null,
+    "coreVersion": "13.351",
+    "systemId": "tos",
+    "systemVersion": "0.6.4c",
+    "createdTime": 1770135134373,
+    "modifiedTime": 1770135134640,
+    "lastModifiedBy": "J03KIFAyMdNdBOUD"
+  },
+  "_key": "!folders!hmGnUHNLA1Ykwyr6"
+}

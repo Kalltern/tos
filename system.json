@@ -44,7 +44,7 @@
     {
       "name": "quickplay-spells",
       "label": "Quickplay spells",
-      "path": "packs/quickplay-spells",
+      "path": "src/packs/quickplay-spells",
       "type": "Item",
       "system": "tos"
     }
