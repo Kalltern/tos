@@ -1,6 +1,9 @@
 # Adapted from drawsteel
 name: Release Creation
 
+permissions:
+  contents: write
+
 env:
   NODE_VERSION: 20
   ZIP_NAME: tos.zip
