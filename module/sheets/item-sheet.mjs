@@ -7,7 +7,7 @@ const { api, sheets } = foundry.applications;
  * @extends {ItemSheetV2}
  */
 export class ToSItemSheet extends api.HandlebarsApplicationMixin(
-  sheets.ItemSheetV2
+  sheets.ItemSheetV2,
 ) {
   constructor(options = {}) {
     super(options);
@@ -69,6 +69,9 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
     attributesWeapon: {
       template: "systems/tos/templates/item/attribute-parts/weapon.hbs",
     },
+    attributesOffhand: {
+      template: "systems/tos/templates/item/attribute-parts/offhand.hbs",
+    },
     attributesSpell: {
       template: "systems/tos/templates/item/attribute-parts/spell.hbs",
     },
@@ -103,6 +106,9 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         break;
       case "weapon":
         options.parts.push("attributesWeapon", "doctrines", "combatEffects");
+        if (this.item.system.offhand) {
+          options.parts.push("attributesOffhand");
+        }
         break;
       case "spell":
         options.parts.push("attributesSpell", "combatEffects");
@@ -145,6 +151,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
       case "doctrines":
       case "combatEffects":
       case "attributesWeapon":
+      case "attributesOffhand":
       case "attributesSpell":
         // Necessary for preserving active tab on re-render
         context.tab = context.tabs[partId];
@@ -162,7 +169,7 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
             rollData: this.item.getRollData(),
             // Relative UUID resolution
             relativeTo: this.item,
-          }
+          },
         );
         break;
       case "effects":
@@ -211,6 +218,13 @@ export class ToSItemSheet extends api.HandlebarsApplicationMixin(
         case "attributesConsumable":
         case "attributesGear":
         case "attributesWeapon":
+          tab.id = "attributes";
+          tab.label += "Attributes";
+          break;
+        case "attributesOffhand":
+          tab.id = "offhand";
+          tab.label += "OffHand";
+          break;
         case "attributesSpell":
           tab.id = "attributes";
           tab.label += "Attributes";

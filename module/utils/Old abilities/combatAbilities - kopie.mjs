@@ -11,71 +11,8 @@ export async function combatAbilities() {
   const abilities = actor.items.filter(
     (i) =>
       i.type === "ability" &&
-      (["melee", "ranged"].includes(i.system.type) ||
-        i.system.class === "defense"),
+      (i.system.type === "melee" || i.system.class === "defense"),
   );
-
-  const ABILITY_TABS = [
-    { id: "melee", label: "Melee" },
-    { id: "ranged", label: "Ranged" },
-  ];
-
-  function getAbilityCategory(ability) {
-    if (ability.system.type === "ranged") return "ranged";
-    if (ability.system.type === "melee" || ability.system.class === "defense") {
-      return "melee";
-    }
-    return null;
-  }
-
-  const abilitiesByCategory = {
-    melee: [],
-    ranged: [],
-  };
-
-  for (const ability of abilities) {
-    const category = getAbilityCategory(ability);
-    if (category && abilitiesByCategory[category]) {
-      abilitiesByCategory[category].push(ability);
-    }
-  }
-
-  let tabHeadersHtml = "";
-  let tabContentHtml = "";
-
-  for (const tab of ABILITY_TABS) {
-    const list = abilitiesByCategory[tab.id];
-    if (!list.length) continue;
-
-    tabHeadersHtml += `
-    <div class="tab-item" data-tab="${tab.id}">
-      ${tab.label} (${list.length})
-    </div>
-  `;
-
-    const abilityListHtml = list
-      .map(
-        (ability) => `
-      <li class="spell-choice ability-choice"
-          data-ability-id="${ability.id}">
-        <img src="${ability.img}"
-             class="ability-icon">
-        <span class="ability-name">
-          ${ability.name}
-        </span>
-      </li>
-    `,
-      )
-      .join("");
-
-    tabContentHtml += `
-    <div class="tab-pane" data-tab="${tab.id}">
-      <ul style="list-style:none; padding:0;">
-        ${abilityListHtml}
-      </ul>
-    </div>
-  `;
-  }
 
   if (!abilities.length)
     return ui.notifications.warn(
@@ -88,6 +25,20 @@ export async function combatAbilities() {
 
   if (!document.getElementById("tos-ability-dialog-styles")) {
     const css = `
+        #ability-list .ability-choice {
+            position: relative;
+            font-size: 16px;
+            color: black;
+            cursor: pointer;
+            padding: 5px;
+            border-bottom: 1px solid #444;
+        }
+
+        #ability-list .ability-choice:hover {
+            color: black;
+            text-shadow: 0 0 1px red, 0 0 2px red;
+        }
+
         .ability-dialog .window-content { max-width: 300px; width: 100%; }
         .ability-dialog .window { width: auto; }
         #keep-open-container { margin-bottom: 8px; font-size: 14px; }
@@ -109,20 +60,47 @@ export async function combatAbilities() {
   // 3. EXECUTION HANDLER: _onAbilityChosen
   // ====================================================================
 
-  async function onAbilityChosen(ability, container, dialog, actor) {
+  async function _onAbilityChosen(
+    event,
+    container,
+    abilities,
+    abilityDialogInstance,
+    actor,
+  ) {
+    const el = event.currentTarget;
+    const idx = Number(el.dataset.value);
+    const ability = abilities[idx];
+    if (!ability) return ui.notifications.error("Selected ability not found.");
+
+    // Determine the type of roll based on the item's class
     const isDefenseRoll = ability.system.class === "defense";
-    const keepOpen = container.querySelector("#keep-open")?.checked;
 
-    await deductAbilityCost(actor, ability);
+    // Only close if checkbox is NOT checked
+    const keepOpenCheckbox = container.querySelector("#keep-open");
+    const keepOpen = keepOpenCheckbox ? keepOpenCheckbox.checked : false;
 
-    if (isDefenseRoll || ability.system.weaponAbility) {
-      const mode = isDefenseRoll ? "defense" : "attack";
-      await weaponSelectionFlow(actor, ability, mode);
-    } else {
-      await game.tos.getNonWeaponAbility(actor, ability);
+    try {
+      await deductAbilityCost(actor, ability);
+
+      // Both Defense and Attack Abilities require weapon selection/passing
+      if (isDefenseRoll || (ability.system && ability.system.weaponAbility)) {
+        const mode = isDefenseRoll ? "defense" : "attack";
+        await weaponSelectionFlow(actor, ability, mode);
+      }
+      // Non-Weapon Melee Abilities
+      else {
+        await game.tos.getNonWeaponAbility(actor, ability);
+      }
+    } catch (err) {
+      console.error("Error using ability:", err);
+      ui.notifications.error(
+        "There was an error using that ability. See console.",
+      );
     }
 
-    if (!keepOpen) dialog.close();
+    if (!keepOpen && abilityDialogInstance?.close) {
+      abilityDialogInstance.close();
+    }
   }
 
   // ====================================================================
@@ -132,49 +110,62 @@ export async function combatAbilities() {
   let abilityDialog = new Dialog({
     title: `Choose Combat or Defense Ability`,
     content: `
-<form class="ability-dialog-form">
-
-  <div id="keep-open-container">
-    <label>
-      <input type="checkbox" id="keep-open">
-      Keep this window open
-    </label>
-  </div>
-
-  <div class="ability-tabs">
-    <div class="tab-headers">${tabHeadersHtml}</div>
-    <div class="tab-content">${tabContentHtml}</div>
-  </div>
-
-</form>
-`,
+        <form>
+            <fieldset>
+                <div id="keep-open-container">
+                    <label><input type="checkbox" id="keep-open" /> Keep this window open</label>
+                </div>
+                <ul id="ability-list" style="list-style: none; padding: 0; margin: 0;">
+                    ${abilityChoices
+                      .map(
+                        (c) =>
+                          `<li class="ability-choice" data-value="${
+                            c.value
+                          }" tabindex="0" role="button" aria-pressed="false">
+                                    <img src="${
+                                      abilities[c.value].img
+                                    }" width="24" height="24" style="vertical-align: middle;" />
+                                    <span style="${
+                                      abilities[c.value].system.class ===
+                                      "defense"
+                                        ? "color: blue;"
+                                        : ""
+                                    }">
+                                        ${c.label} 
+                                        (${
+                                          abilities[c.value].system.class ===
+                                          "defense"
+                                            ? "Defense"
+                                            : "Attack"
+                                        })
+                                    </span>
+                                </li>`,
+                      )
+                      .join("")}
+                </ul>
+            </fieldset>
+        </form>
+    `,
     classes: ["ability-dialog"],
     buttons: {},
     render: (html) => {
-      // Activate first tab
-      const firstTab = html.find(".tab-item").first();
-      firstTab.addClass("active");
-      html
-        .find(`.tab-pane[data-tab="${firstTab.data("tab")}"]`)
-        .addClass("active");
+      const container = html instanceof HTMLElement ? html : html[0];
 
-      // Switch tabs
-      html.find(".tab-item").click(function () {
-        const tab = $(this).data("tab");
-        html.find(".tab-item").removeClass("active");
-        $(this).addClass("active");
-        html.find(".tab-pane").removeClass("active");
-        html.find(`.tab-pane[data-tab="${tab}"]`).addClass("active");
-      });
+      const list = container.querySelector("#ability-list");
+      if (!list) return;
 
-      // Ability selection
-      html.find(".ability-choice").click(async (event) => {
-        const abilityId = event.currentTarget.dataset.abilityId;
-        const ability = abilities.find((a) => a.id === abilityId);
-        if (!ability) return;
-
-        await onAbilityChosen(ability, html[0], abilityDialog, actor);
-      });
+      const items = Array.from(list.querySelectorAll(".ability-choice"));
+      for (const li of items) {
+        li.addEventListener("click", async (event) => {
+          await _onAbilityChosen(
+            event,
+            container,
+            abilities,
+            abilityDialog,
+            actor,
+          );
+        });
+      }
     },
   });
 
@@ -190,29 +181,16 @@ export async function combatAbilities() {
    * @param {object} ability
    * @param {'attack'|'defense'} mode
    */
-  async function weaponSelectionFlow(actor, ability, mode) {
-    let weapons;
-
-    if (ability.system.type === "melee") {
-      weapons = actor.items.filter(
-        (i) =>
-          i.type === "weapon" &&
-          ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-          !i.system.thrown,
-      );
-    }
-
-    if (ability.system.type === "ranged") {
-      weapons = actor.items.filter(
-        (i) =>
-          (i.type === "weapon" &&
-            ["bow", "crossbow"].includes(i.system.class)) ||
-          (["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
-            i.system.thrown),
-      );
-    }
-    if (!weapons?.length)
+  async function weaponSelectionFlow(actor, ability, mode = "attack") {
+    const weapons = actor.items.filter(
+      (i) =>
+        i.type === "weapon" &&
+        ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
+        i.system.thrown !== true,
+    );
+    if (!weapons.length)
       return ui.notifications.warn("This actor has no valid weapons.");
+
     const weaponChoices = weapons.map((w, idx) => ({
       label: w.name,
       value: idx,

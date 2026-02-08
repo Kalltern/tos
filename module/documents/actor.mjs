@@ -125,6 +125,7 @@ export class ToSActor extends Actor {
 
     // Make modifications to data here. For example:
     const systemData = actorData.system; //everything else
+
     // Loop through attribute scores, and add their modifiers to our sheet output.
     for (let [key, attribute] of Object.entries(systemData.attributes)) {
       attribute.total = attribute.value + attribute.bonus;

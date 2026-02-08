@@ -7,10 +7,6 @@
   {{! As you add new fields, add them in here! }}
 
   <div class="resource">
-    <label class="resource-label">{{localize
-        "TOS.Item.Weapon.FIELDS.rollFormula.label"
-      }}:</label>
-    <span>{{system.formula}}</span>
 
     <div class="grid grid-4col">
 
@@ -152,6 +148,15 @@
             "TOS.Item.Weapon.FIELDS.thrown.label"
           }}</label>
         <input type="checkbox" name="system.thrown" {{checked system.thrown}} />
+
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.offhand.label"
+          }}</label>
+        <input
+          type="checkbox"
+          name="system.offhand"
+          {{checked system.offhand}}
+        />
       </div>
 
     </div>

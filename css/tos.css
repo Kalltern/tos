@@ -949,6 +949,11 @@ prose-mirror {
 .button-container button:hover {
   color: #ffffff;
 }
+
+.button-container.single {
+  grid-template-columns: 1fr;
+}
+
 .checkbox-row {
   display: flex;
   align-items: center;
@@ -1228,6 +1233,19 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
   justify-content: flex-end;
 }
 
+.weapon-state {
+  font-size: 0.8em;
+  margin-left: 0.25em;
+}
+
+.item.is-equipped.is-active-set {
+  font-weight: bold;
+}
+
+.item.is-equipped:not(.is-active-set) {
+  opacity: 0.6;
+}
+
 /* =========================
    Chat adjustments
    ========================= */
@@ -1305,10 +1323,207 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
   text-align: center;
 }
 
+.single-roll .roll-label {
+  text-align: center;
+  width: 100%;
+}
+
 .roll-label {
   font-size: 0.75rem; /* small */
   text-transform: uppercase;
   letter-spacing: 0.05em;
   opacity: 0.7;
   margin-bottom: 0.25rem;
+}
+
+/* Ability and Spells macro CSS */
+
+.spell-choice.ability-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-bottom: 1px solid #444;
+  font-size: 15px;
+}
+
+.spell-choice.ability-choice:hover {
+  text-shadow:
+    0 0 1px red,
+    0 0 2px red;
+}
+
+/* Ability icon */
+.ability-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Ability name */
+.ability-name {
+  flex: 1;
+}
+
+/* ===== Ability & Spell Tabs (SCOPED) ===== */
+
+.ability-tabs,
+.spell-tabs {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tab headers row */
+.ability-tabs .tab-headers,
+.spell-tabs .tab-headers {
+  display: flex;
+  border-bottom: 1px solid #555;
+  margin-bottom: 6px;
+}
+
+/* Individual tab */
+.ability-tabs .tab-item,
+.spell-tabs .tab-item {
+  padding: 4px 10px;
+  cursor: pointer;
+  border: 1px solid #555;
+  border-bottom: none;
+  margin-right: 4px;
+  background: #a39967;
+  font-size: 14px;
+}
+
+/* Active tab */
+.ability-tabs .tab-item.active,
+.spell-tabs .tab-item.active {
+  background: #d5d08a;
+  font-weight: bold;
+}
+
+/* ===== Tab panes ===== */
+
+/* Hide all panes by default */
+.ability-tabs .tab-pane,
+.spell-tabs .tab-pane {
+  display: none;
+}
+
+/* Show only active pane */
+.ability-tabs .tab-pane.active,
+.spell-tabs .tab-pane.active {
+  display: block;
+}
+
+/* ===== Rich Spell Choice (icon + hover) ===== */
+
+/* Spell icon */
+.spell-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Spell name */
+.spell-name {
+  flex: 1;
+}
+
+.weapon-select {
+  margin-left: 6px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.weapon-select:hover {
+  opacity: 1;
+}
+
+.item.selected {
+  outline: 1px solid #88f;
+}
+
+/* Loadout slots */
+.weapon-loadouts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.weapon-loadout-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weapon-loadout-label {
+  width: 50px;
+  font-weight: bold;
+}
+
+.weapon-loadout-slots {
+  display: flex;
+  gap: 8px;
+}
+
+.weapon-slot {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  background: #2b2b2b;
+  border: 2px solid #444;
+}
+
+.weapon-slot.filled {
+  border-color: rgba(255, 243, 136, 0.432);
+}
+
+.weapon-slot.empty {
+  opacity: 0.6;
+}
+
+.items-list .item.equipped {
+  background: rgba(100, 180, 255, 0.25);
+}
+
+.weapon-set-toggle {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.weapon-set-btn {
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--color-border-light-primary);
+  background: var(--color-bg-button);
+  cursor: pointer;
+}
+
+.weapon-set-btn.active {
+  background: var(--color-bg-highlight);
+  border-color: var(--color-border-highlight);
+  font-weight: bold;
+}
+
+.weapon-slot.drop-hover {
+  outline: 2px dashed var(--color-border-highlight);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.weapon-slot.blocked {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.weapon-slot .two-handed-ghost img {
+  opacity: 0.4;
+  filter: grayscale(50%);
+}
+.weapon-slot.blocked::after {
+  content: "2H";
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 10px;
+  opacity: 0.7;
 }

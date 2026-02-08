@@ -203,6 +203,7 @@
       },
       "Weapon": {
         "FIELDS": {
+          "offhand": { "label": "Can be held offhand" },
           "rollFormula": { "label": "Roll Formula" },
           "diceNum": { "label": "Number of dices" },
           "dieSize": { "label": "Die Size" },
@@ -278,7 +279,7 @@
           "actionCost": { "label": "Action Cost" },
           "damage": { "label": "Damage" },
           "attributeTest": { "label": "Test" },
-          "weaponAbility": { "label": "Weapon required" },
+          "weaponAbility": { "label": "Weapon Ability" },
           "resourceCost": { "label": "Resource Cost" }
         }
       },

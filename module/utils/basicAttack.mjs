@@ -1,0 +1,289 @@
+export async function universalAttackLogic({
+  attackType,
+  weaponFilter,
+  getWeaponSkillData = null,
+  flavorLabel,
+  showBreakthrough = false,
+}) {
+  const selectedToken = canvas.tokens.controlled[0];
+  if (!selectedToken) {
+    ui.notifications.warn("Please select a token.");
+    return;
+  }
+
+  const actor = selectedToken.actor;
+  const weapons = actor.items.filter(weaponFilter);
+
+  if (!weapons.length) {
+    ui.notifications.warn(`This actor has no ${attackType} weapons.`);
+    return;
+  }
+
+  // ─── Custom Bonuses ───
+  const customDamage = 0;
+  const customAttack = 0;
+  const customBleed = 0;
+  const customStun = 0;
+  const customEffect1 = 0;
+  const customEffect2 = 0;
+  const customEffect3 = 0;
+
+  const weaponChoices = weapons.map((weapon, index) => ({
+    label: weapon.name,
+    value: index,
+  }));
+
+  const handleWeaponSelection = async (weaponIndex) => {
+    const weapon = weapons[weaponIndex];
+
+    const doctrine = await game.tos.getDoctrineBonuses(actor, weapon);
+
+    const {
+      weaponSkillEffect = 0,
+      weaponSkillCrit = 0,
+      weaponSkillCritDmg = 0,
+      weaponSkillCritPen = 0,
+    } = getWeaponSkillData ? await getWeaponSkillData(actor, weapon) : {};
+
+    const penetration = weapon.system.penetration || 0;
+
+    // ─── Attack Roll ───
+    const attackData = await game.tos.getAttackRolls(
+      actor,
+      weapon,
+      doctrine.doctrineBonus,
+      doctrine.doctrineCritBonus,
+      weaponSkillCrit,
+      customAttack,
+    );
+
+    const {
+      attackRoll,
+      critSuccess,
+      critFailure,
+      rollName,
+      criticalSuccessThreshold,
+      criticalFailureThreshold,
+    } = attackData;
+
+    // ─── Damage Roll ───
+    const { damageRoll, damageTotal, breakthroughRollResult } =
+      await game.tos.getDamageRolls(actor, weapon, customDamage);
+    const hasBreakthrough =
+      showBreakthrough &&
+      typeof breakthroughRollResult === "string" &&
+      breakthroughRollResult.trim() !== "";
+    // ─── Critical Roll ───
+    const critData = await game.tos.getCriticalRolls(
+      actor,
+      weapon,
+      doctrine.doctrineCritRangeBonus,
+      attackRoll,
+      weaponSkillCritDmg,
+      weaponSkillCritPen,
+      damageTotal,
+      penetration,
+      doctrine.doctrineCritDmg,
+      doctrine.doctrineSkillCritPen,
+    );
+
+    const {
+      critScore,
+      critScoreResult,
+      critBonusPenetration,
+      critDamageTotal,
+    } = critData;
+
+    // ─── Effects Roll ───
+    const effects = await game.tos.getEffectRolls(
+      actor,
+      weapon,
+      doctrine.doctrineBleedBonus,
+      doctrine.doctrineStunBonus,
+      weaponSkillEffect,
+      customBleed,
+      customStun,
+      customEffect1,
+      customEffect2,
+      customEffect3,
+      critScore,
+      critSuccess,
+    );
+
+    const { allBleedRollResults, effectsRollResults } = effects;
+
+    // ─── Damage Line ───
+    const damageLine = `
+<div style="
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  font-size:16px;
+  max-width: fit-content;
+  margin: 0 auto;
+" class="combat-grid">
+
+  <div style="display:grid; grid-template-columns:auto 1fr; column-gap:8px;">
+    <div>Damage:</div><div style="text-align:center;">${damageTotal}</div>
+    <div>Penetration:</div><div style="text-align:center;">${penetration}</div>
+${
+  hasBreakthrough
+    ? `
+      <div>Breakthrough:</div>
+      <div style="text-align:center;">
+        ${breakthroughRollResult}
+      </div>
+    `
+    : `
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+    `
+}
+  </div>
+
+  <div style="display:grid; grid-template-columns:auto 1fr; column-gap:8px;">
+    <div>Crit Dmg:</div><div style="text-align:center;">${critDamageTotal}</div>
+    <div>Crit Pen:</div><div style="text-align:center;">${critBonusPenetration}</div>
+    <div>Crit score:</div>
+    <div style="text-align:center;">
+      <span title="Crit range result ${critScoreResult}"
+        style="text-decoration:underline dotted; cursor:help;">
+        [ ${critScore} ]
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+    const attackHTML = await attackRoll.render();
+    const damageHTML = await damageRoll.render();
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker(),
+      content: `
+<div class="dual-roll">
+  <div class="roll-column">
+    <div class="roll-label">Margin of Success</div>
+    ${attackHTML}
+  </div>
+  <div class="roll-column">
+    <div class="roll-label">Damage Roll</div>
+    ${damageHTML}
+  </div>
+</div>
+`,
+      rolls: [attackRoll, damageRoll],
+      flavor: `
+<span style="display:inline-flex; align-items:center;">
+  <img src="${weapon.img}" width="36" height="36" style="margin-right:8px;">
+  <strong style="font-size:20px;">${flavorLabel}</strong>
+</span>
+
+<hr>
+
+<p style="text-align:center; font-size:20px;">
+  <b>${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}</b>
+</p>
+
+${damageLine}
+<hr>
+
+<table style="width:100%; text-align:center; font-size:15px;">
+  <tr><th>Effects</th></tr>
+  <tr>
+    <td><b>${allBleedRollResults}</b> ${effectsRollResults}</td>
+  </tr>
+</table>
+<hr>
+`,
+      flags: {
+        tos: {
+          rollName,
+          criticalSuccessThreshold,
+          criticalFailureThreshold,
+        },
+        attack: {
+          type: "attack",
+          normal: { damage: damageTotal, penetration: penetration },
+          critical: {
+            damage: critDamageTotal,
+            penetration: critBonusPenetration,
+          },
+          breakthrough: {
+            damage: breakthroughRollResult,
+            penetration: penetration,
+          },
+        },
+      },
+    });
+  };
+
+  // ─── CSS ───
+  const style = document.createElement("style");
+  style.textContent = `
+#weapon-list .weapon-choice { font-size:16px; color:black; }
+#weapon-list .weapon-choice:hover { text-shadow:0 0 2px red; }
+.weapon-dialog .window-content { max-width:300px; }
+`;
+  document.head.appendChild(style);
+
+  new Dialog({
+    title: "Select Weapon",
+    content: `
+<ul id="weapon-list" style="list-style:none; padding:0;">
+${weaponChoices
+  .map(
+    (c) => `
+<li class="weapon-choice" data-value="${c.value}"
+  style="cursor:pointer; padding:5px; border-bottom:1px solid #444;">
+  ${c.label}
+</li>`,
+  )
+  .join("")}
+</ul>
+`,
+    buttons: {},
+    render: (html) => {
+      html.find("#weapon-list li").each((_, el) => {
+        el.addEventListener("click", () =>
+          handleWeaponSelection(Number(el.dataset.value)),
+        );
+      });
+    },
+  }).render(true);
+}
+
+export async function rangedAttack() {
+  return universalAttackLogic({
+    attackType: "ranged",
+    flavorLabel: "Ranged attack",
+    showBreakthrough: false,
+    weaponFilter: (i) =>
+      i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class),
+  });
+}
+
+export async function throwingAttack() {
+  return universalAttackLogic({
+    attackType: "throwing",
+    flavorLabel: "Throwing attack",
+    showBreakthrough: true,
+    weaponFilter: (i) => i.type === "weapon" && i.system.thrown === true,
+    getWeaponSkillData: (actor, weapon) =>
+      game.tos.getWeaponSkillBonuses(actor, weapon),
+  });
+}
+
+export async function meleeAttack() {
+  return universalAttackLogic({
+    attackType: "melee",
+    flavorLabel: "Melee attack",
+    showBreakthrough: true,
+    weaponFilter: (i) =>
+      i.type === "weapon" &&
+      ["axe", "sword", "blunt", "polearm"].includes(i.system.class) &&
+      i.system.thrown !== true,
+    getWeaponSkillData: (actor, weapon) =>
+      game.tos.getWeaponSkillBonuses(actor, weapon),
+  });
+}

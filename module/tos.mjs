@@ -12,12 +12,14 @@ import { defenseRoll } from "./utils/defense.mjs";
 import { throwExplosive } from "./utils/throwExplosive.mjs";
 import { castSpell } from "./utils/castSpell.mjs";
 import { spellDefense } from "./utils/spellDefense.mjs";
-import { meleeAttack } from "./utils/meleeAttack.mjs";
-import { rangedAttack } from "./utils/rangedAttack.mjs";
-import { throwingAttack } from "./utils/throwingAttack.mjs";
 import { combatAbilities } from "./utils/combatAbilities.mjs";
-import { rangedAbilities } from "./utils/rangedAbilities.mjs";
 import { attackActions } from "./utils/attackActions.mjs";
+import {
+  universalAttackLogic,
+  rangedAttack,
+  throwingAttack,
+  meleeAttack,
+} from "./utils/basicAttack.mjs";
 import {
   delayTurn,
   restAndRecover,
@@ -71,7 +73,6 @@ Hooks.once("init", function () {
   game.tos = game.tos || {};
   game.tos.evaluateDmgVsArmor = evaluateDmgVsArmor;
   game.tos.firstAid = firstAid;
-  game.tos.rangedAbilities = rangedAbilities;
   game.tos.combatAbilities = combatAbilities;
   game.tos.delayTurn = delayTurn;
   game.tos.restAndRecover = restAndRecover;
@@ -79,6 +80,7 @@ Hooks.once("init", function () {
   game.tos.spellDefense = spellDefense;
   game.tos.attackActions = attackActions;
   game.tos.meleeAttack = meleeAttack;
+  game.tos.universalAttackLogic = universalAttackLogic;
   game.tos.rangedAttack = rangedAttack;
   game.tos.throwingAttack = throwingAttack;
   game.tos.castSpell = castSpell;
@@ -653,6 +655,7 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
   if (!message?.flags?.attack) return;
 
   const attack = message.flags.attack;
+
   const scene = game.scenes.get(sceneId);
   const combat = game.combat;
   for (const tokenId of targetIds) {
@@ -802,6 +805,16 @@ async function handlePostDamageStatus({ actor, combatant }) {
 }
 
 Hooks.on("renderChatMessage", (message, html, data) => {
+  function updateButtonContainerLayout(container) {
+    const buttonCount = container.find("button, a.button").length;
+
+    if (buttonCount <= 1) {
+      container.addClass("single");
+    } else {
+      container.removeClass("single");
+    }
+  }
+
   // Check if the current user is the one who made the roll
   if (game.user.id === message.author.id) {
     // Add logic to check if the message is a roll message and create a reroll button
@@ -818,6 +831,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
 
       // Append the reroll button to the container
       buttonContainer.append(rerollButton);
+      updateButtonContainerLayout(buttonContainer);
       // Add click event listener for the reroll button
       rerollButton.on("click", async (event) => {
         event.preventDefault();
@@ -865,11 +879,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
       let buttonContainer = html.find(".button-container");
 
       if (buttonContainer.length === 0) {
-        buttonContainer = $(`
-        <div class="button-container"
-             style="display:flex; gap:6px; justify-content:center; margin-top:6px;">
-        </div>
-      `);
+        buttonContainer = $('<div class="button-container"></div>');
         html.find(".message-content").append(buttonContainer);
       }
 
@@ -883,7 +893,7 @@ Hooks.on("renderChatMessage", (message, html, data) => {
     `);
 
       buttonContainer.append(applyDamageButton);
-
+      updateButtonContainerLayout(buttonContainer);
       applyDamageButton.on("click", async () => {
         console.log("Apply Damage clicked", message);
         await handleApplyDamage(message.id);

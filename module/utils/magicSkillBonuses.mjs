@@ -28,64 +28,6 @@ function _injectDialogCSS() {
         .spell-dialog .window{
             width: auto;
         }
-
-        /* List and selection styling */
-        .spell-choice {
-            position: relative;
-            font-size: 16px;
-            color: black;
-            cursor: pointer;
-            padding: 5px; 
-            border-bottom: 1px solid #ccc;
-        }
-        .spell-choice:hover {
-            color: black;
-            text-shadow: 0 0 1px #888, 0 0 2px #888;
-            background-color: #f0f0f0;
-        }
-
-        /* New Tabs styling */
-        .spell-tabs { 
-            border: 1px solid #7a7971; 
-            border-radius: 4px;
-            margin-top: 5px;
-            background-color: #fff;
-        }
-        .tab-headers { 
-            display: flex; 
-            background: rgba(0, 0, 0, 0.1); 
-            border-bottom: 1px solid #7a7971; 
-            flex-wrap: wrap; /* Allow tabs to wrap if there are many */
-        }
-        .tab-headers .tab-item {
-            flex-grow: 1;
-            text-align: center;
-            padding: 5px 8px;
-            cursor: pointer;
-            border-right: 1px solid #7a7971;
-            font-weight: bold;
-            font-size: 13px; /* Slightly smaller font for multiple tabs */
-            min-width: 20%;
-        }
-        .tab-headers .tab-item:last-child {
-            border-right: none;
-        }
-        .tab-headers .tab-item.active {
-            background: #4a4944;
-            color: white;
-            text-shadow: none;
-        }
-        .tab-content {
-            padding: 5px;
-            max-height: 40vh; /* Limit height for scrollability */
-            overflow-y: auto;
-        }
-        .tab-pane {
-            display: none;
-        }
-        .tab-pane.active {
-            display: block;
-        }
     `;
 
   // Prevent re-injection if already present
@@ -134,6 +76,7 @@ export function showSpellSelectionDialogs(actor) {
 
   return new Promise((resolve) => {
     // --- Inner function to show the second (spell) dialog with Ranks as Tabs ---
+
     const showSpellDialog = (schoolName, schoolDialog) => {
       if (schoolDialog) schoolDialog.close();
 
@@ -183,8 +126,16 @@ export function showSpellSelectionDialogs(actor) {
           // Tab Content (List of spells)
           const spellListHtml = spells
             .map(
-              (spell) =>
-                `<li class="spell-choice" data-spell-id="${spell.id}">${spell.name}</li>`,
+              (spell) => `
+<li class="spell-choice ability-choice"
+    data-spell-id="${spell.id}">
+  <img src="${spell.img}"
+       class="ability-icon">
+  <span class="ability-name">
+    ${spell.name}
+  </span>
+</li>
+    `,
             )
             .join("");
 
@@ -284,6 +235,11 @@ export function showSpellSelectionDialogs(actor) {
       spellDialog.render(true);
     };
 
+    if (schools.length === 1) {
+      showSpellDialog(schools[0], null);
+      return;
+    }
+
     // --- First Dialog (School Selection - Unchanged) ---
     const schoolDialog = new Dialog({
       title: "Select Spell School",
@@ -291,9 +247,12 @@ export function showSpellSelectionDialogs(actor) {
                 ${schools
                   .map(
                     (school) =>
-                      `<li class="spell-choice" data-value="${school}">
-                        ${school.charAt(0).toUpperCase() + school.slice(1)}
-                    </li>`,
+                      `<li class="spell-choice ability-choice"
+    data-value="${school}">
+  <span class="ability-name">
+    ${school.charAt(0).toUpperCase() + school.slice(1)}
+  </span>
+</li>`,
                   )
                   .join("")}
             </ul></fieldset></form>`,
@@ -761,17 +720,14 @@ export async function finalizeRollsAndPostChat(
 
   const rolls = [attackRoll];
 
-  if (
-    damageRoll instanceof Roll &&
-    damageRoll.formula.replace(/\s+/g, "") !== "0d0"
-  ) {
+  if (hasDamage && damageRoll instanceof Roll) {
     rolls.push(damageRoll);
   }
 
   const attackHTML = await attackRoll.render();
-  const damageHTML = await damageRoll.render();
+  const damageHTML = hasDamage ? await damageRoll.render() : "";
   const content = `
-<div class="${damageHTML ? "dual-roll" : "single-roll"}">
+<div class="${hasDamage ? "dual-roll" : "single-roll"}">
 
   <div class="roll-column">
     <div class="roll-label">Margin of Success</div>
@@ -779,7 +735,7 @@ export async function finalizeRollsAndPostChat(
   </div>
 
   ${
-    damageHTML
+    hasDamage
       ? `
   <div class="roll-column">
     <div class="roll-label">Damage Roll</div>
@@ -791,6 +747,27 @@ export async function finalizeRollsAndPostChat(
 
 </div>
 `;
+  let attackFlag = null;
+
+  if (hasDamage) {
+    attackFlag = {
+      type: "attack",
+      normal: {
+        damage: damageTotal,
+        penetration: spell.system.penetration,
+        halfDamage: spell.system.halfDamage ?? false,
+      },
+    };
+
+    if (critSuccess) {
+      attackFlag.critical = {
+        damage: critDamageTotal,
+        penetration: critBonusPenetration,
+        halfDamage: spell.system.halfDamage ?? false,
+      };
+    }
+  }
+
   await ChatMessage.create({
     speaker: ChatMessage.getSpeaker(),
     content,
@@ -832,18 +809,7 @@ export async function finalizeRollsAndPostChat(
         criticalFailureThreshold:
           actor.system.combatSkills.channeling.criticalFailureThreshold,
       },
-      attack: {
-        type: "attack",
-        normal: {
-          damage: damageTotal,
-          penetration: spell.system.penetration,
-        },
-
-        critical: {
-          damage: critDamageTotal,
-          penetration: critBonusPenetration,
-        },
-      },
+      ...(attackFlag && { attack: attackFlag }),
     },
   });
 }

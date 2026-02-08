@@ -1,0 +1,328 @@
+{{! offhand Tab }}
+<section
+  class="tab offhand {{tab.cssClass}}"
+  data-group="primary"
+  data-tab="offhand"
+>
+  {{! As you add new fields, add them in here! }}
+
+  <div class="resource">
+    <label class="resource-label">{{localize
+        "TOS.Item.Weapon.FIELDS.rollFormula.label"
+      }}:</label>
+    <span>{{system.offhandProperties.formula}}</span>
+
+    <div class="grid grid-4col">
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.attack.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.attack"
+          value="{{system.offhandProperties.attack}}"
+          data-dtype="Number"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.defense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.defense"
+          value="{{system.offhandProperties.defense}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critRange.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.critRange"
+          value="{{system.offhandProperties.critRange}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critChance.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.critChance"
+          value="{{system.offhandProperties.critChance}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critFail.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.critFail"
+          value="{{system.offhandProperties.critFail}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critDefense.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.critDefense"
+          value="{{system.offhandProperties.critDefense}}"
+          data-dtype="Number"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.critDodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.critDodge"
+          value="{{system.offhandProperties.critDodge}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.dodge.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.dodge"
+          value="{{system.offhandProperties.dodge}}"
+          data-dtype="Number"
+        />
+      </div>
+
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.breakthrough.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.breakthrough"
+          value="{{system.offhandProperties.breakthrough}}"
+          data-dtype="String"
+          placeholder="e.g. 2d6"
+        />
+      </div>
+      <div class="grid-span-1">
+        <label class="resource-label">{{localize
+            "TOS.Item.Weapon.FIELDS.sneakDamage.label"
+          }}</label>
+        <input
+          type="text"
+          name="system.offhandProperties.sneakDamage"
+          value="{{system.offhandProperties.sneakDamage}}"
+          data-dtype="String"
+          placeholder="e.g. 2d6"
+        />
+      </div>
+      <div class="grid-span-2"></div>
+
+    </div>
+
+  </div>
+       <div class="grid grid-4col">
+
+  <label class="resource-label">{{localize "dimakerus"}}</label>
+  <input type="checkbox" name="system.offhandProperties.doctrines.dimakerus" {{checked system.offhandProperties.doctrines.dimakerus}} />
+
+  <label class="resource-label">{{localize "duelist"}}</label>
+  <input type="checkbox" name="system.offhandProperties.doctrines.duelist" {{checked system.offhandProperties.doctrines.duelist}} />
+
+  <label class="resource-label">{{localize "monk"}}</label>
+  <input type="checkbox" name="system.offhandProperties.doctrines.monk" {{checked system.offhandProperties.doctrines.monk}} />
+
+     <label class="resource-label">{{localize "rogue"}}</label>
+  <input type="checkbox" name="system.offhandProperties.doctrines.rogue" {{checked system.offhandProperties.doctrines.rogue}} />
+<br>
+
+  <div class="grid grid-3col">
+
+    {{!-- -------------------------
+         Built-in effects
+    -------------------------- --}}
+
+    <div class="grid-span-1 effect-row">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.stun.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.offhandProperties.effects.stun"
+        value="{{system.offhandProperties.effects.stun}}"
+        data-dtype="Number"
+      />
+    </div>
+
+    <div class="grid-span-1 effect-row">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.bleed.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.offhandProperties.effects.bleed"
+        value="{{system.offhandProperties.effects.bleed}}"
+        data-dtype="Number"
+      />
+    </div>
+
+    <div class="grid-span-1 effect-row">
+    </div>
+    {{!-- -------------------------
+         Customizable effect slot #1
+    -------------------------- --}}
+    <div class="grid-span-1">
+      <label class="resource-label">{{localize "TOS.Effect.type1"}}</label>
+      <select name="system.offhandProperties.effectType1">
+        <option value="">-- Select a type --</option>
+        {{#each system.offhandProperties.effectTypes as |effectType|}}
+          <option value="{{effectType}}"
+            {{#if (eq ../system.offhandProperties.effectType1 effectType)}}selected{{/if}}>
+            {{effectType}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.extra1.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.offhandProperties.effects.extra1"
+        value="{{system.offhandProperties.effects.extra1}}"
+        data-dtype="Number"
+      />
+    </div>
+
+ {{#if (eq system.offhandProperties.effectType1 "Custom")}}
+     <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Effect.Custom.name1"}}
+      </label>
+      <input
+        type="text"
+        name="system.offhandProperties.effects.effectName1"
+        value="{{system.offhandProperties.effects.effectName1}}"
+        data-dtype="text"
+      />
+    </div>
+{{/if}}
+
+{{#unless (eq system.offhandProperties.effectType1 "Custom")}}
+    <div class="grid-span-1 effect-row">
+    </div>
+{{/unless}}
+    {{!-- -------------------------
+         Customizable effect slot #2
+    -------------------------- --}}
+    <div class="grid-span-1">
+      <label class="resource-label">{{localize "TOS.Effect.type2"}}</label>
+      <select name="system.offhandProperties.effectType2">
+        <option value="">-- Select a type --</option>
+        {{#each system.offhandProperties.effectTypes as |effectType|}}
+          <option value="{{effectType}}"
+            {{#if (eq ../system.offhandProperties.effectType2 effectType)}}selected{{/if}}>
+            {{effectType}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.extra2.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.offhandProperties.effects.extra2"
+        value="{{system.offhandProperties.effects.extra2}}"
+        data-dtype="Number"
+      />
+    </div>
+
+ {{#if (eq system.offhandProperties.effectType2 "Custom")}}
+     <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Effect.Custom.name2"}}
+      </label>
+      <input
+        type="text"
+        name="system.offhandProperties.effects.effectName2"
+        value="{{system.offhandProperties.effects.effectName2}}"
+        data-dtype="text"
+      />
+    </div>
+{{/if}}
+
+{{#unless (eq system.offhandProperties.effectType2 "Custom")}}
+    <div class="grid-span-1 effect-row">
+    </div>
+{{/unless}}
+
+    {{!-- -------------------------
+         Customizable effect slot #3
+    -------------------------- --}}
+    <div class="grid-span-1">
+      <label class="resource-label">{{localize "TOS.Effect.type3"}}</label>
+      <select name="system.offhandProperties.effectType3">
+        <option value="">-- Select a type --</option>
+        {{#each system.offhandProperties.effectTypes as |effectType|}}
+          <option value="{{effectType}}"
+            {{#if (eq ../system.offhandProperties.effectType3 effectType)}}selected{{/if}}>
+            {{effectType}}
+          </option>
+        {{/each}}
+      </select>
+    </div>
+
+    <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Item.Weapon.FIELDS.extra3.label"}}
+      </label>
+      <input
+        type="number"
+        name="system.offhandProperties.effects.extra3"
+        value="{{system.offhandProperties.effects.extra3}}"
+        data-dtype="Number"
+      />
+    </div>
+
+ {{#if (eq system.offhandProperties.effectType3 "Custom")}}
+     <div class="grid-span-1">
+      <label class="resource-label">
+        {{localize "TOS.Effect.Custom.name3"}}
+      </label>
+      <input
+        type="text"
+        name="system.offhandProperties.effects.effectName3"
+        value="{{system.offhandProperties.effects.effectName3}}"
+        data-dtype="text"
+      />
+    </div>
+{{/if}}
+
+{{#unless (eq system.offhandProperties.effectType3 "Custom")}}
+    <div class="grid-span-1 effect-row">
+    </div>
+{{/unless}}
+
+  </div>
+</section>

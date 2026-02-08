@@ -32,10 +32,10 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       toggleEffect: this._toggleEffect,
       roll: this._onRoll,
       toggleEquipped: this._toggleEquipped,
-      myAction: this._myAction,
       toggleReroll: this._toggleReroll,
       toggleSchool: this._toggleSchool,
       buildSpellTooltip: this._buildSpellTooltip,
+      setActiveWeaponSet: this._setActiveWeaponSet,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -100,15 +100,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     console.debug(
       "Icon class toggled:",
       rerollActive[index] ? "active" : "inactive",
-    );
-  }
-
-  static _myAction(event) {
-    const isChecked = event.target.checked; // Get the state of the checkbox
-    console.log(
-      `My custom action triggered, checkbox is ${
-        isChecked ? "checked" : "unchecked"
-      }`,
     );
   }
 
@@ -220,6 +211,99 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     }
   }
 
+  static _setActiveWeaponSet(event, target) {
+    if (this.actor.type !== "character") return;
+    const set = Number(target.dataset.set);
+
+    if (this.actor.system.combat.activeWeaponSet === set) return;
+
+    this.actor.update({
+      "system.combat.activeWeaponSet": set,
+    });
+  }
+
+  _assignWeaponDirect(itemId, set, slot) {
+    if (this.actor.type !== "character") return;
+    if (!itemId || !set || !slot) return;
+
+    // 🔒 Normalize weaponSets (CRITICAL)
+    const weaponSets = foundry.utils.deepClone(
+      this.actor.system.combat.weaponSets,
+    ) ?? {
+      1: { main: null, off: null },
+      2: { main: null, off: null },
+    };
+
+    const updates = {};
+
+    // 🔹 Remove this weapon from all slots first
+    for (const [setId, slots] of Object.entries(weaponSets)) {
+      for (const hand of ["main", "off"]) {
+        if (slots?.[hand] === itemId) {
+          updates[`system.combat.weaponSets.${setId}.${hand}`] = null;
+        }
+      }
+    }
+
+    // 🔹 Two-handed logic (main-hand only)
+    if (slot === "main") {
+      const item = this.actor.items.get(itemId);
+      const isTwoHanded =
+        item?.system.type === "heavy" ||
+        ["crossbow", "box"].includes(item?.system.class);
+
+      if (isTwoHanded) {
+        updates[`system.combat.weaponSets.${set}.off`] = null;
+      }
+    }
+
+    // 🔹 Assign to requested slot
+    updates[`system.combat.weaponSets.${set}.${slot}`] = itemId;
+
+    // 🔹 Apply update
+    return this.actor.update(updates);
+  }
+
+  _openWeaponEquipMenuFromItem(itemId) {
+    const sheet = this; // 👈 IMPORTANT
+
+    new Dialog({
+      title: "Equip Weapon",
+      content: `<p>Select where to equip this weapon:</p>`,
+      buttons: {
+        set1main: {
+          label: "Set 1 – Main",
+          callback: () => sheet._assignWeaponDirect(itemId, 1, "main"),
+        },
+        set1off: {
+          label: "Set 1 – Off",
+          callback: () => sheet._assignWeaponDirect(itemId, 1, "off"),
+        },
+        set2main: {
+          label: "Set 2 – Main",
+          callback: () => sheet._assignWeaponDirect(itemId, 2, "main"),
+        },
+        set2off: {
+          label: "Set 2 – Off",
+          callback: () => sheet._assignWeaponDirect(itemId, 2, "off"),
+        },
+      },
+    }).render(true);
+  }
+
+  _onRightClick(event) {
+    if (this.actor.type !== "character") return;
+    const icon = event.target.closest(".weapon-icon");
+    if (!icon) return;
+
+    event.preventDefault();
+
+    const itemId = icon.dataset.itemId;
+    if (!itemId) return;
+
+    this._openWeaponEquipMenuFromItem(itemId);
+  }
+
   /** @override */
   static PARTS = {
     header: {
@@ -316,7 +400,32 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     // Offloading context prep to a helper function
     this._prepareItems(context);
+    context.weaponSets = {};
+    // Resolve weapon sets -> Item documents (VIEW DATA ONLY)
+    if (this.actor.type === "character") {
+      for (const [setId, slots] of Object.entries(
+        this.actor.system.combat.weaponSets ?? {},
+      )) {
+        const mainItem = slots.main
+          ? (this.actor.items.get(slots.main) ?? null)
+          : null;
 
+        const offItem = slots.off
+          ? (this.actor.items.get(slots.off) ?? null)
+          : null;
+
+        const mainIsTwoHanded =
+          !!mainItem &&
+          (mainItem.system.type === "heavy" ||
+            ["crossbow", "box"].includes(mainItem.system.class));
+
+        context.weaponSets[setId] = {
+          main: mainItem,
+          off: offItem,
+          mainIsTwoHanded,
+        };
+      }
+    }
     return context;
   }
 
@@ -576,6 +685,19 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     this.#dragDrop.forEach((d) => d.bind(this.element));
     this.#disableOverrides();
+    console.log("Sheet element:", this.element);
+    console.log(
+      "weapon-equip buttons:",
+      this.element.querySelectorAll(".weapon-equip").length,
+    );
+    if (!this._weaponContextBound) {
+      this.element.addEventListener(
+        "contextmenu",
+        this._onRightClick.bind(this),
+      );
+      this._weaponContextBound = true;
+    }
+
     // You may want to add other special handling here
     // Foundry comes with a large number of utility classes, e.g. SearchFilter
     // That you may want to implement yourself.
@@ -944,14 +1066,36 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    * @protected
    */
   _onDragStart(event) {
-    const docRow = event.currentTarget.closest("li");
-    if ("link" in event.target.dataset) return;
-    // Chained operation
-    let dragData = this._getEmbeddedDocument(docRow)?.toDragData();
+    const slotEl = event.currentTarget.closest(".weapon-slot");
 
+    // 🔹 CASE 1: Dragging from a weapon slot
+    if (slotEl) {
+      const itemId = slotEl.dataset.itemId;
+      const set = Number(slotEl.dataset.set);
+      const slot = slotEl.dataset.slot;
+
+      if (!itemId || !set || !slot) return;
+
+      const dragData = {
+        type: "WeaponSlot",
+        itemId,
+        fromSet: set,
+        fromSlot: slot,
+        actorId: this.actor.id,
+      };
+
+      event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+      return;
+    }
+
+    // 🔹 CASE 2: Normal inventory item drag (existing behavior)
+    const docRow = event.currentTarget.closest("li");
+    if (!docRow) return;
+
+    const dragData = this._getEmbeddedDocument(docRow)?.toDragData();
     if (!dragData) return;
 
-    // Set data transfer
     event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
   }
 
@@ -960,7 +1104,13 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    * @param {DragEvent} event       The originating DragEvent
    * @protected
    */
-  _onDragOver(event) {}
+  _onDragOver(event) {
+    const slot = event.target.closest(".weapon-slot");
+    if (!slot) return;
+
+    event.preventDefault();
+    slot.classList.add("drop-hover");
+  }
 
   /**
    * Callback actions which occur when a dragged element is dropped on a target.
@@ -968,8 +1118,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    * @protected
    */
   async _onDrop(event) {
+    const slot = event.target.closest(".weapon-slot");
+    if (slot) slot.classList.remove("drop-hover");
     const data = TextEditor.getDragEventData(event);
     const actor = this.actor;
+    const dropTarget = event.target.closest(".weapon-slot");
+    if (dropTarget) {
+      return this._onDropWeaponSlot(event, dropTarget);
+    }
     const allowed = Hooks.call("dropActorSheetData", actor, this, data);
     if (allowed === false) return;
 
@@ -1149,6 +1305,65 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
   async _onDropItemCreate(itemData, event) {
     itemData = itemData instanceof Array ? itemData : [itemData];
     return this.actor.createEmbeddedDocuments("Item", itemData);
+  }
+
+  /**
+   * Handle the final creation of dropped Item data on the weapon slot.
+   * This method is factored out to allow downstream classes the opportunity to override item creation behavior.
+   * @param {object[]|object} itemData      The item data requested for creation
+   * @param {DragEvent} event               The concluding DragEvent which provided the drop data
+   * @returns {Promise<Item[]>}
+   * @private
+   */
+  async _onDropWeaponSlot(event, slotEl) {
+    if (this.actor.type !== "character") return;
+    event.preventDefault();
+
+    const data = TextEditor.getDragEventData(event);
+    if (!data) return;
+
+    const toSet = Number(slotEl.dataset.set);
+    const toSlot = slotEl.dataset.slot;
+    if (!toSet || !toSlot) return;
+
+    const weaponSets = this.actor.system.combat.weaponSets ?? {};
+
+    // 🚫 BLOCK: off-hand is blocked by a two-handed main weapon
+    if (toSlot === "off") {
+      const mainId = weaponSets?.[toSet]?.main;
+      if (mainId) {
+        const mainItem = this.actor.items.get(mainId);
+        const mainIsTwoHanded =
+          mainItem?.system.type === "heavy" ||
+          ["crossbow", "box"].includes(mainItem?.system.class);
+
+        if (mainIsTwoHanded) return;
+      }
+    }
+
+    // 🔹 Slot → slot drag
+    if (data.type === "WeaponSlot") {
+      // 🚫 BLOCK: two-handed weapons cannot go into off-hand
+      if (toSlot === "off") return;
+
+      this._assignWeaponDirect(data.itemId, toSet, toSlot);
+      return;
+    }
+
+    // 🔹 Inventory → slot drag
+    if (data.type !== "Item") return;
+
+    const item = await Item.implementation.fromDropData(data);
+    if (!item?.isOwned || item.type !== "weapon") return;
+
+    const isTwoHanded =
+      item.system.type === "heavy" ||
+      ["crossbow", "box"].includes(item.system.class);
+
+    // 🚫 BLOCK: two-handed weapons cannot go into off-hand
+    if (isTwoHanded && toSlot === "off") return;
+
+    this._assignWeaponDirect(item.id, toSet, toSlot);
   }
 
   /**
