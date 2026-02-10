@@ -1086,6 +1086,8 @@
         "firearm"
       ],
       "equipped": false,
+      "twoHandGrip": false,
+      "gripMode": "one",
       "offhand": false,
       "type": "",
       "typeOptions": ["light", "medium", "heavy"],

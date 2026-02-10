@@ -138,7 +138,16 @@
           name="system.finesse"
           {{checked system.finesse}}
         />
-
+        {{#unless (eq system.type "heavy")}}
+          <label class="resource-label">
+            {{localize "TOS.Item.Weapon.FIELDS.twoHandGrip.label"}}
+          </label>
+          <input
+            type="checkbox"
+            name="system.twoHandGrip"
+            {{checked system.twoHandGrip}}
+          />
+        {{/unless}}
         <label class="resource-label">{{localize
             "TOS.Item.Weapon.FIELDS.sharp.label"
           }}</label>

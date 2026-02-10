@@ -1443,28 +1443,68 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
   outline: 1px solid #88f;
 }
 
-/* Loadout slots */
+/* ============================= */
+/* WEAPON LOADOUTS – CORE LAYOUT */
+/* ============================= */
+
 .weapon-loadouts {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  gap: 2rem;
 }
 
-.weapon-loadout-row {
-  display: flex;
+.weapon-loadouts.horizontal {
+  flex-direction: row;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
 }
 
-.weapon-loadout-label {
-  width: 50px;
+.equip-dialog {
+  display: grid;
+  grid-template-columns: auto 1fr 1fr;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.equip-header {
+  display: contents;
   font-weight: bold;
+  text-align: center;
 }
 
-.weapon-loadout-slots {
-  display: flex;
-  gap: 8px;
+.equip-row {
+  display: contents;
 }
+
+.equip-dialog button {
+  width: 100%;
+}
+
+.weapon-slot {
+  cursor: pointer;
+}
+.weapon-slot[data-item-id] {
+  cursor: context-menu;
+}
+
+/* ============================= */
+/* SET BLOCKS (LEFT / RIGHT)     */
+/* ============================= */
+
+.weapon-set-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.weapon-slot-row {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* ============================= */
+/* WEAPON SLOTS                  */
+/* ============================= */
 
 .weapon-slot {
   width: 48px;
@@ -1472,58 +1512,126 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
   border-radius: 6px;
   background: #2b2b2b;
   border: 2px solid #444;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.weapon-slot.filled {
-  border-color: rgba(255, 243, 136, 0.432);
+/* Active Set 1 */
+.weapon-loadouts.active-set-1 .weapon-slot.filled[data-set="1"] {
+  border-color: rgba(79, 160, 255, 0.6);
+  box-shadow: 0 0 6px rgba(255, 243, 136, 0.6);
+}
+
+/* Active Set 2 */
+.weapon-loadouts.active-set-2 .weapon-slot.filled[data-set="2"] {
+  border-color: rgba(255, 164, 79, 0.6);
+  box-shadow: 0 0 6px rgba(255, 243, 136, 0.6);
+}
+.weapon-loadouts.active-set-1 .weapon-slot[data-set="2"],
+.weapon-loadouts.active-set-2 .weapon-slot[data-set="1"] {
+  filter: opacity(45%);
 }
 
 .weapon-slot.empty {
   opacity: 0.6;
 }
 
-.items-list .item.equipped {
-  background: rgba(100, 180, 255, 0.25);
-}
-
-.weapon-set-toggle {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.weapon-set-btn {
-  padding: 0.25rem 0.75rem;
-  border: 1px solid var(--color-border-light-primary);
-  background: var(--color-bg-button);
-  cursor: pointer;
-}
-
-.weapon-set-btn.active {
-  background: var(--color-bg-highlight);
-  border-color: var(--color-border-highlight);
-  font-weight: bold;
-}
+/* ============================= */
+/* DRAG & DROP FEEDBACK          */
+/* ============================= */
 
 .weapon-slot.drop-hover {
   outline: 2px dashed var(--color-border-highlight);
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* ============================= */
+/* TWO-HANDED BLOCKING           */
+/* ============================= */
+
 .weapon-slot.blocked {
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.35;
 }
 
-.weapon-slot .two-handed-ghost img {
-  opacity: 0.4;
-  filter: grayscale(50%);
-}
-.weapon-slot.blocked::after {
-  content: "2H";
+/* ============================= */
+/* TWO-HANDED GHOST OVERLAY      */
+/* ============================= */
+
+.two-handed-ghost {
   position: absolute;
-  bottom: 2px;
-  right: 4px;
-  font-size: 10px;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 1;
+}
+
+.two-handed-ghost img {
+  width: 44px;
+  height: 44px;
+  filter: opacity(45%);
+}
+
+/* ============================= */
+/* SET SWITCHER                  */
+/* ============================= */
+
+.weapon-set-switcher {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  flex: 0 0 auto;
+}
+
+.weapon-set-toggle {
+  background: transparent;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
   opacity: 0.7;
+}
+
+/* ============================= */
+/* ITEM LIST HIGHLIGHTS          */
+/* ============================= */
+
+/* Set 1 */
+.item.equipped-set-1 {
+  background: rgba(80, 160, 255, 0.25);
+  border-left: 4px solid #4fa0ff;
+}
+
+/* Set 2 */
+.item.equipped-set-2 {
+  background: rgba(135, 77, 48, 0.4);
+  border-left: 4px solid #ffa44f;
+}
+
+.grip-toggle {
+  cursor: pointer;
+  font-size: 1.1rem;
+  margin-left: 6px;
+
+  color: var(--color-text-light-primary);
+  opacity: 0.45;
+
+  transition:
+    opacity 0.15s ease,
+    filter 0.15s ease;
+}
+
+.grip-toggle:hover {
+  opacity: 0.7;
+}
+
+.grip-toggle.active {
+  opacity: 1;
+  color: #f5c542; /* warm yellow */
+  filter: drop-shadow(0 0 4px rgba(245, 197, 66, 0.8));
 }

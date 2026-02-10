@@ -204,6 +204,7 @@
       "Weapon": {
         "FIELDS": {
           "offhand": { "label": "Can be held offhand" },
+          "twoHandGrip": { "label": "Can Two hand grip" },
           "rollFormula": { "label": "Roll Formula" },
           "diceNum": { "label": "Number of dices" },
           "dieSize": { "label": "Die Size" },

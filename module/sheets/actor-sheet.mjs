@@ -36,6 +36,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       toggleSchool: this._toggleSchool,
       buildSpellTooltip: this._buildSpellTooltip,
       setActiveWeaponSet: this._setActiveWeaponSet,
+      toggleTwoHandGrip: this._toggleTwoHandGrip,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -213,12 +214,12 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
   static _setActiveWeaponSet(event, target) {
     if (this.actor.type !== "character") return;
-    const set = Number(target.dataset.set);
 
-    if (this.actor.system.combat.activeWeaponSet === set) return;
+    const current = this.actor.system.combat.activeWeaponSet ?? 1;
+    const next = current === 1 ? 2 : 1;
 
     this.actor.update({
-      "system.combat.activeWeaponSet": set,
+      "system.combat.activeWeaponSet": next,
     });
   }
 
@@ -226,7 +227,9 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (this.actor.type !== "character") return;
     if (!itemId || !set || !slot) return;
 
-    // 🔒 Normalize weaponSets (CRITICAL)
+    const item = this.actor.items.get(itemId);
+    if (!item) return;
+
     const weaponSets = foundry.utils.deepClone(
       this.actor.system.combat.weaponSets,
     ) ?? {
@@ -236,7 +239,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     const updates = {};
 
-    // 🔹 Remove this weapon from all slots first
+    // Remove item from all slots first (allows replacement)
     for (const [setId, slots] of Object.entries(weaponSets)) {
       for (const hand of ["main", "off"]) {
         if (slots?.[hand] === itemId) {
@@ -245,54 +248,150 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       }
     }
 
-    // 🔹 Two-handed logic (main-hand only)
+    const isShield = item.system.shield;
+
+    // Shields ONLY in off-hand
+    if (isShield && slot !== "off") return;
+
+    // Two-handed weapon blocks off-hand
+    if (slot === "off") {
+      const mainId = weaponSets?.[set]?.main;
+      if (mainId) {
+        const mainItem = this.actor.items.get(mainId);
+        const mainIsTwoHanded = this._isEffectivelyTwoHanded(mainItem);
+
+        if (mainIsTwoHanded) return;
+      }
+    }
+
+    // Two-handed weapon clears off-hand
     if (slot === "main") {
-      const item = this.actor.items.get(itemId);
-      const isTwoHanded =
-        item?.system.type === "heavy" ||
-        ["crossbow", "box"].includes(item?.system.class);
+      const isTwoHanded = this._isEffectivelyTwoHanded(item);
 
       if (isTwoHanded) {
         updates[`system.combat.weaponSets.${set}.off`] = null;
       }
     }
 
-    // 🔹 Assign to requested slot
     updates[`system.combat.weaponSets.${set}.${slot}`] = itemId;
-
-    // 🔹 Apply update
     return this.actor.update(updates);
   }
 
+  static async _toggleTwoHandGrip(event, target) {
+    const button = target;
+    const itemId = button.dataset.itemId;
+
+    const actor = this.actor;
+    if (!actor || actor.type !== "character") return;
+
+    const item = actor.items.get(itemId);
+    if (!item) return;
+
+    // Capability guard
+    if (!item.system.twoHandGrip) return;
+
+    const newMode = item.system.gripMode === "two" ? "one" : "two";
+    console.log("Grip toggle itemId:", itemId);
+
+    await item.update({
+      "system.gripMode": newMode,
+    });
+  }
+
+  _isEffectivelyTwoHanded(item) {
+    if (!item) return false;
+    if (item.system.type === "heavy") return true;
+    if (item.system.gripMode === "two") return true;
+    if (["crossbow", "box"].includes(item.system.class)) return true;
+    return false;
+  }
+
   _openWeaponEquipMenuFromItem(itemId) {
-    const sheet = this; // 👈 IMPORTANT
+    const item = this.actor.items.get(itemId);
+    if (!item) return;
+
+    const isShield = item.system?.shield === true;
+    const isTwoHanded = this._isEffectivelyTwoHanded(item);
+
+    // Determine availability
+    const allowMain = !isShield;
+    const allowOff = !isTwoHanded;
+
+    // Safety check
+    if (!allowMain && !allowOff) return;
+
+    const content = `
+  <div class="equip-dialog">
+    <div class="equip-header">
+      <div></div>
+      <div>Set 1</div>
+      <div>Set 2</div>
+    </div>
+
+    ${
+      allowMain
+        ? `
+    <div class="equip-row">
+      <div>Main hand</div>
+      <button data-action="equip" data-set="1" data-hand="main">Main</button>
+      <button data-action="equip" data-set="2" data-hand="main">Main</button>
+    </div>
+    `
+        : ""
+    }
+
+    ${
+      allowOff
+        ? `
+    <div class="equip-row">
+      <div>Off hand</div>
+      <button data-action="equip" data-set="1" data-hand="off">Off</button>
+      <button data-action="equip" data-set="2" data-hand="off">Off</button>
+    </div>
+    `
+        : ""
+    }
+  </div>
+  `;
 
     new Dialog({
-      title: "Equip Weapon",
-      content: `<p>Select where to equip this weapon:</p>`,
-      buttons: {
-        set1main: {
-          label: "Set 1 – Main",
-          callback: () => sheet._assignWeaponDirect(itemId, 1, "main"),
-        },
-        set1off: {
-          label: "Set 1 – Off",
-          callback: () => sheet._assignWeaponDirect(itemId, 1, "off"),
-        },
-        set2main: {
-          label: "Set 2 – Main",
-          callback: () => sheet._assignWeaponDirect(itemId, 2, "main"),
-        },
-        set2off: {
-          label: "Set 2 – Off",
-          callback: () => sheet._assignWeaponDirect(itemId, 2, "off"),
-        },
+      title: isShield ? "Equip Shield" : "Equip Weapon",
+      content,
+      buttons: {}, // IMPORTANT: no default buttons
+      render: (html) => {
+        html[0].addEventListener("click", (event) => {
+          const button = event.target.closest("button[data-action='equip']");
+          if (!button) return;
+
+          const set = Number(button.dataset.set);
+          const hand = button.dataset.hand;
+
+          this._assignWeaponDirect(itemId, set, hand);
+        });
       },
     }).render(true);
   }
 
   _onRightClick(event) {
     if (this.actor.type !== "character") return;
+
+    /* ---------------------------------- */
+    /* 1️⃣ WEAPON SLOT RIGHT-CLICK (CLEAR) */
+    /* ---------------------------------- */
+    const slot = event.target.closest(".weapon-slot");
+    if (slot) {
+      event.preventDefault();
+
+      const itemId = slot.dataset.itemId;
+      if (!itemId) return; // empty slot → do nothing
+
+      this._clearWeaponSlot(itemId);
+      return;
+    }
+
+    /* ---------------------------------- */
+    /* 2️⃣ INVENTORY WEAPON RIGHT-CLICK    */
+    /* ---------------------------------- */
     const icon = event.target.closest(".weapon-icon");
     if (!icon) return;
 
@@ -302,6 +401,30 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (!itemId) return;
 
     this._openWeaponEquipMenuFromItem(itemId);
+  }
+
+  _clearWeaponSlot(itemId) {
+    if (this.actor.type !== "character") return;
+    if (!itemId) return;
+
+    const weaponSets = foundry.utils.deepClone(
+      this.actor.system.combat.weaponSets,
+    );
+
+    if (!weaponSets) return;
+
+    const updates = {};
+
+    for (const [setId, slots] of Object.entries(weaponSets)) {
+      for (const hand of ["main", "off"]) {
+        if (slots?.[hand] === itemId) {
+          updates[`system.combat.weaponSets.${setId}.${hand}`] = null;
+        }
+      }
+    }
+
+    if (!Object.keys(updates).length) return;
+    return this.actor.update(updates);
   }
 
   /** @override */
@@ -414,15 +537,15 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
           ? (this.actor.items.get(slots.off) ?? null)
           : null;
 
-        const mainIsTwoHanded =
-          !!mainItem &&
-          (mainItem.system.type === "heavy" ||
-            ["crossbow", "box"].includes(mainItem.system.class));
+        const mainIsTwoHanded = this._isEffectivelyTwoHanded(mainItem);
+
+        const offIsShield = !!offItem && offItem.system?.shield;
 
         context.weaponSets[setId] = {
           main: mainItem,
           off: offItem,
           mainIsTwoHanded,
+          offIsShield,
         };
       }
     }
@@ -1328,7 +1451,23 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     const weaponSets = this.actor.system.combat.weaponSets ?? {};
 
-    // 🚫 BLOCK: off-hand is blocked by a two-handed main weapon
+    // Slot → slot drag
+    if (data.type === "WeaponSlot") {
+      this._assignWeaponDirect(data.itemId, toSet, toSlot);
+      return;
+    }
+
+    if (data.type !== "Item") return;
+
+    const item = await Item.implementation.fromDropData(data);
+    if (!item?.isOwned) return;
+
+    const isShield = item.system.shield;
+
+    // Shields only in off-hand
+    if (isShield && toSlot !== "off") return;
+
+    // Two-handed blocks off-hand
     if (toSlot === "off") {
       const mainId = weaponSets?.[toSet]?.main;
       if (mainId) {
@@ -1341,27 +1480,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       }
     }
 
-    // 🔹 Slot → slot drag
-    if (data.type === "WeaponSlot") {
-      // 🚫 BLOCK: two-handed weapons cannot go into off-hand
-      if (toSlot === "off") return;
-
-      this._assignWeaponDirect(data.itemId, toSet, toSlot);
-      return;
-    }
-
-    // 🔹 Inventory → slot drag
-    if (data.type !== "Item") return;
-
-    const item = await Item.implementation.fromDropData(data);
-    if (!item?.isOwned || item.type !== "weapon") return;
-
-    const isTwoHanded =
-      item.system.type === "heavy" ||
-      ["crossbow", "box"].includes(item.system.class);
-
-    // 🚫 BLOCK: two-handed weapons cannot go into off-hand
-    if (isTwoHanded && toSlot === "off") return;
+    // Weapons only
+    if (item.type !== "weapon" && !isShield) return;
 
     this._assignWeaponDirect(item.id, toSet, toSlot);
   }
