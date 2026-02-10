@@ -13,7 +13,7 @@ import { throwExplosive } from "./utils/throwExplosive.mjs";
 import { castSpell } from "./utils/castSpell.mjs";
 import { spellDefense } from "./utils/spellDefense.mjs";
 import { combatAbilities } from "./utils/combatAbilities.mjs";
-import { attackActions } from "./utils/attackActions.mjs";
+import { attackActions, autoAttack } from "./utils/attackActions.mjs";
 import {
   universalAttackLogic,
   rangedAttack,
@@ -99,6 +99,7 @@ Hooks.once("init", function () {
   game.tos.performAttackRoll = performAttackRoll;
   game.tos.finalizeRollsAndPostChat = finalizeRollsAndPostChat;
   game.tos.defenseRoll = defenseRoll;
+  game.tos.autoAttack = autoAttack;
   registerDynamicInitiative();
   /**
    * Set an initiative formula for the system

@@ -167,7 +167,43 @@ export class ToSActor extends Actor {
     const combat = systemData.combatSkills.combat;
     const melee = combat.value; //Adding melee skill for better calculation of defense/throw/ranged defense
     const brawler = systemData.skills.brawler;
+
+    /* -------------------------------------------- */
+    /* Shield bonuses from active weapon set        */
+    /* -------------------------------------------- */
+
+    const combatData = systemData.combat;
+    const combatSkills = systemData.combatSkills;
+    const secondary = systemData.secondaryAttributes;
+
+    const activeSetId = combatData?.activeWeaponSet;
+    if (activeSetId) {
+      const activeSet = combatData.weaponSets?.[activeSetId];
+      if (activeSet?.off) {
+        const shield = actorData.items.get(activeSet.off);
+
+        if (shield?.system?.shield) {
+          // Defense bonuses
+          combatSkills.meleeDefense.bonus += shield.system.defense ?? 0;
+          combatSkills.rangedDefense.bonus += shield.system.rangedDefense ?? 0;
+
+          combatSkills.meleeDefense.critbonus += shield.system.critDefense ?? 0;
+
+          combatSkills.rangedDefense.critbonus +=
+            shield.system.rangedCritDefense ?? 0;
+
+          // Dodge penalty
+          combatSkills.dodge.bonus += shield.system.dodgePenalty ?? 0;
+
+          // Initiative / speed penalties
+          secondary.ini.bonus += shield.system.iniPenalty ?? 0;
+          secondary.spd.bonus += shield.system.maxSpeed ?? 0;
+        }
+      }
+    }
+
     const meleeOrRanged = Math.max(throwing[melee], combatset1[archery.value]);
+
     const attributeScore = Object.entries(systemData.attributes).map(
       ([key, attribute]) => ({
         total: attribute.value + (attribute.bonus ?? 0), // Combine value and bonus

@@ -128,11 +128,21 @@ export async function combatAbilities() {
   // ====================================================================
   // 4. MAIN DIALOG (Unified List)
   // ====================================================================
+  const isCharacter = actor.type === "character";
+  const hasActiveSet = isCharacter && actor.system.combat?.activeWeaponSet;
+
+  const activeSetPreview = hasActiveSet
+    ? renderWeaponLoadoutsDialog(actor)
+    : "";
 
   let abilityDialog = new Dialog({
     title: `Choose Combat or Defense Ability`,
     content: `
 <form class="ability-dialog-form">
+
+  ${activeSetPreview}
+
+  ${activeSetPreview ? "<hr>" : ""}
 
   <div id="keep-open-container">
     <label>
@@ -175,6 +185,16 @@ export async function combatAbilities() {
 
         await onAbilityChosen(ability, html[0], abilityDialog, actor);
       });
+      html.find(".weapon-set-toggle").on("click", async () => {
+        const next = actor.system.combat.activeWeaponSet === 1 ? 2 : 1;
+
+        await actor.update({
+          "system.combat.activeWeaponSet": next,
+        });
+
+        abilityDialog.close();
+        combatAbilities(); // 🔁 reopen with updated preview
+      });
     },
   });
 
@@ -191,6 +211,47 @@ export async function combatAbilities() {
    * @param {'attack'|'defense'} mode
    */
   async function weaponSelectionFlow(actor, ability, mode) {
+    // ==================================================
+    // 1. AUTO-RESOLVE VIA ACTIVE WEAPON SET
+    // ==================================================
+
+    const activeWeapon = resolveActiveSetWeapon(actor, ability);
+
+    if (activeWeapon) {
+      await updateCombatFlags(actor);
+
+      if (mode === "defense") {
+        return game.tos.defenseRoll({ actor, weapon: activeWeapon, ability });
+      }
+
+      const abilityDamage = ability.system.roll.diceBonusFormula || 0;
+      const halfDamage = ability.system.roll.halfDamage;
+      const abilityAttack = ability.system.attack || 0;
+      const abilityBreakthrough = ability.system.breakthrough || 0;
+      const abilityPenetration = ability.system.penetration || 0;
+      const abilityAttributeTestName = ability.system.attributeTest || 0;
+      const abilityTestModifier = ability.system.testModifier || 0;
+      const abilityCritRange = ability.system.critRange || 0;
+      const abilityCritChance = ability.system.critChance || 0;
+      const abilityCritFail = ability.system.critFail || 0;
+
+      return runAttackMacro(
+        actor,
+        activeWeapon,
+        ability,
+        abilityDamage,
+        abilityAttack,
+        abilityBreakthrough,
+        abilityPenetration,
+        abilityAttributeTestName,
+        abilityTestModifier,
+        abilityCritRange,
+        abilityCritChance,
+        abilityCritFail,
+        halfDamage,
+      );
+    }
+
     let weapons;
 
     if (ability.system.type === "melee") {
@@ -664,4 +725,139 @@ export async function combatAbilities() {
       },
     });
   }
+}
+function buildWeaponSetView(actor) {
+  const sets = actor.system.combat.weaponSets;
+  const result = {};
+
+  for (const setId of [1, 2]) {
+    const slots = sets?.[setId] ?? {};
+    const main = slots.main ? actor.items.get(slots.main) : null;
+    const off = slots.off ? actor.items.get(slots.off) : null;
+
+    const mainIsTwoHanded = main
+      ? main.system.type === "heavy" ||
+        ["crossbow", "box"].includes(main.system.class) ||
+        main.system.gripMode === "two"
+      : false;
+
+    const offIsShield = !!off?.system?.shield;
+
+    result[setId] = {
+      main,
+      off,
+      mainIsTwoHanded,
+      offIsShield,
+    };
+  }
+
+  return result;
+}
+
+function resolveActiveSetWeapon(actor, ability) {
+  if (actor.type !== "character") return null;
+
+  const activeSetId = actor.system.combat?.activeWeaponSet;
+  if (!activeSetId) return null;
+
+  const set = actor.system.combat.weaponSets?.[activeSetId];
+  if (!set?.main) return null;
+
+  const weapon = actor.items.get(set.main);
+  if (!weapon || weapon.type !== "weapon") return null;
+
+  // Ability discrimination
+  if (ability.system.type === "melee") {
+    if (
+      ["axe", "sword", "blunt", "polearm"].includes(weapon.system.class) &&
+      !weapon.system.thrown
+    ) {
+      return weapon;
+    }
+    return null;
+  }
+
+  if (ability.system.type === "ranged") {
+    if (
+      ["bow", "crossbow"].includes(weapon.system.class) ||
+      weapon.system.thrown === true
+    ) {
+      return weapon;
+    }
+    return null;
+  }
+
+  // Defense abilities accept ANY weapon
+  if (ability.system.class === "defense") {
+    return weapon;
+  }
+
+  return null;
+}
+
+function renderWeaponLoadoutsDialog(actor) {
+  const weaponSets = buildWeaponSetView(actor);
+  const activeSet = actor.system.combat.activeWeaponSet;
+
+  return `
+<section class="weapon-loadouts horizontal active-set-${activeSet}">
+
+  ${[1, 2]
+    .map((setId) => {
+      const ws = weaponSets[setId];
+
+      return `
+<div class="weapon-set-block">
+  <div class="weapon-loadout-label">Set ${setId}</div>
+
+  <div class="weapon-slot-row">
+
+    <!-- MAIN -->
+    <div class="weapon-slot main ${ws.main ? "filled" : "empty"}"
+         data-set="${setId}" data-slot="main">
+      ${
+        ws.main
+          ? `<img src="${ws.main.img}" title="${ws.main.name}">`
+          : `<span>Main</span>`
+      }
+    </div>
+
+    <!-- OFF -->
+    <div class="weapon-slot off
+      ${ws.mainIsTwoHanded ? "blocked" : ws.off ? "filled" : "empty"}
+      ${ws.offIsShield ? "shield" : ""}"
+      data-set="${setId}" data-slot="off">
+
+      ${
+        ws.mainIsTwoHanded
+          ? `
+            <div class="two-handed-ghost">
+              <img src="${ws.main.img}"
+                   title="${ws.main.name} (Two-handed)"
+                   width="44" height="44">
+            </div>
+          `
+          : ws.off
+            ? `<img src="${ws.off.img}" title="${ws.off.name}" width="44" height="44">`
+            : `<span>Off</span>`
+      }
+
+    </div>
+
+  </div>
+</div>
+`;
+    })
+    .join("")}
+
+  <div class="weapon-set-switcher">
+    <button type="button"
+      class="weapon-set-toggle set-${activeSet}"
+      title="Switch Weapon Set">
+      <i class="fa-sharp fa-regular fa-arrows-repeat"></i>
+    </button>
+  </div>
+
+</section>
+`;
 }

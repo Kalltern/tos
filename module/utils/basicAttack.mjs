@@ -4,6 +4,7 @@ export async function universalAttackLogic({
   getWeaponSkillData = null,
   flavorLabel,
   showBreakthrough = false,
+  weaponContext = null,
 }) {
   const selectedToken = canvas.tokens.controlled[0];
   if (!selectedToken) {
@@ -218,6 +219,13 @@ ${damageLine}
     });
   };
 
+  if (weaponContext?.weapon) {
+    const index = weapons.findIndex((w) => w.id === weaponContext.weapon.id);
+    if (index !== -1) {
+      return handleWeaponSelection(index);
+    }
+  }
+
   // ─── CSS ───
   const style = document.createElement("style");
   style.textContent = `
@@ -253,17 +261,18 @@ ${weaponChoices
   }).render(true);
 }
 
-export async function rangedAttack() {
+export async function rangedAttack(options = {}) {
   return universalAttackLogic({
     attackType: "ranged",
     flavorLabel: "Ranged attack",
     showBreakthrough: false,
     weaponFilter: (i) =>
       i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class),
+    weaponContext: options.weaponContext ?? null,
   });
 }
 
-export async function throwingAttack() {
+export async function throwingAttack(options = {}) {
   return universalAttackLogic({
     attackType: "throwing",
     flavorLabel: "Throwing attack",
@@ -271,10 +280,11 @@ export async function throwingAttack() {
     weaponFilter: (i) => i.type === "weapon" && i.system.thrown === true,
     getWeaponSkillData: (actor, weapon) =>
       game.tos.getWeaponSkillBonuses(actor, weapon),
+    weaponContext: options.weaponContext ?? null,
   });
 }
 
-export async function meleeAttack() {
+export async function meleeAttack(options = {}) {
   return universalAttackLogic({
     attackType: "melee",
     flavorLabel: "Melee attack",
@@ -285,5 +295,6 @@ export async function meleeAttack() {
       i.system.thrown !== true,
     getWeaponSkillData: (actor, weapon) =>
       game.tos.getWeaponSkillBonuses(actor, weapon),
+    weaponContext: options.weaponContext ?? null,
   });
 }

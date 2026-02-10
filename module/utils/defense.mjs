@@ -63,10 +63,22 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
   /* -------------------------------------------- */
   /*  DEFENSE SELECTOR                            */
   /* -------------------------------------------- */
+
+  const isCharacter = actor.type === "character";
+  const hasActiveSet = isCharacter && actor.system.combat?.activeWeaponSet;
+
+  const activeSetPreview = hasActiveSet
+    ? renderWeaponLoadoutsDialog(actor)
+    : "";
+
   if (!ability) {
-    new Dialog({
+    const dialog = new Dialog({
       title: "Select Defense Type",
-      content: "<p>Choose defense:</p>",
+      content: `
+    ${activeSetPreview}
+    <hr>
+    <p>Choose defense:</p>
+  `,
       buttons: {
         melee: {
           label: "Melee Defense",
@@ -82,7 +94,21 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
         },
       },
       default: "melee",
-    }).render(true);
+      render: (html) => {
+        html.find(".weapon-set-toggle").on("click", async () => {
+          const next = actor.system.combat.activeWeaponSet === 1 ? 2 : 1;
+
+          await actor.update({
+            "system.combat.activeWeaponSet": next,
+          });
+
+          dialog.close();
+          defenseRoll({ actor }); // 🔁 reopen with updated preview
+        });
+      },
+    });
+
+    dialog.render(true);
   }
 
   /* -------------------------------------------- */
@@ -125,7 +151,6 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
   /* -------------------------------------------- */
   /*  MELEE DEFENSE                               */
   /* -------------------------------------------- */
-
   async function meleeDefense({ ability = null, weapon = null } = {}) {
     const resolveWithWeapon = async (weapon) => {
       const rollName = `Defense with ${weapon.name}`;
@@ -166,6 +191,17 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
         criticalFailureThreshold,
       );
     };
+
+    if (!weapon && actor.type === "character") {
+      const set =
+        actor.system.combat.weaponSets?.[actor.system.combat?.activeWeaponSet];
+      if (set?.main) {
+        const activeWeapon = actor.items.get(set.main);
+        if (activeWeapon) {
+          return resolveWithWeapon(activeWeapon);
+        }
+      }
+    }
 
     /* -------------------------------------------- */
     /*  IF WEAPON ALREADY KNOWN → SKIP DIALOG       */
@@ -235,6 +271,16 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
       );
     };
 
+    if (!weapon && actor.type === "character") {
+      const set =
+        actor.system.combat.weaponSets?.[actor.system.combat?.activeWeaponSet];
+      if (set?.main) {
+        const activeWeapon = actor.items.get(set.main);
+        if (activeWeapon) {
+          return resolveWithWeapon(activeWeapon);
+        }
+      }
+    }
     /* -------------------------------------------- */
     /*  IF WEAPON ALREADY KNOWN → SKIP DIALOG       */
     /* -------------------------------------------- */
@@ -306,6 +352,17 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
         criticalFailureThreshold,
       );
     };
+
+    if (!weapon && actor.type === "character") {
+      const set =
+        actor.system.combat.weaponSets?.[actor.system.combat?.activeWeaponSet];
+      if (set?.main) {
+        const activeWeapon = actor.items.get(set.main);
+        if (activeWeapon) {
+          return resolveWithWeapon(activeWeapon);
+        }
+      }
+    }
 
     /* -------------------------------------------- */
     /*  IF WEAPON ALREADY KNOWN → SKIP DIALOG       */
@@ -396,4 +453,98 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
       },
     });
   }
+}
+
+function buildWeaponSetView(actor) {
+  const sets = actor.system.combat.weaponSets;
+  const result = {};
+
+  for (const setId of [1, 2]) {
+    const slots = sets?.[setId] ?? {};
+    const main = slots.main ? actor.items.get(slots.main) : null;
+    const off = slots.off ? actor.items.get(slots.off) : null;
+
+    const mainIsTwoHanded = main
+      ? main.system.type === "heavy" ||
+        ["crossbow", "box"].includes(main.system.class) ||
+        main.system.gripMode === "two"
+      : false;
+
+    const offIsShield = !!off?.system?.shield;
+
+    result[setId] = {
+      main,
+      off,
+      mainIsTwoHanded,
+      offIsShield,
+    };
+  }
+
+  return result;
+}
+function renderWeaponLoadoutsDialog(actor) {
+  const weaponSets = buildWeaponSetView(actor);
+  const activeSet = actor.system.combat.activeWeaponSet;
+
+  return `
+<section class="weapon-loadouts horizontal active-set-${activeSet}">
+
+  ${[1, 2]
+    .map((setId) => {
+      const ws = weaponSets[setId];
+
+      return `
+<div class="weapon-set-block">
+  <div class="weapon-loadout-label">Set ${setId}</div>
+
+  <div class="weapon-slot-row">
+
+    <!-- MAIN -->
+    <div class="weapon-slot main ${ws.main ? "filled" : "empty"}"
+         data-set="${setId}" data-slot="main">
+      ${
+        ws.main
+          ? `<img src="${ws.main.img}" title="${ws.main.name}">`
+          : `<span>Main</span>`
+      }
+    </div>
+
+    <!-- OFF -->
+    <div class="weapon-slot off
+      ${ws.mainIsTwoHanded ? "blocked" : ws.off ? "filled" : "empty"}
+      ${ws.offIsShield ? "shield" : ""}"
+      data-set="${setId}" data-slot="off">
+
+      ${
+        ws.mainIsTwoHanded
+          ? `
+            <div class="two-handed-ghost">
+              <img src="${ws.main.img}"
+                   title="${ws.main.name} (Two-handed)"
+                   width="44" height="44">
+            </div>
+          `
+          : ws.off
+            ? `<img src="${ws.off.img}" title="${ws.off.name}" width="44" height="44">`
+            : `<span>Off</span>`
+      }
+
+    </div>
+
+  </div>
+</div>
+`;
+    })
+    .join("")}
+
+  <div class="weapon-set-switcher">
+    <button type="button"
+      class="weapon-set-toggle set-${activeSet}"
+      title="Switch Weapon Set">
+      <i class="fa-sharp fa-regular fa-arrows-repeat"></i>
+    </button>
+  </div>
+
+</section>
+`;
 }
