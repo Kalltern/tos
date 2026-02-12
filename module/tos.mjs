@@ -282,12 +282,13 @@ Hooks.once("ready", function () {
   Hooks.on("hotbarDrop", (bar, data, slot) => createDocMacro(data, slot));
 });
 const SOCKET = "system.tos";
-Hooks.once("setup", () => {
+Hooks.once("ready", () => {
   console.log("TOS | Socket Listener Registered");
 
   game.socket.on(SOCKET, async (data) => {
     console.log("TOS | GM Received Socket Data:", data);
     if (!game.user.isGM) return;
+    console.log("Emitting damage socket:", SOCKET, data);
     if (data.type === "applyDamage") {
       await applyDamageAsGM(data);
     }
@@ -643,12 +644,11 @@ async function applyDamageToTargets(message, targets, mode) {
     await applyDamageAsGM(data);
   } else {
     game.socket.emit(SOCKET, data);
-
-    // UI Feedback for player so they know they sent it
-    ui.notifications.info("Damage request sent to GM.");
+    console.log("GM socket listener active");
   }
 }
-async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
+async function applyDamageAsGM(data) {
+  const { messageId, mode, targetIds, sceneId } = data;
   const message = game.messages.get(messageId);
   if (!message?.flags?.attack) return;
 
@@ -689,7 +689,7 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
 
     if (game.user.isGM && !authorIsGM) {
       ui.notifications.info(
-        `${author.name} applied ${healthLost} damage to ${actor.name}`,
+        `${author.name} applied ${result.totalHpLoss} damage to ${actor.name}`,
       );
     }
     console.log(
