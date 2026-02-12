@@ -285,7 +285,7 @@ Hooks.once("ready", function () {
   Hooks.on("hotbarDrop", (bar, data, slot) => createDocMacro(data, slot));
 });
 const SOCKET = "system.tos";
-Hooks.once("setup", () => {
+Hooks.once("ready", () => {
   console.log("TOS | Socket Listener Registered");
 
   game.socket.on(SOCKET, async (data) => {
@@ -651,8 +651,8 @@ async function applyDamageToTargets(message, targets, mode) {
     ui.notifications.info("Damage request sent to GM.");
   }
 }
-async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
-  const message = game.messages.get(messageId);
+async function applyDamageAsGM(data) {
+  const { messageId, mode, targetIds, sceneId } = data;
   if (!message?.flags?.attack) return;
 
   const attack = message.flags.attack;
@@ -693,7 +693,7 @@ async function applyDamageAsGM({ messageId, mode, targetIds, sceneId }) {
 
     if (game.user.isGM && !authorIsGM) {
       ui.notifications.info(
-        `${author.name} applied ${healthLost} damage to ${actor.name}`,
+        `${author.name} applied ${result.totalHpLoss} damage to ${actor.name}`,
       );
     }
     console.log(
