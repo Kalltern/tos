@@ -19,6 +19,15 @@
   --tos-c-groove: #11121f;
 }
 
+/*.theme-dark .application .window-content {
+  padding: 12px;
+  background: linear-gradient(#7b0000, #4b0000);
+  border: 4px solid #d4af37;
+  box-shadow:
+    0 0 0 2px #900000,
+    0 0 0 6px #d4af37,
+    inset 0 0 30px rgba(0, 0, 0, 0.6);
+}*/
 /* Global styles */
 .window-app {
   font-family: "Roboto", sans-serif;
@@ -315,9 +324,35 @@ prose-mirror {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start; /* Moves content to the top */
-  max-width: 230px;
+  max-width: 260px;
   margin-right: 10px;
+  position: relative;
+  background: linear-gradient(
+    to bottom,
+    rgba(30, 25, 20, 0.6),
+    rgba(10, 10, 10, 0.6)
+  );
+  padding: 10px;
+  border-right: 1px solid rgba(200, 170, 90, 0.35);
+  box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.6);
 }
+
+.tos .profile-container .grid.grid-4col,
+.tos .profile-container .grid.grid-3col {
+  padding: 5px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  border: 1px solid rgba(200, 170, 90, 0.25);
+  box-shadow:
+    inset 0 10px 15px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+.tos .profile-container .grid.grid-4col .stat-values {
+  margin-bottom: 5px;
+}
+
 .tos .item-form {
   font-family: "Roboto", sans-serif;
 }
@@ -330,19 +365,32 @@ prose-mirror {
   flex-wrap: wrap;
   justify-content: flex-start;
   margin-bottom: 10px;
+  border: 2px solid #514226;
+  box-shadow:
+    inset 0 0 40px rgba(0, 0, 0, 0.7),
+    0 0 20px rgba(0, 0, 0, 0.8);
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(60, 60, 60, 0.3) 0%,
+      rgb(12 12 11 / 71%) 80%
+    ),
+    url("headertexture.jpg");
 }
 .tos .sheet-header .profile-img {
-  flex: 0 0 165px; /* Keeps the image size fixed */
+  flex: 0 0 165px;
   height: 216px;
-  margin-bottom: 10px; /* Adds space below the image */
-  align-self: flex-start; /* Ensures it stays at the top */
-  border-color: #00000000;
+  margin-bottom: 10px;
+  margin-left: 8px;
+  align-self: flex-start;
+
+  border: 3px solid #5f5843; /* gold border */
 }
 
 .tos .sheet-header .header-fields {
   flex: 1;
   margin-bottom: 75px;
-  margin-left: 5px;
+  margin-right: 10px;
 }
 .tos .sheet-npc-header {
   height: 440px; /* NPC-specific height */
@@ -991,8 +1039,8 @@ label {
 
 .stats-resource-label {
   display: flex;
-  align-items: flex-end; /* push text to bottom */
-  min-height: 35px;
+  align-items: center; /* push text to bottom */
+  min-height: 30px;
   justify-content: center;
 }
 

@@ -501,6 +501,141 @@ export async function combatAbilities() {
     ui.notifications.info(`${ability.name} activated`);
   }
 
+  async function postUniversalStyleAttackChat({
+    actor,
+    weapon,
+    ability,
+    attackRoll,
+    damageRoll,
+    critSuccess,
+    critFailure,
+    damageTotal,
+    penetration,
+    critDamageTotal,
+    critBonusPenetration,
+    critScore,
+    critScoreResult,
+    breakthroughRollResult,
+    showBreakthrough,
+    allBleedRollResults,
+    effectsRollResults,
+    rollName,
+    criticalSuccessThreshold,
+    criticalFailureThreshold,
+    halfDamage = 0,
+  }) {
+    const attackHTML = await attackRoll.render();
+    const damageHTML = await damageRoll.render();
+
+    const hasBreakthrough =
+      showBreakthrough &&
+      typeof breakthroughRollResult === "string" &&
+      breakthroughRollResult.trim() !== "";
+
+    const damageLine = `
+<div style="
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 24px;
+  font-size:16px;
+  max-width: fit-content;
+  margin: 0 auto;
+">
+
+  <div style="display:grid; grid-template-columns:auto 1fr; column-gap:8px;">
+    <div>Damage:</div><div style="text-align:center;">${damageTotal}</div>
+    <div>Penetration:</div><div style="text-align:center;">${penetration}</div>
+    ${
+      hasBreakthrough
+        ? `
+          <div>Breakthrough:</div>
+          <div style="text-align:center;">${breakthroughRollResult}</div>
+        `
+        : `
+          <div>&nbsp;</div><div>&nbsp;</div>
+        `
+    }
+  </div>
+
+  <div style="display:grid; grid-template-columns:auto 1fr; column-gap:8px;">
+    <div>Crit Dmg:</div><div style="text-align:center;">${critDamageTotal}</div>
+    <div>Crit Pen:</div><div style="text-align:center;">${critBonusPenetration}</div>
+    <div>Crit score:</div>
+    <div style="text-align:center;">
+      <span title="Crit range result ${critScoreResult}"
+        style="text-decoration:underline dotted; cursor:help;">
+        [ ${critScore} ]
+      </span>
+    </div>
+  </div>
+</div>
+`;
+
+    await ChatMessage.create({
+      speaker: ChatMessage.getSpeaker(),
+      content: `
+<div class="dual-roll">
+  <div class="roll-column">
+    <div class="roll-label">Margin of Success</div>
+    ${attackHTML}
+  </div>
+  <div class="roll-column">
+    <div class="roll-label">Damage Roll</div>
+    ${damageHTML}
+  </div>
+</div>
+`,
+      rolls: [attackRoll, damageRoll],
+      flavor: `
+<span style="display:inline-flex; align-items:center;">
+  <img src="${ability.img}" width="36" height="36" style="margin-right:8px;">
+  <strong style="font-size:20px;">
+    ${ability.name} with ${weapon.name}
+  </strong>
+</span>
+
+<hr>
+
+<p style="text-align:center; font-size:20px;">
+  <b>${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}</b>
+</p>
+
+${damageLine}
+
+<hr>
+
+<table style="width:100%; text-align:center; font-size:15px;">
+  <tr><th>Effects</th></tr>
+  <tr>
+    <td><b>${allBleedRollResults}</b> ${effectsRollResults}</td>
+  </tr>
+</table>
+<hr>
+`,
+      flags: {
+        tos: {
+          rollName,
+          criticalSuccessThreshold,
+          criticalFailureThreshold,
+        },
+        attack: {
+          type: "attack",
+          normal: { damage: damageTotal, penetration, halfDamage },
+          critical: {
+            damage: critDamageTotal,
+            penetration: critBonusPenetration,
+            halfDamage,
+          },
+          breakthrough: {
+            damage: breakthroughRollResult,
+            penetration,
+            halfDamage,
+          },
+        },
+      },
+    });
+  }
+
   async function runAttackMacro(
     actor,
     weapon,
@@ -637,92 +772,27 @@ export async function combatAbilities() {
     }
     rollName = `${ability.name} with ${weapon.name}`;
     console.log(criticalSuccessThreshold);
-    await ChatMessage.create({
-      speaker: ChatMessage.getSpeaker(),
-      rolls: [attackRoll, damageRoll],
-      flavor: `
-        <div style="display:flex; align-items:center; justify-content:left; gap:8px; font-size:1.3em; font-weight:bold;">
-    <img src="${ability.img}" title="${ability.name}" width="36" height="36">
-    <span>${ability.name} with ${weapon.name}</span>
-</div>
-<hr>
-<table style="width: 100%; text-align: center;font-size: 15px;">
-    <tr>
-      <th>Description:</th>
-    </tr>
-    <td>${concatRollAndDescription}</td>
-<p style="text-align: center; font-size: 20px;"><b>
-    ${
-      critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""
-    }
-    </b></p> 		
-</table>
-<table style="width: 100%; text-align: center;font-size: 15px;">
-    <th>Normal</th>
-    <th>Crit</th>
-    ${weapon.system.breakthrough ? "<th>Breakthrough</th>" : ""}
-    		
-    <tr>
-        <td>${damageTotal}</td>
-        <td>${critDamageTotal}</td>
-        ${
-          weapon.system.breakthrough ? `<td>${breakthroughRollResult}</td>` : ""
-        }
-    </tr>
-</table>
-    
-    <hr>
-    <table style="width: 100%; text-align: center; font-size: 15px;">
-        <tr>
-            <th>Penetration</th>
-            <th>Critical Score</th>
-        </tr>
-        <tr>
-    <td>${penetration}/${critBonusPenetration}</td>
-    <td title="Crit range result ${critScoreResult}">[${critScore}]</td>
-        </tr>
-    </table>
-    <hr>
-    <table style="width: 100%; text-align: center;font-size: 15px;">
-        <tr>
-            <th>Effects</th>
-        </tr>
-        <tr>
-            <td><b>${allBleedRollResults}</b> ${effectsRollResults} 
-
-            </td>
-        </tr>
-    </table>
-    <hr>
-
-    `,
-      flags: {
-        tos: {
-          rollName,
-          criticalSuccessThreshold,
-          criticalFailureThreshold,
-        },
-        attack: {
-          type: "attack",
-          normal: {
-            damage: damageTotal,
-            penetration: penetration,
-            halfDamage: ability?.system?.roll?.halfDamage ?? false,
-          },
-
-          critical: {
-            damage: critDamageTotal,
-            penetration: critBonusPenetration,
-            halfDamage: ability?.system?.roll?.halfDamage ?? false,
-          },
-
-          breakthrough: {
-            damage: breakthroughRollResult,
-            penetration: penetration,
-            halfDamage: ability?.system?.roll?.halfDamage ?? false,
-          },
-        },
-      },
+    await postUniversalStyleAttackChat({
+      actor,
+      weapon,
+      ability,
+      attackRoll,
+      damageRoll,
+      critSuccess,
+      critFailure,
+      damageTotal,
+      penetration,
+      critDamageTotal,
+      critBonusPenetration,
+      critScore,
+      critScoreResult,
+      breakthroughRollResult,
+      showBreakthrough: weapon.system.breakthrough,
+      allBleedRollResults,
+      effectsRollResults,
+      rollName,
+      criticalSuccessThreshold,
+      criticalFailureThreshold,
     });
   }
 }
