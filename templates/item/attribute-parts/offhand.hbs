@@ -14,12 +14,34 @@
 
     <div class="grid grid-4col">
 
-      <div class="grid-span-1">
+      
+        <div class="grid-span-1">
+          <label class="resource-label">{{localize "TOS.Item.Weapon.FIELDS.rollMod.label"}}</label>
+          <input
+            type="text"
+            name="system.offhandProperties.diceBonus"
+            value="{{system.offhandProperties.diceBonus}}"
+            data-dtype="String"
+            placeholder="e.g. +5+2d6"
+          />
+        </div>
+
+        <div class="grid-span-1">
+          <label class="resource-label">{{localize "TOS.Item.Weapon.FIELDS.penetration.label"}}</label>
+          <input
+            type="number"
+            name="system.offhandProperties.penetration"
+            value="{{system.offhandProperties.penetration}}"
+            data-dtype="Number"
+            placeholder="e.g. 2"
+          />
+        </div>
+        <div class="grid-span-1">
         <label class="resource-label">{{localize
             "TOS.Item.Weapon.FIELDS.attack.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.attack"
           value="{{system.offhandProperties.attack}}"
           data-dtype="Number"
@@ -30,7 +52,7 @@
             "TOS.Item.Weapon.FIELDS.defense.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.defense"
           value="{{system.offhandProperties.defense}}"
           data-dtype="Number"
@@ -42,7 +64,7 @@
             "TOS.Item.Weapon.FIELDS.critRange.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.critRange"
           value="{{system.offhandProperties.critRange}}"
           data-dtype="Number"
@@ -54,7 +76,7 @@
             "TOS.Item.Weapon.FIELDS.critChance.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.critChance"
           value="{{system.offhandProperties.critChance}}"
           data-dtype="Number"
@@ -66,7 +88,7 @@
             "TOS.Item.Weapon.FIELDS.critFail.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.critFail"
           value="{{system.offhandProperties.critFail}}"
           data-dtype="Number"
@@ -78,7 +100,7 @@
             "TOS.Item.Weapon.FIELDS.critDefense.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.critDefense"
           value="{{system.offhandProperties.critDefense}}"
           data-dtype="Number"
@@ -89,7 +111,7 @@
             "TOS.Item.Weapon.FIELDS.critDodge.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.critDodge"
           value="{{system.offhandProperties.critDodge}}"
           data-dtype="Number"
@@ -101,7 +123,7 @@
             "TOS.Item.Weapon.FIELDS.dodge.label"
           }}</label>
         <input
-          type="text"
+          type="number"
           name="system.offhandProperties.dodge"
           value="{{system.offhandProperties.dodge}}"
           data-dtype="Number"
@@ -137,7 +159,7 @@
     </div>
 
   </div>
-       <div class="grid grid-4col">
+ <div class="grid grid-4col">
 
   <label class="resource-label">{{localize "dimakerus"}}</label>
   <input type="checkbox" name="system.offhandProperties.doctrines.dimakerus" {{checked system.offhandProperties.doctrines.dimakerus}} />
@@ -151,8 +173,8 @@
      <label class="resource-label">{{localize "rogue"}}</label>
   <input type="checkbox" name="system.offhandProperties.doctrines.rogue" {{checked system.offhandProperties.doctrines.rogue}} />
 <br>
-
-  <div class="grid grid-3col">
+</div>
+<div class="grid grid-3col">
 
     {{!-- -------------------------
          Built-in effects
@@ -191,7 +213,7 @@
       <label class="resource-label">{{localize "TOS.Effect.type1"}}</label>
       <select name="system.offhandProperties.effectType1">
         <option value="">-- Select a type --</option>
-        {{#each system.offhandProperties.effectTypes as |effectType|}}
+        {{#each system.effectTypes as |effectType|}}
           <option value="{{effectType}}"
             {{#if (eq ../system.offhandProperties.effectType1 effectType)}}selected{{/if}}>
             {{effectType}}
@@ -237,7 +259,7 @@
       <label class="resource-label">{{localize "TOS.Effect.type2"}}</label>
       <select name="system.offhandProperties.effectType2">
         <option value="">-- Select a type --</option>
-        {{#each system.offhandProperties.effectTypes as |effectType|}}
+        {{#each system.effectTypes as |effectType|}}
           <option value="{{effectType}}"
             {{#if (eq ../system.offhandProperties.effectType2 effectType)}}selected{{/if}}>
             {{effectType}}
@@ -284,7 +306,7 @@
       <label class="resource-label">{{localize "TOS.Effect.type3"}}</label>
       <select name="system.offhandProperties.effectType3">
         <option value="">-- Select a type --</option>
-        {{#each system.offhandProperties.effectTypes as |effectType|}}
+        {{#each system.effectTypes as |effectType|}}
           <option value="{{effectType}}"
             {{#if (eq ../system.offhandProperties.effectType3 effectType)}}selected{{/if}}>
             {{effectType}}

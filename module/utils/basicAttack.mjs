@@ -4,7 +4,7 @@ export async function universalAttackLogic({
   getWeaponSkillData = null,
   flavorLabel,
   showBreakthrough = false,
-  weaponContext = null,
+  context: preResolvedContext = null,
 }) {
   const selectedToken = canvas.tokens.controlled[0];
   if (!selectedToken) {
@@ -37,16 +37,30 @@ export async function universalAttackLogic({
   const handleWeaponSelection = async (weaponIndex) => {
     const weapon = weapons[weaponIndex];
 
+    const resolvedContext =
+      preResolvedContext ?? game.tos.resolveWeaponContext(actor, null, weapon);
+
+    if (!resolvedContext) return;
+
     const doctrine = await game.tos.getDoctrineBonuses(actor, weapon);
 
-    const {
-      weaponSkillEffect = 0,
-      weaponSkillCrit = 0,
-      weaponSkillCritDmg = 0,
-      weaponSkillCritPen = 0,
-    } = getWeaponSkillData ? await getWeaponSkillData(actor, weapon) : {};
+    const skillData = getWeaponSkillData
+      ? await getWeaponSkillData(actor, weapon, resolvedContext)
+      : {};
 
-    const penetration = weapon.system.penetration || 0;
+    const weaponSkillEffect = Number(skillData.weaponSkillEffect) || 0;
+    const weaponSkillCrit = Number(skillData.weaponSkillCrit) || 0;
+    const weaponSkillCritDmg = Number(skillData.weaponSkillCritDmg) || 0;
+    const weaponSkillCritPen = Number(skillData.weaponSkillCritPen) || 0;
+
+    const mainPen = Number(weapon.system.penetration) || 0;
+    const offPen = resolvedContext?.isDualWield
+      ? Number(
+          resolvedContext.offWeapon?.system?.offhandProperties?.penetration,
+        ) || 0
+      : 0;
+
+    const penetration = mainPen + offPen;
 
     // ─── Attack Roll ───
     const attackData = await game.tos.getAttackRolls(
@@ -56,6 +70,7 @@ export async function universalAttackLogic({
       doctrine.doctrineCritBonus,
       weaponSkillCrit,
       customAttack,
+      resolvedContext,
     );
 
     const {
@@ -69,7 +84,12 @@ export async function universalAttackLogic({
 
     // ─── Damage Roll ───
     const { damageRoll, damageTotal, breakthroughRollResult } =
-      await game.tos.getDamageRolls(actor, weapon, customDamage);
+      await game.tos.getDamageRolls(
+        actor,
+        weapon,
+        resolvedContext,
+        customDamage,
+      );
     const hasBreakthrough =
       showBreakthrough &&
       typeof breakthroughRollResult === "string" &&
@@ -78,6 +98,7 @@ export async function universalAttackLogic({
     const critData = await game.tos.getCriticalRolls(
       actor,
       weapon,
+      resolvedContext,
       doctrine.doctrineCritRangeBonus,
       attackRoll,
       weaponSkillCritDmg,
@@ -99,6 +120,7 @@ export async function universalAttackLogic({
     const effects = await game.tos.getEffectRolls(
       actor,
       weapon,
+      resolvedContext,
       doctrine.doctrineBleedBonus,
       doctrine.doctrineStunBonus,
       weaponSkillEffect,
@@ -219,8 +241,10 @@ ${damageLine}
     });
   };
 
-  if (weaponContext?.weapon) {
-    const index = weapons.findIndex((w) => w.id === weaponContext.weapon.id);
+  if (preResolvedContext?.weapon) {
+    const index = weapons.findIndex(
+      (w) => w.id === preResolvedContext.weapon.id,
+    );
     if (index !== -1) {
       return handleWeaponSelection(index);
     }
@@ -268,7 +292,7 @@ export async function rangedAttack(options = {}) {
     showBreakthrough: false,
     weaponFilter: (i) =>
       i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class),
-    weaponContext: options.weaponContext ?? null,
+    context: options.context ?? null,
   });
 }
 
@@ -280,7 +304,7 @@ export async function throwingAttack(options = {}) {
     weaponFilter: (i) => i.type === "weapon" && i.system.thrown === true,
     getWeaponSkillData: (actor, weapon) =>
       game.tos.getWeaponSkillBonuses(actor, weapon),
-    weaponContext: options.weaponContext ?? null,
+    context: options.context ?? null,
   });
 }
 
@@ -295,6 +319,6 @@ export async function meleeAttack(options = {}) {
       i.system.thrown !== true,
     getWeaponSkillData: (actor, weapon) =>
       game.tos.getWeaponSkillBonuses(actor, weapon),
-    weaponContext: options.weaponContext ?? null,
+    context: options.context ?? null,
   });
 }

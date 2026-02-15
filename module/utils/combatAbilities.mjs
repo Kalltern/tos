@@ -215,13 +215,13 @@ export async function combatAbilities() {
     // 1. AUTO-RESOLVE VIA ACTIVE WEAPON SET
     // ==================================================
 
-    const activeWeapon = resolveActiveSetWeapon(actor, ability);
+    const weaponContext = game.tos.resolveWeaponContext(actor, ability);
 
-    if (activeWeapon) {
+    if (weaponContext) {
       await updateCombatFlags(actor);
 
       if (mode === "defense") {
-        return game.tos.defenseRoll({ actor, weapon: activeWeapon, ability });
+        return game.tos.defenseRoll({ actor, weapon: weaponContext, ability });
       }
 
       const abilityDamage = ability.system.roll.diceBonusFormula || 0;
@@ -237,7 +237,7 @@ export async function combatAbilities() {
 
       return runAttackMacro(
         actor,
-        activeWeapon,
+        weaponContext,
         ability,
         abilityDamage,
         abilityAttack,
@@ -281,12 +281,18 @@ export async function combatAbilities() {
 
     const handleWeaponSelection = async (weaponIndex) => {
       const weapon = weapons[weaponIndex];
+      const weaponContext = game.tos.resolveWeaponContext(
+        actor,
+        ability,
+        weapon,
+      );
+      if (!weaponContext) return;
 
       await updateCombatFlags(actor);
 
       if (mode === "defense") {
         // defenseRoll function
-        await game.tos.defenseRoll({ actor, weapon, ability });
+        await game.tos.defenseRoll({ actor, weapon: weaponContext, ability });
       } else {
         const abilityDamage = ability.system.roll.diceBonusFormula || 0;
         const halfDamage = ability.system.roll.halfDamage;
@@ -301,7 +307,7 @@ export async function combatAbilities() {
 
         await runAttackMacro(
           actor,
-          weapon,
+          weaponContext,
           ability,
           abilityDamage,
           abilityAttack,
@@ -638,7 +644,7 @@ ${damageLine}
 
   async function runAttackMacro(
     actor,
-    weapon,
+    weaponContext,
     ability,
     abilityDamage,
     abilityAttack,
@@ -651,6 +657,7 @@ ${damageLine}
     abilityCritFail,
     halfDamage,
   ) {
+    const weapon = weaponContext.weapon;
     let {
       doctrineBonus,
       doctrineCritBonus,
@@ -671,7 +678,15 @@ ${damageLine}
       weaponSkillCritPen,
     } = await game.tos.getWeaponSkillBonuses(actor, weapon);
 
-    const penetration = (weapon.system.penetration || 0) + abilityPenetration;
+    const mainPen = Number(weapon.system.penetration) || 0;
+
+    const offPen = weaponContext?.isDualWield
+      ? Number(
+          weaponContext.offWeapon?.system?.offhandProperties?.penetration,
+        ) || 0
+      : 0;
+
+    const penetration = mainPen + offPen + abilityPenetration;
 
     let {
       attackRoll,
@@ -687,6 +702,7 @@ ${damageLine}
       doctrineCritBonus,
       weaponSkillCrit,
       abilityAttack,
+      weaponContext,
       abilityCritFail,
     );
 
@@ -694,6 +710,7 @@ ${damageLine}
       await game.tos.getDamageRolls(
         actor,
         weapon,
+        weaponContext,
         abilityDamage,
         abilityBreakthrough,
       );
@@ -706,6 +723,7 @@ ${damageLine}
     } = await game.tos.getCriticalRolls(
       actor,
       weapon,
+      weaponContext,
       doctrineCritRangeBonus,
       attackRoll,
       weaponSkillCritDmg,
@@ -720,6 +738,7 @@ ${damageLine}
       await game.tos.getEffectRolls(
         actor,
         weapon,
+        weaponContext,
         doctrineBleedBonus,
         doctrineStunBonus,
         weaponSkillEffect,
@@ -796,77 +815,9 @@ ${damageLine}
     });
   }
 }
-function buildWeaponSetView(actor) {
-  const sets = actor.system.combat.weaponSets;
-  const result = {};
-
-  for (const setId of [1, 2]) {
-    const slots = sets?.[setId] ?? {};
-    const main = slots.main ? actor.items.get(slots.main) : null;
-    const off = slots.off ? actor.items.get(slots.off) : null;
-
-    const mainIsTwoHanded = main
-      ? main.system.type === "heavy" ||
-        ["crossbow", "box"].includes(main.system.class) ||
-        main.system.gripMode === "two"
-      : false;
-
-    const offIsShield = !!off?.system?.shield;
-
-    result[setId] = {
-      main,
-      off,
-      mainIsTwoHanded,
-      offIsShield,
-    };
-  }
-
-  return result;
-}
-
-function resolveActiveSetWeapon(actor, ability) {
-  if (actor.type !== "character") return null;
-
-  const activeSetId = actor.system.combat?.activeWeaponSet;
-  if (!activeSetId) return null;
-
-  const set = actor.system.combat.weaponSets?.[activeSetId];
-  if (!set?.main) return null;
-
-  const weapon = actor.items.get(set.main);
-  if (!weapon || weapon.type !== "weapon") return null;
-
-  // Ability discrimination
-  if (ability.system.type === "melee") {
-    if (
-      ["axe", "sword", "blunt", "polearm"].includes(weapon.system.class) &&
-      !weapon.system.thrown
-    ) {
-      return weapon;
-    }
-    return null;
-  }
-
-  if (ability.system.type === "ranged") {
-    if (
-      ["bow", "crossbow"].includes(weapon.system.class) ||
-      weapon.system.thrown === true
-    ) {
-      return weapon;
-    }
-    return null;
-  }
-
-  // Defense abilities accept ANY weapon
-  if (ability.system.class === "defense") {
-    return weapon;
-  }
-
-  return null;
-}
 
 function renderWeaponLoadoutsDialog(actor) {
-  const weaponSets = buildWeaponSetView(actor);
+  const weaponSets = game.tos.buildWeaponSetView(actor);
   const activeSet = actor.system.combat.activeWeaponSet;
 
   return `

@@ -1,4 +1,6 @@
-async function getSneakDamageFormula(actor, weapon) {
+async function getSneakDamageFormula(actor, weapon, weaponContext = null) {
+  const offProps = weaponContext ? getOffhandProps(weaponContext) : null;
+  const offhandSneakDamage = offProps?.sneakDamage ?? 0;
   const useSneak = (await actor.getFlag("tos", "useSneakAttack")) || false;
   if (!useSneak) return { sneakDamage: "", sneakEffect: 0, sneakCritRange: 0 };
 
@@ -21,9 +23,9 @@ async function getSneakDamageFormula(actor, weapon) {
     if (doctrineRogueLevel >= 3) sneakEffect = 50;
     if (doctrineRogueLevel >= 4) sneakCritRange = 2;
   }
-  let sneakDamage = `${actor.system.sneakDamage ?? 1}d6`;
+  let sneakDamage = `${actor.system.sneakDamage ?? 1}d6 + ${offhandSneakDamage}`;
   if (weapon.system.sneakDamage) {
-    sneakDamage = `(${sneakDamage} + ${weapon.system.sneakDamage})`;
+    sneakDamage = `(${sneakDamage} + ${weapon.system.sneakDamage} )`;
   }
 
   return {
@@ -374,10 +376,21 @@ export async function getAttackRolls(
   doctrineCritBonus,
   weaponSkillCrit,
   abilityAttack = 0,
+  weaponContext = null,
   customCritFail = 0,
 ) {
+  let totalWeaponAttack = doctrineBonus + weapon.system.attack;
   let criticalSuccessThreshold = 0;
   let criticalFailureThreshold = 0;
+  const offProps = getOffhandProps(weaponContext);
+  if (offProps?.attack) {
+    totalWeaponAttack += offProps.attack;
+  }
+  if (offProps) {
+    criticalSuccessThreshold += offProps?.critChance || 0;
+    criticalFailureThreshold -= offProps?.critFail || 0;
+  }
+
   const finesse = actor.system.combatSkills.combat.finesseRating;
   const normalCombat = actor.system.combatSkills.combat.rating;
   let attackRollFormula = 0;
@@ -405,9 +418,9 @@ export async function getAttackRolls(
       customCritFail;
     // ATTACK ROLL
     console.log("Aim value", aimValue, abilityAttack);
-    attackRollFormula = `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
+    attackRollFormula = `@combatSkills.archery.rating + ${totalWeaponAttack} - 1d100`;
     if (abilityAttack) {
-      attackRollFormula = `@combatSkills.archery.rating + @weaponAttack + ${doctrineBonus} + ${abilityAttack} - 1d100`;
+      attackRollFormula = `@combatSkills.archery.rating + ${totalWeaponAttack} + ${abilityAttack} - 1d100`;
     }
   } else {
     criticalSuccessThreshold =
@@ -421,13 +434,13 @@ export async function getAttackRolls(
     console.log("Aim value", aimValue);
     attackRollFormula =
       finesse > normalCombat && weapon.system.finesse
-        ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} - 1d100`
-        : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} - 1d100`;
+        ? `@combatSkills.combat.finesseRating + ${totalWeaponAttack} - 1d100`
+        : `@combatSkills.combat.rating + ${totalWeaponAttack} - 1d100`;
     if (abilityAttack) {
       attackRollFormula =
         finesse > normalCombat && weapon.system.finesse
-          ? `@combatSkills.combat.finesseRating + @weaponAttack + ${doctrineBonus} + ${abilityAttack} - 1d100`
-          : `@combatSkills.combat.rating + @weaponAttack + ${doctrineBonus} + ${abilityAttack} - 1d100`;
+          ? `@combatSkills.combat.finesseRating + ${totalWeaponAttack} + ${abilityAttack} - 1d100`
+          : `@combatSkills.combat.rating + ${totalWeaponAttack} + ${abilityAttack} - 1d100`;
     }
   }
 
@@ -462,6 +475,7 @@ export async function getAttackRolls(
 export async function getDamageRolls(
   actor,
   weapon,
+  weaponContext = null,
   abilityDamage = 0,
   abilityBreakthrough = 0,
 ) {
@@ -476,13 +490,20 @@ export async function getDamageRolls(
     cha: actor.system.attributes.cha.total,
     per: actor.system.attributes.per.total,
   };
-  // DAMAGE ROLL
-  const { sneakDamage } = await getSneakDamageFormula(actor, weapon);
-  let damageFormula = `(${weapon.system.formula}`;
-  if (sneakDamage) damageFormula += sneakDamage;
-  damageFormula += ")";
-  if (abilityDamage) damageFormula += `${abilityDamage}`;
+  const offProps = getOffhandProps(weaponContext);
 
+  const { sneakDamage } = await getSneakDamageFormula(
+    actor,
+    weapon,
+    weaponContext ?? null,
+  );
+  let damageFormula = `(${weapon.system.formula}`;
+  if (offProps?.diceBonus) {
+    damageFormula += ` + ${offProps.diceBonus}`;
+  }
+  if (sneakDamage) damageFormula += `+ ${sneakDamage}`;
+  if (abilityDamage) damageFormula += `+ ${abilityDamage}`;
+  damageFormula += ")";
   damageFormula = damageFormula.replace(/\s*\+\s*$/, "");
   damageFormula = damageFormula.replace(/@([\w.]+)/g, (_, key) => {
     return foundry.utils.getProperty(rollData, key) ?? 0;
@@ -496,6 +517,9 @@ export async function getDamageRolls(
   if (weapon.system.breakthrough) {
     let breakthroughFormula = `${weapon.system.breakthrough}`;
     if (abilityBreakthrough) breakthroughFormula += ` + ${abilityBreakthrough}`;
+    if (offProps?.breakthrough) {
+      breakthroughFormula += ` + ${offProps.breakthrough}`;
+    }
     breakthroughFormula = breakthroughFormula.replace(/\s*\+\s*$/, "");
     breakthroughFormula = breakthroughFormula.replace(
       /@([\w.]+)/g,
@@ -517,6 +541,7 @@ export async function getDamageRolls(
 export async function getCriticalRolls(
   actor,
   weapon,
+  weaponContext = null,
   doctrineCritRangeBonus,
   attackRoll,
   weaponSkillCritDmg,
@@ -527,13 +552,19 @@ export async function getCriticalRolls(
   doctrineSkillCritPen,
 ) {
   // CRITICAL SCORE ROLL (only in flavor text)
+  const offProps = getOffhandProps(weaponContext);
   const failedAttack = attackRoll.total < 0 ? -5 : 0;
-  const { sneakCritRange } = await getSneakDamageFormula(actor, weapon);
+  const { sneakCritRange } = await getSneakDamageFormula(
+    actor,
+    weapon,
+    weaponContext ?? null,
+  );
   const critRange =
     weapon.system.critRange +
       actor.system.critRangeMelee +
       doctrineCritRangeBonus +
       sneakCritRange +
+      (offProps?.critRange || 0) +
       failedAttack || 0;
   const critScoreRollFormula = `${critRange} + 1d20`;
   const critScoreRoll = new Roll(critScoreRollFormula);
@@ -592,6 +623,7 @@ function getEffectName(systemMap, effectMap, index) {
 export async function getEffectRolls(
   actor,
   weapon,
+  weaponContext = null,
   doctrineBleedBonus,
   doctrineStunBonus,
   weaponSkillEffect,
@@ -600,9 +632,14 @@ export async function getEffectRolls(
   ability = {},
 ) {
   // --- Initial Setup ---
-  const { sneakEffect } = await getSneakDamageFormula(actor, weapon);
+  const { sneakEffect } = await getSneakDamageFormula(
+    actor,
+    weapon,
+    weaponContext ?? null,
+  );
   console.log("sneakEffect", sneakEffect);
   let effectsRollResults = "";
+  const offProps = getOffhandProps(weaponContext);
   const weaponEffects = weapon.system.effects || {};
   const actorEffects = actor.system.effects || {};
   const weaponSystem = weapon.system || {};
@@ -640,6 +677,7 @@ export async function getEffectRolls(
         modifiedEffectValue =
           modifiedEffectValue +
           doctrineStunBonus +
+          (offProps?.effects?.stun || 0) +
           sneakEffect +
           weaponSkillEffect +
           (critScore > 1 && critSuccess ? 100 : 0);
@@ -655,6 +693,7 @@ export async function getEffectRolls(
         modifiedEffectValue =
           modifiedEffectValue +
           doctrineBleedBonus +
+          (offProps?.effects?.bleed || 0) +
           sneakEffect +
           weaponSkillEffect;
 
@@ -688,8 +727,30 @@ export async function getEffectRolls(
       customEffectRolls.set(wName, wValue);
     }
   }
+  // 2b  Add Off-hand Effects
+  if (offProps?.effects) {
+    for (let i = 1; i <= 3; i++) {
+      const oKey = `extra${i}`;
+      const oValue = offProps.effects[oKey] || 0;
 
-  // 2b. Merge/Add ALL Ability Effects
+      const oName = getEffectName(
+        weaponContext.offWeapon.system,
+        offProps.effects,
+        i,
+      );
+
+      if (oValue > 0 && oName.trim() !== "") {
+        if (customEffectRolls.has(oName)) {
+          const mergedValue = customEffectRolls.get(oName) + oValue;
+          customEffectRolls.set(oName, mergedValue);
+        } else {
+          customEffectRolls.set(oName, oValue);
+        }
+      }
+    }
+  }
+
+  // 2c. Merge/Add ALL Ability Effects
   if (ability) {
     for (let j = 1; j <= 3; j++) {
       const aKey = `extra${j}`;
@@ -738,6 +799,7 @@ export async function getEffectRolls(
       (abilityEffects["bleed"] || 0) +
       weaponSkillEffect +
       doctrineBleedBonus +
+      (offProps?.effects?.bleed || 0) +
       sneakEffect;
     const bleedChance = modifiedBleedValue % 100;
     const sharpBleedRoll = new Roll("1d100");
@@ -759,6 +821,7 @@ export async function getEffectRolls(
       (abilityBleed || 0) +
       (weaponSkillEffect || 0) +
       (sneakEffect || 0) +
+      (offProps?.effects?.bleed || 0) +
       (doctrineBleedBonus || 0);
   }
   let allBleedRollResults = "";
@@ -809,4 +872,11 @@ export function evaluateDmgVsArmor({
     newHp: Math.max(hp - hpLoss, 0),
     newTempHp: tempHp - tempHpLoss,
   };
+}
+
+function getOffhandProps(weaponContext) {
+  if (!weaponContext?.isDualWield || !weaponContext.offWeapon) {
+    return null;
+  }
+  return weaponContext.offWeapon.system.offhandProperties ?? null;
 }

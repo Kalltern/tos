@@ -93,18 +93,7 @@ export async function attackActions() {
           ? await actor.setFlag("tos", "aimCount", aimValue)
           : await actor.unsetFlag("tos", "aimCount");
 
-        // ─── Weapon Resolution ───
-        const attackTypeMap = {
-          autoAttack: null, // resolved internally
-          throwingAttack: "throwing",
-        };
-
-        const attackType = attackTypeMap[fnName];
-        const weaponContext = attackType
-          ? resolveActiveWeaponForAttack(actor, attackType)
-          : null;
-
-        await game.tos[fnName]({ weaponContext });
+        await game.tos[fnName]();
       },
     };
   }
@@ -131,35 +120,8 @@ export async function attackActions() {
   dialog.render(true);
 }
 
-function buildWeaponSetView(actor) {
-  const sets = actor.system.combat.weaponSets;
-  const result = {};
-
-  for (const setId of [1, 2]) {
-    const slots = sets?.[setId] ?? {};
-    const main = slots.main ? actor.items.get(slots.main) : null;
-    const off = slots.off ? actor.items.get(slots.off) : null;
-
-    const mainIsTwoHanded = main
-      ? main.system.type === "heavy" ||
-        ["crossbow", "box"].includes(main.system.class) ||
-        main.system.gripMode === "two"
-      : false;
-
-    const offIsShield = !!off?.system?.shield;
-
-    result[setId] = {
-      main,
-      off,
-      mainIsTwoHanded,
-      offIsShield,
-    };
-  }
-
-  return result;
-}
 function renderWeaponLoadoutsDialog(actor) {
-  const weaponSets = buildWeaponSetView(actor);
+  const weaponSets = game.tos.buildWeaponSetView(actor);
   const activeSet = actor.system.combat.activeWeaponSet;
 
   return `
@@ -249,47 +211,23 @@ function resolveActiveWeaponForAttack(actor, attackType) {
   return { weapon, hasShield };
 }
 
-export async function autoAttack(options = {}) {
+export async function autoAttack() {
   const actor = canvas.tokens.controlled[0]?.actor;
   if (!actor) return;
 
-  // ─── NPCs → ALWAYS old logic ───
-  if (actor.type !== "character") {
-    return game.tos.meleeAttack(); // ❗ no weaponContext
+  const context = game.tos.resolveWeaponContext(actor);
+
+  if (!context?.weapon) {
+    return game.tos.meleeAttack();
   }
 
-  const activeSet = actor.system.combat?.activeWeaponSet;
-  const set = actor.system.combat.weaponSets?.[activeSet];
+  const weapon = context.weapon;
 
-  // ─── No active weapon set → old logic ───
-  if (!set?.main) {
-    return game.tos.meleeAttack(); // ❗ no weaponContext
-  }
-
-  const weapon = actor.items.get(set.main);
-  if (!weapon) {
-    return game.tos.meleeAttack(); // ❗ no weaponContext
-  }
-
-  // ─── Resolve weapon category ───
-  const isRanged = ["bow", "crossbow"].includes(weapon.system.class);
   const isThrown = weapon.system.thrown === true;
+  const isRanged = ["bow", "crossbow"].includes(weapon.system.class);
 
-  // ─── Throwing is explicit ───
-  if (isThrown) {
-    return game.tos.throwingAttack({
-      weaponContext: { weapon },
-    });
-  }
+  if (isThrown) return game.tos.throwingAttack({ context });
+  if (isRanged) return game.tos.rangedAttack({ context });
 
-  // ─── Auto-route melee / ranged ───
-  if (isRanged) {
-    return game.tos.rangedAttack({
-      weaponContext: { weapon },
-    });
-  }
-
-  return game.tos.meleeAttack({
-    weaponContext: { weapon },
-  });
+  return game.tos.meleeAttack({ context });
 }

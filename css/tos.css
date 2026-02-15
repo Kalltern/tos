@@ -19,15 +19,10 @@
   --tos-c-groove: #11121f;
 }
 
-/*.theme-dark .application .window-content {
-  padding: 12px;
-  background: linear-gradient(#7b0000, #4b0000);
-  border: 4px solid #d4af37;
-  box-shadow:
-    0 0 0 2px #900000,
-    0 0 0 6px #d4af37,
-    inset 0 0 30px rgba(0, 0, 0, 0.6);
-}*/
+body.theme-dark .application,
+body.theme-dark.application {
+  background: rgb(12 12 12 / 90%);
+}
 /* Global styles */
 .window-app {
   font-family: "Roboto", sans-serif;
@@ -325,13 +320,10 @@ prose-mirror {
   align-items: center;
   justify-content: flex-start; /* Moves content to the top */
   max-width: 260px;
-  margin-right: 10px;
   position: relative;
-  background: linear-gradient(
-    to bottom,
-    rgba(30, 25, 20, 0.6),
-    rgba(10, 10, 10, 0.6)
-  );
+  background:
+    linear-gradient(to bottom, rgba(30, 25, 20, 0.6), rgba(10, 10, 10, 0.6)),
+    url(headertextureTest7.JPG);
   padding: 10px;
   border-right: 1px solid rgba(200, 170, 90, 0.35);
   box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.6);
@@ -364,33 +356,65 @@ prose-mirror {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border: 2px solid #514226;
+}
+.tos .sheet-header .profile-img {
+  flex: 0 0 165px;
+  height: 216px;
+  margin-bottom: 10px;
+  align-self: center;
+
+  border: 3px solid #5f5843; /* gold border */
+}
+
+.tos .sheet-header-item {
+  height: auto; /* Adjust the height as needed */
+  overflow: hidden; /* Ensures content does not exceed the height */
+  flex: 0 auto;
+  display: flex;
+  min-width: 0;
+  padding: 5px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin-bottom: 5px;
+  border: 2px solid #514226;
+  background:
+    radial-gradient(
+      circle at center,
+      rgba(60, 60, 60, 0.2) 10%,
+      rgb(12 12 11 / 71%) 80%
+    ),
+    url("headertextureTest7.JPG");
+}
+
+.tos .sheet-header-item .header-fields {
+  flex: 1;
+  min-width: 0;
+  padding: 5px;
+}
+
+.tos .sheet-header-item .profile-img {
+  flex: 0 0 120px;
+  height: 216px;
+  margin-bottom: 10px;
+  object-fit: cover;
+  border: 3px solid #5f5843; /* gold border */
+}
+
+.tos .sheet-header .actor {
+  flex: 1;
+  padding: 5px;
   box-shadow:
     inset 0 0 40px rgba(0, 0, 0, 0.7),
     0 0 20px rgba(0, 0, 0, 0.8);
   background:
     radial-gradient(
       circle at center,
-      rgba(60, 60, 60, 0.3) 0%,
+      rgba(60, 60, 60, 0.2) 10%,
       rgb(12 12 11 / 71%) 80%
     ),
-    url("headertexture.jpg");
-}
-.tos .sheet-header .profile-img {
-  flex: 0 0 165px;
-  height: 216px;
-  margin-bottom: 10px;
-  margin-left: 8px;
-  align-self: flex-start;
-
-  border: 3px solid #5f5843; /* gold border */
-}
-
-.tos .sheet-header .header-fields {
-  flex: 1;
-  margin-bottom: 75px;
-  margin-right: 10px;
+    url("headertextureTest7.JPG");
 }
 .tos .sheet-npc-header {
   height: 440px; /* NPC-specific height */
@@ -409,7 +433,7 @@ prose-mirror {
   border-color: #2e312e;
   background: radial-gradient(
     circle at 30% 30%,
-    #252323,
+    #181717,
     #0b0c0c 65%,
     #121212 100%
   );
@@ -512,7 +536,7 @@ prose-mirror {
   background: radial-gradient(
     circle at 30% 30%,
     #191412,
-    #241d1a 65%,
+    #120f0e 65%,
     #141313 100%
   );
   box-shadow:
@@ -540,7 +564,7 @@ prose-mirror {
   background: radial-gradient(
     circle at 30% 30%,
     #191412,
-    #241d1a 65%,
+    #160e0b 65%,
     #141313 100%
   );
   box-shadow:
@@ -950,7 +974,7 @@ prose-mirror {
   .tab.miracles,
   .tab.spells,
   .tab.config {
-    max-height: 700px !important; /* Height for higher resolutions */
+    max-height: 688px !important; /* Height for higher resolutions */
   }
 }
 
@@ -1661,7 +1685,8 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
   border-left: 4px solid #ffa44f;
 }
 
-.grip-toggle {
+.grip-toggle,
+.npc-offhand-toggle {
   cursor: pointer;
   font-size: 1.1rem;
   margin-left: 6px;
@@ -1674,11 +1699,13 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
     filter 0.15s ease;
 }
 
-.grip-toggle:hover {
+.grip-toggle:hover,
+.npc-offhand-toggle:hover {
   opacity: 0.7;
 }
 
-.grip-toggle.active {
+.grip-toggle.active,
+.npc-offhand-toggle.active {
   opacity: 1;
   color: #f5c542; /* warm yellow */
   filter: drop-shadow(0 0 4px rgba(245, 197, 66, 0.8));

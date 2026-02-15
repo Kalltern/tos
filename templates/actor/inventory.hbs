@@ -370,6 +370,15 @@
   ></i>
 {{/if}}
 
+{{#if (eq actor.type "npc")}}
+<i
+  class="npc-offhand-toggle fas fa-hand-paper {{#if item.system.npcOffhand}}active{{/if}}"
+  data-action="toggleNpcOffhand"
+  data-item-id="{{item._id}}"
+  title="Toggle Offhand"
+></i>
+{{/if}}
+
 
       <div class="item-formula item-prop">
         {{item.system.formula}}

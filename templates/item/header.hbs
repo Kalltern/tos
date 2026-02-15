@@ -1,4 +1,4 @@
-<header class="sheet-header">
+<header class="sheet-header-item">
 
   {{!-- =====================
        PROFILE IMAGE & NAME
@@ -37,7 +37,7 @@
          WEAPON & ABILITY
     ====================== --}}
     {{#if (or (eq item.type "weapon") (eq item.type "ability"))}}
-      <div class="grid grid-2col">
+      <div class="grid-2col">
 
         {{!-- Weapon dice fields --}}
         {{#if (eq item.type "weapon")}}
@@ -77,7 +77,7 @@
         <div class="grid-span-1">
           <label class="resource-label">{{localize "TOS.Item.Weapon.FIELDS.penetration.label"}}</label>
           <input
-            type="text"
+            type="number"
             name="system.penetration"
             value="{{system.penetration}}"
             data-dtype="Number"

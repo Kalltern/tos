@@ -1089,6 +1089,7 @@
       "twoHandGrip": false,
       "gripMode": "one",
       "offhand": false,
+      "npcOffhand": false,
       "type": "",
       "typeOptions": ["light", "medium", "heavy"],
       "weight": 0,
@@ -1101,6 +1102,8 @@
       "critDodge": 0,
       "dodge": 0,
       "offhandProperties": {
+        "diceBonus": "",
+        "penetration": 0,
         "attack": 0,
         "defense": 0,
         "critRange": 0,
@@ -1109,6 +1112,8 @@
         "critDefense": 0,
         "critDodge": 0,
         "dodge": 0,
+        "breakthrough": "",
+        "sneakDamage": "",
         "effects": {
           "stun": 0,
           "bleed": 0,

@@ -13,6 +13,10 @@ import { throwExplosive } from "./utils/throwExplosive.mjs";
 import { castSpell } from "./utils/castSpell.mjs";
 import { spellDefense } from "./utils/spellDefense.mjs";
 import { combatAbilities } from "./utils/combatAbilities.mjs";
+import {
+  resolveWeaponContext,
+  buildWeaponSetView,
+} from "./utils/weaponResolver.mjs";
 import { attackActions, autoAttack } from "./utils/attackActions.mjs";
 import {
   universalAttackLogic,
@@ -71,6 +75,8 @@ Hooks.once("init", function () {
   CONFIG.TOS = TOS;
 
   game.tos = game.tos || {};
+  game.tos.resolveWeaponContext = resolveWeaponContext;
+  game.tos.buildWeaponSetView = buildWeaponSetView;
   game.tos.evaluateDmgVsArmor = evaluateDmgVsArmor;
   game.tos.firstAid = firstAid;
   game.tos.combatAbilities = combatAbilities;

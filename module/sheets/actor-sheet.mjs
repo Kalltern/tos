@@ -37,6 +37,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       buildSpellTooltip: this._buildSpellTooltip,
       setActiveWeaponSet: this._setActiveWeaponSet,
       toggleTwoHandGrip: this._toggleTwoHandGrip,
+      toggleNpcOffhand: this._toggleNpcOffhand,
     },
     // Custom property that's merged into `this.options`
     dragDrop: [{ dragSelector: "[data-drag]", dropSelector: null }],
@@ -165,6 +166,41 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     <div><b>Range:</b> ${data.range}</div>
     ${data.description ? `<hr>${data.description}` : ""}
   `;
+  }
+
+  static async _toggleNpcOffhand(event, target) {
+    const actor = this.actor;
+    if (!actor || actor.type !== "npc") return;
+
+    const itemId = target.dataset.itemId;
+    const item = actor.items.get(itemId);
+    if (!item || item.type !== "weapon") return;
+
+    const isCurrentlyOffhand = item.system.npcOffhand;
+
+    const updates = [];
+
+    // Clear all existing npcOffhand flags
+    for (const w of actor.items.filter((i) => i.type === "weapon")) {
+      if (w.system.npcOffhand) {
+        updates.push({
+          _id: w.id,
+          "system.npcOffhand": false,
+        });
+      }
+    }
+
+    // If this weapon wasn't active, activate it
+    if (!isCurrentlyOffhand) {
+      updates.push({
+        _id: item.id,
+        "system.npcOffhand": true,
+      });
+    }
+
+    if (updates.length) {
+      await actor.updateEmbeddedDocuments("Item", updates);
+    }
   }
 
   static _toggleSchool(event) {
