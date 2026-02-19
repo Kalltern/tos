@@ -180,6 +180,21 @@
             <label class="resource-label">{{localize "TOS.Item.Ability.FIELDS.weaponAbility.label"}}</label>
             <input type="checkbox" name="system.weaponAbility" {{#if system.weaponAbility}}checked{{/if}} />
           </div>
+
+            <div class="grid-span-1">
+            <label class="resource-label">{{localize "TOS.Item.Ability.FIELDS.standalone.label"}}</label>
+            <input type="checkbox" name="system.standalone" {{#if system.standalone}}checked{{/if}} />
+          </div>
+
+          
+            <div class="grid-span-1">
+            <label class="resource-label">{{localize "TOS.Item.Ability.FIELDS.modifiesAttack.label"}}</label>
+            <input type="checkbox" name="system.modifiesAttack" {{#if system.modifiesAttack}}checked{{/if}} />
+          </div>
+                   <div class="grid-span-1">
+            <label class="resource-label">{{localize "TOS.Item.Ability.FIELDS.multiAttack.label"}}</label>
+            <input type="checkbox" name="system.multiAttack" {{#if system.multiAttack}}checked{{/if}} />
+          </div>
         {{/if}}
 
       </div>

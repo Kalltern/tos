@@ -75,7 +75,7 @@ export class ToSItem extends Item {
           const hasFinesse = this.actor.items.some(
             (item) => item.name.toLowerCase() === "finesse",
           );
-          // Check if the actor owns an item named "Finesse"
+          // Check if the actor owns an item named "Giant"
           const hasGiant = this.actor.items.some(
             (item) => item.name.toLowerCase() === "giant",
           );

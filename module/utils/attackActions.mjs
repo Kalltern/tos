@@ -38,6 +38,9 @@ export async function attackActions() {
     ? renderWeaponLoadoutsDialog(actor)
     : "";
 
+  const modifierAbilities = actor.items.filter(
+    (i) => i.type === "ability" && i.system.modifiesAttack === true,
+  );
   const content = `
 <form>
   ${activeSetPreview}
@@ -65,6 +68,20 @@ export async function attackActions() {
     </label>
   </div>
 </form>
+<div class="attack-modifiers">
+  ${modifierAbilities
+    .map(
+      (mod) => `
+    <label>
+      ${mod.name}
+      <input type="checkbox"
+             class="attack-modifier-checkbox"
+             data-ability-id="${mod.id}" />
+    </label>
+  `,
+    )
+    .join("")}
+</div>
 `;
 
   const buttons = {};
@@ -91,7 +108,23 @@ export async function attackActions() {
           ? await actor.setFlag("tos", "aimCount", aimValue)
           : await actor.unsetFlag("tos", "aimCount");
 
-        await game.tos[fnName]();
+        // ─── Collect Modifiers ───
+        const selectedModifierIds = Array.from(
+          html[0].querySelectorAll(".attack-modifier-checkbox:checked"),
+        ).map((cb) => cb.dataset.abilityId);
+
+        const selectedModifiers = modifierAbilities.filter((mod) =>
+          selectedModifierIds.includes(mod.id),
+        );
+
+        // ─── Deduct Costs ───
+        const paid = await game.tos.deductAbilityCost(actor, selectedModifiers);
+        if (!paid) return;
+
+        // ─── Execute Attack ───
+        await game.tos[fnName]({
+          selectedModifiers,
+        });
       },
     };
   }
@@ -213,58 +246,88 @@ export async function autoAttack(options = {}) {
   const actor = canvas.tokens.controlled[0]?.actor;
   if (!actor) return;
 
-  // If pre-resolved context exists → respect it
+  //
+  //  Pre-resolved context branch
+  //
   if (options.weaponContext?.weapon) {
     const weapon = options.weaponContext.weapon;
 
     const isThrown = weapon.system.thrown === true;
     const isRanged = ["bow", "crossbow"].includes(weapon.system.class);
 
-    if (isThrown) return game.tos.throwingAttack(options);
-    if (isRanged) return game.tos.rangedAttack(options);
-    return game.tos.meleeAttack(options);
+    if (isThrown)
+      return game.tos.throwingAttack({
+        context: options.weaponContext,
+        selectedModifiers: options.selectedModifiers ?? [],
+      });
+
+    if (isRanged)
+      return game.tos.rangedAttack({
+        context: options.weaponContext,
+        selectedModifiers: options.selectedModifiers ?? [],
+      });
+
+    return game.tos.meleeAttack({
+      context: options.weaponContext,
+      selectedModifiers: options.selectedModifiers ?? [],
+    });
   }
 
-  // Character smart resolution
+  //
+  //  Character smart resolution
+  //
   if (actor.type === "character") {
     const activeSet = actor.system.combat?.activeWeaponSet;
     const weaponSets = game.tos.buildWeaponSetView(actor);
     const ws = weaponSets[activeSet];
 
-    if (activeSet) {
-      if (ws?.main) {
-        const weapon = ws.main;
+    if (activeSet && ws?.main) {
+      const weapon = ws.main;
 
-        const isThrown = weapon.system.thrown === true;
-        const isRanged = ["bow", "crossbow"].includes(weapon.system.class);
+      const isThrown = weapon.system.thrown === true;
+      const isRanged = ["bow", "crossbow"].includes(weapon.system.class);
 
-        const context = {
-          weapon,
-          offWeapon: ws.off || null,
-          isDualWield: ws.isDualWield || false,
-          hasShield: ws.offIsShield || false,
-        };
+      const context = {
+        weapon,
+        offWeapon: ws.off || null,
+        isDualWield: ws.isDualWield || false,
+        hasShield: ws.offIsShield || false,
+      };
 
-        if (isThrown) return game.tos.throwingAttack({ context });
-        if (isRanged) return game.tos.rangedAttack({ context });
-        return game.tos.meleeAttack({ context });
-      }
+      if (isThrown)
+        return game.tos.throwingAttack({
+          context,
+          selectedModifiers: options.selectedModifiers ?? [],
+        });
+
+      if (isRanged)
+        return game.tos.rangedAttack({
+          context,
+          selectedModifiers: options.selectedModifiers ?? [],
+        });
+
+      return game.tos.meleeAttack({
+        context,
+        selectedModifiers: options.selectedModifiers ?? [],
+      });
     }
 
     // 🔥 Fallback if no main weapon
-    if (!ws?.main) {
-      // no active main weapon
-      return game.tos.universalAttackLogic({
-        attackType: "attack",
-        flavorLabel: "Attack",
-        showBreakthrough: true,
-        weaponFilter: (i) => i.type === "weapon",
-        getWeaponSkillData: (actor, weapon) =>
-          game.tos.getWeaponSkillBonuses(actor, weapon),
-      });
-    }
+    return game.tos.universalAttackLogic({
+      attackType: "attack",
+      flavorLabel: "Attack",
+      showBreakthrough: true,
+      weaponFilter: (i) => i.type === "weapon",
+      getWeaponSkillData: (actor, weapon) =>
+        game.tos.getWeaponSkillBonuses(actor, weapon),
+      selectedModifiers: options.selectedModifiers ?? [],
+    });
   }
 
-  // NPC always manual
-  return game.tos.meleeAttack();
+  //
+  //  NPC fallback
+  //
+  return game.tos.meleeAttack({
+    selectedModifiers: options.selectedModifiers ?? [],
+  });
 }

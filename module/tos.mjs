@@ -12,7 +12,10 @@ import { defenseRoll } from "./utils/defense.mjs";
 import { throwExplosive } from "./utils/throwExplosive.mjs";
 import { castSpell } from "./utils/castSpell.mjs";
 import { spellDefense } from "./utils/spellDefense.mjs";
-import { combatAbilities } from "./utils/combatAbilities.mjs";
+import {
+  combatAbilities,
+  deductAbilityCost,
+} from "./utils/combatAbilities.mjs";
 import {
   resolveWeaponContext,
   buildWeaponSetView,
@@ -76,6 +79,7 @@ Hooks.once("init", function () {
 
   game.tos = game.tos || {};
   game.tos.resolveWeaponContext = resolveWeaponContext;
+  game.tos.deductAbilityCost = deductAbilityCost;
   game.tos.buildWeaponSetView = buildWeaponSetView;
   game.tos.evaluateDmgVsArmor = evaluateDmgVsArmor;
   game.tos.firstAid = firstAid;

@@ -5,12 +5,14 @@ export async function universalAttackLogic({
   flavorLabel,
   showBreakthrough = false,
   context: preResolvedContext = null,
+  selectedModifiers = [],
 }) {
   const selectedToken = canvas.tokens.controlled[0];
   if (!selectedToken) {
     ui.notifications.warn("Please select a token.");
     return;
   }
+  console.log("MODIFIERS RECEIVED:", selectedModifiers);
 
   const actor = selectedToken.actor;
   const weapons = actor.items.filter(weaponFilter);
@@ -20,16 +22,86 @@ export async function universalAttackLogic({
     return;
   }
 
-  // ─── Custom Bonuses ───
-  const customDamage = 0;
-  const customAttack = 0;
-
   const weaponChoices = weapons.map((weapon, index) => ({
     label: weapon.name,
     value: index,
   }));
 
   const handleWeaponSelection = async (weaponIndex) => {
+    let customAttack = 0;
+    let customDamage = "";
+    let customBreakthrough = "";
+    let customPenetration = 0;
+    let customCritRange = 0;
+    let customCritChance = 0;
+    let concatDescription = "";
+
+    for (const mod of selectedModifiers) {
+      if (mod.system.description) {
+        concatDescription += `<hr><b>${mod.name}</b><br>${mod.system.description}`;
+      }
+    }
+
+    let attributeTestHTML = "";
+
+    for (const mod of selectedModifiers) {
+      const testName = mod.system.attributeTest;
+      const testModifier = Number(mod.system.testModifier) || 0;
+
+      if (!testName || testName === "-- Select a Type --") continue;
+
+      const attributeMap = {
+        strength: "str",
+        endurance: "end",
+        dexterity: "dex",
+        intelligence: "int",
+        wisdom: "wis",
+        charisma: "cha",
+      };
+
+      const shortKey = attributeMap[testName.toLowerCase()] ?? testName;
+
+      let attributeValue = actor.system.attributes[shortKey]?.mod ?? 0;
+
+      if (actor.type === "npc") {
+        attributeValue = actor.system.attributes[shortKey]?.value ?? 0;
+      }
+
+      const attributeRoll = new Roll(
+        `(${attributeValue + testModifier}) - 1d100`,
+      );
+
+      await attributeRoll.evaluate({ async: true });
+
+      attributeTestHTML += `
+    
+    <tr>
+    <hr>
+    <td>
+    
+    <b>${mod.name} — ${testName} Test</b><br>
+    Margin of Success: ${attributeRoll.total}<br>
+    
+    </tr>
+    <hr>
+    </td>
+ 
+  `;
+    }
+
+    for (const mod of selectedModifiers) {
+      customAttack += Number(mod.system.attack) || 0;
+      customBreakthrough += Number(mod.system.breakthrough) || 0;
+      customPenetration += Number(mod.system.penetration) || 0;
+      customCritRange += Number(mod.system.critRange) || 0;
+      customCritChance += Number(mod.system.critChance) || 0;
+      const modDamage = mod.system.roll?.diceBonusFormula;
+      if (modDamage) {
+        customDamage = customDamage
+          ? `(${customDamage}) + (${modDamage})`
+          : modDamage;
+      }
+    }
     const weapon = weapons[weaponIndex];
     const resolvedFlavor =
       typeof flavorLabel === "function" ? flavorLabel(weapon) : flavorLabel;
@@ -57,14 +129,18 @@ export async function universalAttackLogic({
         ) || 0
       : 0;
 
-    const penetration = mainPen + offPen;
-
+    const penetration = mainPen + offPen + customPenetration;
+    const totalDoctrineBonus = doctrine.doctrineBonus;
+    const totalDoctrineCritBonus =
+      doctrine.doctrineCritBonus + customCritChance;
+    const totalCritRangeBonus =
+      doctrine.doctrineCritRangeBonus + customCritRange;
     // ─── Attack Roll ───
     const attackData = await game.tos.getAttackRolls(
       actor,
       weapon,
-      doctrine.doctrineBonus,
-      doctrine.doctrineCritBonus,
+      totalDoctrineBonus,
+      totalDoctrineCritBonus,
       weaponSkillCrit,
       customAttack,
       resolvedContext,
@@ -86,6 +162,7 @@ export async function universalAttackLogic({
         weapon,
         resolvedContext,
         customDamage,
+        customBreakthrough,
       );
     const hasBreakthrough =
       showBreakthrough &&
@@ -96,7 +173,7 @@ export async function universalAttackLogic({
       actor,
       weapon,
       resolvedContext,
-      doctrine.doctrineCritRangeBonus,
+      totalCritRangeBonus,
       attackRoll,
       weaponSkillCritDmg,
       weaponSkillCritPen,
@@ -123,6 +200,8 @@ export async function universalAttackLogic({
       weaponSkillEffect,
       critScore,
       critSuccess,
+      null, // no ability
+      selectedModifiers,
     );
 
     const { allBleedRollResults, effectsRollResults } = effects;
@@ -172,7 +251,9 @@ ${
 
     const attackHTML = await attackRoll.render();
     const damageHTML = await damageRoll.render();
-
+    const modifierLabel = selectedModifiers.length
+      ? ` + ${selectedModifiers.map((m) => m.name).join(", ")}`
+      : "";
     await ChatMessage.create({
       speaker: ChatMessage.getSpeaker(),
       content: `
@@ -191,10 +272,15 @@ ${
       flavor: `
 <span style="display:inline-flex; align-items:center;">
   <img src="${weapon.img}" width="36" height="36" style="margin-right:8px;">
-  <strong style="font-size:20px;">${resolvedFlavor}</strong>
+  <strong style="font-size:20px;">${resolvedFlavor}${modifierLabel}</strong>
 </span>
-
 <hr>
+<table style="width:100%; text-align:center; font-size:16px;">
+
+  ${concatDescription}
+  ${attributeTestHTML}
+</table>
+
 
 <p style="text-align:center; font-size:20px;">
   <b>${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}</b>
@@ -285,6 +371,7 @@ export async function rangedAttack(options = {}) {
     weaponFilter: (i) =>
       i.type === "weapon" && ["bow", "crossbow"].includes(i.system.class),
     context: options.context ?? null,
+    selectedModifiers: options.selectedModifiers ?? [],
   });
 }
 
@@ -297,6 +384,7 @@ export async function throwingAttack(options = {}) {
     getWeaponSkillData: (actor, weapon) =>
       game.tos.getWeaponSkillBonuses(actor, weapon),
     context: options.context ?? null,
+    selectedModifiers: options.selectedModifiers ?? [],
   });
 }
 
@@ -312,5 +400,6 @@ export async function meleeAttack(options = {}) {
     getWeaponSkillData: (actor, weapon) =>
       game.tos.getWeaponSkillBonuses(actor, weapon),
     context: options.context ?? null,
+    selectedModifiers: options.selectedModifiers ?? [],
   });
 }

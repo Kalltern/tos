@@ -275,19 +275,22 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
 
     const updates = {};
 
-    // Remove item from all slots first (allows replacement)
-    for (const [setId, slots] of Object.entries(weaponSets)) {
-      for (const hand of ["main", "off"]) {
-        if (slots?.[hand] === itemId) {
-          updates[`system.combat.weaponSets.${setId}.${hand}`] = null;
-        }
-      }
-    }
-
     const isShield = item.system.shield;
 
     // Shields ONLY in off-hand
     if (isShield && slot !== "off") return;
+
+    const currentMain = weaponSets?.[set]?.main;
+    const currentOff = weaponSets?.[set]?.off;
+
+    // Prevent same item in both hands (same set only)
+    if (slot === "main" && currentOff === itemId) {
+      updates[`system.combat.weaponSets.${set}.off`] = null;
+    }
+
+    if (slot === "off" && currentMain === itemId) {
+      updates[`system.combat.weaponSets.${set}.main`] = null;
+    }
 
     // Two-handed weapon blocks off-hand
     if (slot === "off") {
@@ -418,10 +421,12 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     if (slot) {
       event.preventDefault();
 
-      const itemId = slot.dataset.itemId;
-      if (!itemId) return; // empty slot → do nothing
+      const set = slot.dataset.set;
+      const hand = slot.dataset.slot;
 
-      this._clearWeaponSlot(itemId);
+      if (!set || !hand) return;
+
+      this._clearWeaponSlot(set, hand);
       return;
     }
 
@@ -439,28 +444,15 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     this._openWeaponEquipMenuFromItem(itemId);
   }
 
-  _clearWeaponSlot(itemId) {
+  _clearWeaponSlot(set, hand) {
     if (this.actor.type !== "character") return;
-    if (!itemId) return;
+    if (!set || !hand) return;
 
-    const weaponSets = foundry.utils.deepClone(
-      this.actor.system.combat.weaponSets,
-    );
+    const path = `system.combat.weaponSets.${set}.${hand}`;
 
-    if (!weaponSets) return;
-
-    const updates = {};
-
-    for (const [setId, slots] of Object.entries(weaponSets)) {
-      for (const hand of ["main", "off"]) {
-        if (slots?.[hand] === itemId) {
-          updates[`system.combat.weaponSets.${setId}.${hand}`] = null;
-        }
-      }
-    }
-
-    if (!Object.keys(updates).length) return;
-    return this.actor.update(updates);
+    return this.actor.update({
+      [path]: null,
+    });
   }
 
   /** @override */

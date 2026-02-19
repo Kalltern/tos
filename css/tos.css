@@ -632,7 +632,7 @@ prose-mirror {
 }
 
 .tos .items-header .ability-name {
-  width: 260px;
+  width: 228px;
   text-align: left;
   justify-content: flex-start;
   padding-left: 6px;
@@ -643,7 +643,7 @@ prose-mirror {
 .tos .items-header .ability-cost,
 .tos .items-header .ability-damage,
 .tos .items-header .ability-test {
-  width: 113.73px;
+  width: 100px;
   flex: 0 0 auto;
 }
 
@@ -1687,6 +1687,11 @@ body.theme-dark input:not([readonly]):not([type="checkbox"]) {
   border-left: 4px solid #ffa44f;
 }
 
+/* Both sets */
+.item.equipped-both {
+  background: rgba(118, 69, 161, 0.4);
+  border-left: 4px solid #9b4fff;
+}
 .grip-toggle,
 .npc-offhand-toggle {
   cursor: pointer;

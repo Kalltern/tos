@@ -2,17 +2,24 @@ export async function combatAbilities() {
   // ====================================================================
   // 1. INITIAL SETUP AND FILTERING
   // ====================================================================
-
+  let lockedMultiAttackAbility = null;
+  let multiAttackCount = 1;
   const selectedToken = canvas.tokens.controlled[0];
   if (!selectedToken) return ui.notifications.warn("Please select a token.");
   const actor = selectedToken.actor;
 
   // Collect all relevant abilities: (type: ability) AND (type: melee OR class: defense)
-  const abilities = actor.items.filter(
-    (i) =>
-      i.type === "ability" &&
-      (["melee", "ranged"].includes(i.system.type) ||
-        i.system.class === "defense"),
+  const allAbilities = actor.items.filter((i) => i.type === "ability");
+
+  const modifierAbilities = allAbilities.filter(
+    (a) => a.system.modifiesAttack === true,
+  );
+
+  const abilities = allAbilities.filter(
+    (a) =>
+      !a.system.modifiesAttack &&
+      (["melee", "ranged"].includes(a.system.type) ||
+        a.system.class === "defense"),
   );
 
   const ABILITY_TABS = [
@@ -117,25 +124,111 @@ export async function combatAbilities() {
 
     const useSneak = html.find("#sneak-attack-checkbox")[0]?.checked;
     const useFlanking = html.find("#flanking-attack-checkbox")[0]?.checked;
+    const selectedModifierIds = Array.from(
+      container.querySelectorAll(".attack-modifier-checkbox:checked"),
+    ).map((cb) => cb.dataset.abilityId);
 
+    const selectedModifiers = modifierAbilities.filter((mod) =>
+      selectedModifierIds.includes(mod.id),
+    );
     const intent = {
       aim: aimValue,
       sneak: useSneak,
       flanking: useFlanking,
+      modifiers: selectedModifiers,
     };
     const isDefenseRoll = ability.system.class === "defense";
     const keepOpen = container.querySelector("#keep-open")?.checked;
 
-    await deductAbilityCost(actor, ability);
+    let paid;
 
-    if (isDefenseRoll || ability.system.weaponAbility) {
+    if (lockedMultiAttackAbility?.id === ability.id) {
+      // Already in multiattack mode → only pay modifiers
+      paid = await game.tos.deductAbilityCost(actor, selectedModifiers);
+    } else {
+      // First strike (or normal ability)
+      paid = await game.tos.deductAbilityCost(actor, [
+        ability,
+        ...selectedModifiers,
+      ]);
+    }
+    if (!paid) return;
+    const isStandalone = ability.system.standalone;
+    if (isStandalone) {
+      console.warn("STANDALONE BRANCH HIT:", ability.name);
+
+      await updateCombatFlags(actor, intent);
+
+      await runAttackMacro(
+        actor,
+        null,
+        ability,
+        selectedModifiers,
+        ability.system.roll.diceBonusFormula || 0,
+        ability.system.attack || 0,
+        ability.system.breakthrough || 0,
+        ability.system.penetration || 0,
+        ability.system.attributeTest || 0,
+        ability.system.testModifier || 0,
+        ability.system.critRange || 0,
+        ability.system.critChance || 0,
+        ability.system.critFail || 0,
+        ability.system.roll.halfDamage || false,
+      );
+    } else if (isDefenseRoll || ability.system.weaponAbility) {
       const mode = isDefenseRoll ? "defense" : "attack";
       await weaponSelectionFlow(actor, ability, mode, intent);
     } else {
       await game.tos.getNonWeaponAbility(actor, ability);
     }
+    function transformDialogToMultiAttackMode(dialog, ability) {
+      const html = dialog.element;
 
-    if (!keepOpen) dialog.close();
+      // Remove ability list
+      html.find(".ability-tabs").remove();
+      // Hide Keep Open checkbox
+      html.find("#keep-open-container").hide();
+
+      // Add header + buttons
+      html.find(".ability-dialog-form").prepend(`
+    <div class="multiattack-header">
+      <h3>⚔ Multi-Attack: ${ability.name} (Strike ${multiAttackCount})</h3>
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <button type="button" id="continue-multiattack">
+          ⚔ Attack Again
+        </button>
+      </div>
+      <hr>
+    </div>
+  `);
+
+      // Continue attack
+      html.find("#continue-multiattack").click(async () => {
+        multiAttackCount++;
+        await onAbilityChosen(
+          ability,
+          html.find(".ability-dialog-form")[0],
+          dialog,
+          ability.parent,
+        );
+      });
+    }
+
+    if (
+      ability.system.multiAttack &&
+      actor.type === "character" &&
+      !lockedMultiAttackAbility
+    ) {
+      lockedMultiAttackAbility = ability;
+      transformDialogToMultiAttackMode(abilityDialog, ability, actor);
+
+      return;
+    }
+    const isMultiContinuation =
+      lockedMultiAttackAbility && lockedMultiAttackAbility.id === ability.id;
+    if (!keepOpen && !isMultiContinuation) {
+      dialog.close();
+    }
   }
 
   // ====================================================================
@@ -148,9 +241,27 @@ export async function combatAbilities() {
     ? renderWeaponLoadoutsDialog(actor)
     : "";
 
+  const modifierCheckboxHtml = modifierAbilities
+    .map(
+      (mod) => `
+    <label>
+      ${mod.name}
+      <input type="checkbox"
+             class="attack-modifier-checkbox"
+             data-ability-id="${mod.id}" />
+    </label>
+  `,
+    )
+    .join("");
   let abilityDialog = new Dialog({
     title: `Choose Combat or Defense Ability`,
     content: `
+      <div id="keep-open-container">
+    <label>
+      <input type="checkbox" id="keep-open">
+      Keep this window open
+    </label>
+  </div>
 <form class="ability-dialog-form">
 
   ${activeSetPreview}
@@ -172,20 +283,17 @@ export async function combatAbilities() {
 </div>
 
 <div class="form-group">
-  <label>
-    Sneak Attack <input type="checkbox" id="sneak-attack-checkbox" />
-    Flanking <input type="checkbox" id="flanking-attack-checkbox" />
-  </label>
+<label>
+  Sneak Attack <input type="checkbox" id="sneak-attack-checkbox" />
+  Flanking <input type="checkbox" id="flanking-attack-checkbox" />
+</label>
 </div>
-
+<div class="attack-modifiers">
+  ${modifierCheckboxHtml}
+</div>
 <hr>
 
-  <div id="keep-open-container">
-    <label>
-      <input type="checkbox" id="keep-open">
-      Keep this window open
-    </label>
-  </div>
+
 
   <div class="ability-tabs">
     <div class="tab-headers">${tabHeadersHtml}</div>
@@ -218,6 +326,15 @@ export async function combatAbilities() {
         const abilityId = event.currentTarget.dataset.abilityId;
         const ability = abilities.find((a) => a.id === abilityId);
         if (!ability) return;
+
+        // If we're in multi-attack continuation mode
+        if (
+          lockedMultiAttackAbility &&
+          ability.id !== lockedMultiAttackAbility.id
+        ) {
+          ui.notifications.warn("You are continuing a Multi-Attack.");
+          return;
+        }
 
         await onAbilityChosen(ability, html[0], abilityDialog, actor);
       });
@@ -279,6 +396,7 @@ export async function combatAbilities() {
         actor,
         weaponContext,
         ability,
+        intent.modifiers,
         abilityDamage,
         abilityAttack,
         abilityBreakthrough,
@@ -353,6 +471,7 @@ export async function combatAbilities() {
           actor,
           weaponContext,
           ability,
+          intent.modifiers,
           abilityDamage,
           abilityAttack,
           abilityBreakthrough,
@@ -458,54 +577,6 @@ export async function combatAbilities() {
     }
   }
 
-  async function deductAbilityCost(actor, ability) {
-    const updates = {};
-    const costType = ability.system.costType;
-    const costValue = ability.system.cost;
-
-    if (costType && costValue) {
-      const currentValue = actor.system.stats[costType]?.value ?? 0;
-
-      if (currentValue < costValue) {
-        ui.notifications.warn(`Not enough ${costType}`);
-        return;
-      }
-
-      updates[`system.stats.${costType}.value`] = Math.max(
-        currentValue - costValue,
-        0,
-      );
-    }
-
-    const resources = Array.isArray(ability.system.resources)
-      ? ability.system.resources
-      : Object.values(ability.system.resources ?? {});
-    for (const res of resources) {
-      const { type, mode, amount } = res;
-      if (!type || !mode || !amount) continue;
-
-      const statKey = type.toLowerCase();
-      const currentValue = actor.system.stats[statKey]?.value ?? 0;
-      let newValue = currentValue;
-
-      if (mode === "drain") {
-        newValue = Math.max(currentValue - amount, 0);
-      }
-
-      if (mode === "add") {
-        newValue = currentValue + amount;
-      }
-
-      updates[`system.stats.${statKey}.value`] = newValue;
-    }
-
-    if (Object.keys(updates).length) {
-      await actor.update(updates);
-    }
-
-    ui.notifications.info(`${ability.name} activated`);
-  }
-
   async function postUniversalStyleAttackChat({
     actor,
     weapon,
@@ -596,7 +667,7 @@ export async function combatAbilities() {
 <span style="display:inline-flex; align-items:center;">
   <img src="${ability.img}" width="36" height="36" style="margin-right:8px;">
   <strong style="font-size:20px;">
-    ${ability.name} with ${weapon.name}
+    ${rollName}
   </strong>
 </span>
 <hr>
@@ -649,6 +720,7 @@ ${damageLine}
     actor,
     weaponContext,
     ability,
+    selectedModifiers = [],
     abilityDamage,
     abilityAttack,
     abilityBreakthrough,
@@ -660,28 +732,65 @@ ${damageLine}
     abilityCritFail,
     halfDamage,
   ) {
-    const weapon = weaponContext.weapon;
-    let {
-      doctrineBonus,
-      doctrineCritBonus,
-      doctrineCritRangeBonus,
-      doctrineStunBonus,
-      doctrineSkillCritPen,
-      doctrineCritDmg,
-      doctrineBleedBonus,
-    } = await game.tos.getDoctrineBonuses(actor, weapon);
+    const weapon = weaponContext?.weapon ?? null;
+    abilityAttack = Number(abilityAttack) || 0;
+    abilityPenetration = Number(abilityPenetration) || 0;
+    abilityTestModifier = Number(abilityTestModifier) || 0;
+    abilityCritRange = Number(abilityCritRange) || 0;
+    abilityCritChance = Number(abilityCritChance) || 0;
+    abilityCritFail = Number(abilityCritFail) || 0;
+    let doctrineBonus = 0;
+    let doctrineCritBonus = 0;
+    let doctrineCritRangeBonus = 0;
+    let doctrineStunBonus = 0;
+    let doctrineSkillCritPen = 0;
+    let doctrineCritDmg = 0;
+    let doctrineBleedBonus = 0;
+    for (const mod of selectedModifiers) {
+      abilityAttack += Number(mod.system.attack) || 0;
+      abilityBreakthrough += Number(mod.system.breakthrough) || 0;
+      abilityPenetration += Number(mod.system.penetration) || 0;
+      abilityCritRange += Number(mod.system.critRange) || 0;
+      abilityCritChance += Number(mod.system.critChance) || 0;
+
+      const modDamage = mod.system.roll?.diceBonusFormula;
+
+      if (modDamage) {
+        abilityDamage = abilityDamage
+          ? `(${abilityDamage}) + (${modDamage})`
+          : modDamage;
+      }
+    }
+    if (weapon) {
+      ({
+        doctrineBonus,
+        doctrineCritBonus,
+        doctrineCritRangeBonus,
+        doctrineStunBonus,
+        doctrineSkillCritPen,
+        doctrineCritDmg,
+        doctrineBleedBonus,
+      } = await game.tos.getDoctrineBonuses(actor, weapon));
+    }
 
     doctrineBonus += abilityCritChance;
     doctrineCritRangeBonus += abilityCritRange;
 
-    const {
-      weaponSkillEffect,
-      weaponSkillCrit,
-      weaponSkillCritDmg,
-      weaponSkillCritPen,
-    } = await game.tos.getWeaponSkillBonuses(actor, weapon);
+    let weaponSkillEffect = 0;
+    let weaponSkillCrit = 0;
+    let weaponSkillCritDmg = 0;
+    let weaponSkillCritPen = 0;
 
-    const mainPen = Number(weapon.system.penetration) || 0;
+    if (weapon) {
+      ({
+        weaponSkillEffect,
+        weaponSkillCrit,
+        weaponSkillCritDmg,
+        weaponSkillCritPen,
+      } = await game.tos.getWeaponSkillBonuses(actor, weapon));
+    }
+
+    const mainPen = weapon ? Number(weapon.system.penetration) || 0 : 0;
 
     const offPen = weaponContext?.isDualWield
       ? Number(
@@ -748,6 +857,7 @@ ${damageLine}
         critScore,
         critSuccess,
         ability,
+        selectedModifiers,
       );
 
     const attributeMap = {
@@ -759,7 +869,20 @@ ${damageLine}
       charisma: "cha",
     };
 
-    let concatRollAndDescription;
+    let concatRollAndDescription = ability.system.description || "";
+
+    // Append modifier descriptions
+    for (const mod of selectedModifiers) {
+      if (mod.system.description) {
+        concatRollAndDescription += `
+      <hr>
+      <b>${mod.name}</b><br>
+      ${mod.system.description}
+    `;
+      }
+    }
+
+    // Ability attribute test
     if (
       abilityAttributeTestName &&
       abilityAttributeTestName !== "-- Select a Type --"
@@ -770,6 +893,7 @@ ${damageLine}
 
       let selectedAttributeModifier =
         actor.system.attributes[shortKey]?.mod ?? 0;
+
       if (actor.type === "npc") {
         selectedAttributeModifier =
           actor.system.attributes[shortKey]?.value ?? 0;
@@ -780,19 +904,21 @@ ${damageLine}
       );
       await attributeRoll.evaluate({ async: true });
 
-      const attributeRollTotal = attributeRoll.total;
-      const attributeString = `
-        |${abilityAttributeTestName} Test ${
-          selectedAttributeModifier + abilityTestModifier
-        }%|<br>
-        Margin of Success: ${attributeRollTotal}<br>
-    `;
-
-      concatRollAndDescription = ability.system.description + attributeString;
-    } else {
-      concatRollAndDescription = ability.system.description;
+      concatRollAndDescription += `
+    <hr>
+    <b>${abilityAttributeTestName} Test ${
+      selectedAttributeModifier + abilityTestModifier
+    }%</b><br>
+    Margin of Success: ${attributeRoll.total}
+  `;
     }
-    rollName = `${ability.name} with ${weapon.name}`;
+    const modifierLabel = selectedModifiers.length
+      ? ` + ${selectedModifiers.map((m) => m.name).join(", ")}`
+      : "";
+
+    rollName = weapon
+      ? `${ability.name}${modifierLabel} with ${weapon.name}`
+      : `${ability.name}${modifierLabel}`;
     await postUniversalStyleAttackChat({
       actor,
       weapon,
@@ -808,7 +934,9 @@ ${damageLine}
       critScore,
       critScoreResult,
       breakthroughRollResult,
-      showBreakthrough: weapon.system.breakthrough,
+      showBreakthrough: weapon
+        ? weapon.system.breakthrough
+        : abilityBreakthrough,
       allBleedRollResults,
       effectsRollResults,
       rollName,
@@ -817,6 +945,83 @@ ${damageLine}
       concatRollAndDescription,
     });
   }
+}
+
+export async function deductAbilityCost(actor, abilities = []) {
+  if (!Array.isArray(abilities)) abilities = [abilities];
+
+  const drainTotals = {};
+  const addTotals = {};
+  const updates = {};
+
+  // ---------------------------------
+  // 1. Collect all drains and adds
+  // ---------------------------------
+  for (const ability of abilities) {
+    // Simple costType system
+    const costType = ability.system.costType;
+    const costValue = Number(ability.system.cost) || 0;
+
+    if (costType && costValue > 0) {
+      drainTotals[costType] = (drainTotals[costType] || 0) + costValue;
+    }
+
+    const resources = Array.isArray(ability.system.resources)
+      ? ability.system.resources
+      : Object.values(ability.system.resources ?? {});
+
+    for (const res of resources) {
+      const { type, mode, amount } = res;
+      if (!type || !mode || !amount) continue;
+
+      const value = Number(amount) || 0;
+
+      if (mode === "drain") {
+        drainTotals[type] = (drainTotals[type] || 0) + value;
+      }
+
+      if (mode === "add") {
+        addTotals[type] = (addTotals[type] || 0) + value;
+      }
+    }
+  }
+
+  // ---------------------------------
+  // 2. Validate drains
+  // ---------------------------------
+  for (const [stat, totalDrain] of Object.entries(drainTotals)) {
+    const currentValue = actor.system.stats[stat]?.value ?? 0;
+
+    if (currentValue < totalDrain) {
+      ui.notifications.warn(`Not enough ${stat}`);
+      return false;
+    }
+  }
+
+  // ---------------------------------
+  // 3. Apply final changes
+  // ---------------------------------
+  const affectedStats = new Set([
+    ...Object.keys(drainTotals),
+    ...Object.keys(addTotals),
+  ]);
+
+  for (const stat of affectedStats) {
+    const currentValue = actor.system.stats[stat]?.value ?? 0;
+    const drain = drainTotals[stat] || 0;
+    const add = addTotals[stat] || 0;
+
+    updates[`system.stats.${stat}.value`] = Math.max(
+      currentValue - drain + add,
+      0,
+    );
+  }
+
+  if (Object.keys(updates).length) {
+    await actor.update(updates);
+  }
+
+  return true;
 }
 
 function renderWeaponLoadoutsDialog(actor) {

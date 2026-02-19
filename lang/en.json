@@ -277,10 +277,14 @@
         "FIELDS": {
           "modifier": { "label": "Modifier" },
           "costType": { "label": "Cost type" },
+          "cost": { "label": "Cost" },
           "actionCost": { "label": "Action Cost" },
           "damage": { "label": "Damage" },
           "attributeTest": { "label": "Test" },
           "weaponAbility": { "label": "Weapon Ability" },
+          "modifiesAttack": { "label": "Modifies Attack" },
+          "standalone": { "label": "Stand alone" },
+          "multiAttack": { "label": "Multiattack" },
           "resourceCost": { "label": "Resource Cost" }
         }
       },

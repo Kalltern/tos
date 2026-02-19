@@ -11,6 +11,9 @@
           "TOS.Item.Ability.FIELDS.costType.label"
         }}</div>
       <div class="ability-cost">{{localize
+          "TOS.Item.Ability.FIELDS.cost.label"
+        }}</div>
+      <div class="ability-cost">{{localize
           "TOS.Item.Ability.FIELDS.actionCost.label"
         }}</div>
       <div class="ability-damage">{{localize
@@ -56,6 +59,7 @@
           <div>{{item.name}}</div>
         </div>
         <div class="item-formula item-prop">{{item.system.costType}}</div>
+        <div class="item-formula item-prop">{{item.system.cost}}</div>
         <div class="item-formula item-prop">{{item.system.actionCost}}</div>
         <div class="item-formula item-prop">{{item.system.roll.diceBonus}}</div>
         <div class="item-formula item-prop">{{item.system.attributeTest}}</div>
