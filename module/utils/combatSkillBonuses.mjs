@@ -991,76 +991,68 @@ export function evaluateDmgVsArmor({
   /* 3️⃣ Penetration Floor */
   baseDamage = Math.max(baseDamage, penetration ?? 0);
 
-  /* 4️⃣ Vulnerability Short-Circuit */
-  const hasVulnerability = expression.some(
-    (token) =>
-      token !== "and" && token !== "or" && armorTable?.[token]?.vulnerability,
-  );
-
-  if (hasVulnerability) {
-    let vulnerableDamage = Math.floor(baseDamage * 2);
-
-    if (halfDamage) {
-      vulnerableDamage = Math.floor(vulnerableDamage * 0.5);
-    }
-
-    return {
-      shieldLoss,
-      ...applyToHp(vulnerableDamage, hp, tempHp),
-    };
-  }
-
-  /* 5️⃣ Evaluate Types */
-  const values = {};
+  /* 4️⃣ Build damage type modifiers */
+  const modifiers = {};
 
   for (const token of expression) {
     if (token === "and" || token === "or") continue;
 
-    let value = baseDamage;
+    let modifier = 1;
 
     if (armorTable?.[token]?.immunity) {
-      value = 0;
+      modifier = 0;
     } else {
-      const reduction = armorTable?.[token]?.total ?? 0;
-      value = Math.max(value - reduction, 0);
-
       if (armorTable?.[token]?.resistance) {
-        value = Math.floor(value * 0.5);
+        modifier *= 0.5;
+      }
+
+      if (armorTable?.[token]?.vulnerability) {
+        modifier *= 2;
       }
     }
 
-    values[token] = value;
+    modifiers[token] = modifier;
   }
 
-  /* 6️⃣ Reduce Expression */
-  let result = null;
-  let currentOp = null;
+  /* 5️⃣ Split into OR branches */
+  const branches = [];
+  let currentBranch = [];
 
   for (const token of expression) {
-    if (token === "and" || token === "or") {
-      currentOp = token;
-      continue;
-    }
-
-    const value = values[token];
-
-    if (result === null) {
-      result = value;
-    } else if (currentOp === "and") {
-      result = Math.min(result, value);
-    } else if (currentOp === "or") {
-      result = Math.max(result, value);
+    if (token === "or") {
+      if (currentBranch.length > 0) {
+        branches.push(currentBranch);
+        currentBranch = [];
+      }
+    } else if (token !== "and") {
+      currentBranch.push(token);
     }
   }
 
-  let finalDamage = result ?? 0;
+  if (currentBranch.length > 0) {
+    branches.push(currentBranch);
+  }
 
-  /* 7️⃣ External Half Damage */
+  /* 6️⃣ Multiply modifiers inside each AND branch */
+  const branchResults = branches.map((branch) =>
+    branch.reduce((product, token) => {
+      return product * (modifiers[token] ?? 1);
+    }, 1),
+  );
+
+  /* 7️⃣ OR chooses highest branch */
+  const finalModifier =
+    branchResults.length > 0 ? Math.max(...branchResults) : 1;
+
+  /* 8️⃣ Apply modifier to base damage */
+  let finalDamage = Math.floor(baseDamage * finalModifier);
+
+  /* 9️⃣ External half damage */
   if (halfDamage) {
     finalDamage = Math.floor(finalDamage * 0.5);
   }
 
-  /* 8️⃣ Apply to HP (Single Source of Truth) */
+  /* 🔟 Apply to HP */
   return {
     shieldLoss,
     ...applyToHp(finalDamage, hp, tempHp),
