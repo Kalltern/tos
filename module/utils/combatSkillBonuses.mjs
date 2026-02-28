@@ -57,30 +57,50 @@ export async function getNonWeaponAbility(actor, ability) {
     abilityAttributeTestName &&
     abilityAttributeTestName !== "-- Select a Type --"
   ) {
-    const shortKey =
-      attributeMap[abilityAttributeTestName.toLowerCase()] ??
-      abilityAttributeTestName;
+    const lowerTestName = abilityAttributeTestName.trim().toLowerCase();
+    let baseValue = 0;
 
-    let selectedAttributeModifier = actor.system.attributes[shortKey]?.mod ?? 0;
-    if (actor.type === "npc")
-      selectedAttributeModifier = actor.system.attributes[shortKey]?.value ?? 0;
+    // 1️⃣ Leadership special rule FIRST
+    if (lowerTestName === "leadership") {
+      baseValue =
+        actor.type === "npc"
+          ? (actor.system.attributes.cha?.value ?? 0)
+          : (actor.system.skills?.leadership?.rating ?? 0);
+    }
 
-    const totalModifier =
-      Number(selectedAttributeModifier) + Number(abilityTestModifier);
+    // 2️⃣ Combat Skills
+    else if (actor.system.combatSkills?.[lowerTestName]) {
+      baseValue = actor.system.combatSkills[lowerTestName]?.rating ?? 0;
+    }
 
+    // 3️⃣ Other Skills
+    else if (actor.system.skills?.[lowerTestName]) {
+      baseValue = actor.system.skills[lowerTestName]?.rating ?? 0;
+    }
+
+    // 4️⃣ Attributes LAST
+    else if (attributeMap[lowerTestName]) {
+      const shortKey = attributeMap[lowerTestName];
+
+      baseValue =
+        actor.type === "npc"
+          ? (actor.system.attributes[shortKey]?.value ?? 0)
+          : (actor.system.attributes[shortKey]?.value ?? 0); // use value since you don't have .mod
+    }
+    const totalModifier = Number(baseValue) + Number(abilityTestModifier);
     // Create the Roll
     const attributeRoll = new Roll(`(${totalModifier}) - 1d100`);
     await attributeRoll.evaluate({ async: true });
 
     const attributeRollTotal = attributeRoll.total;
     const attributeString = `<hr>
-      |${abilityAttributeTestName} Test ${totalModifier}%|<br>
-      Margin of Success: ${attributeRollTotal}<br>
-      <hr>
-    `;
+    |${abilityAttributeTestName} Test ${totalModifier}%|<br>
+    Margin of Success: ${attributeRollTotal}<br>
+    <hr>
+  `;
 
     concatRollAndDescription += attributeString;
-    attributeTestRoll = attributeRoll; // store for chat message
+    attributeTestRoll = attributeRoll;
   }
 
   // --- Custom Effects ---
@@ -165,6 +185,7 @@ export async function getNonWeaponAbility(actor, ability) {
 <table style="width: 100%; text-align: center; font-size: 15px;">
   <tr>    <th>Description:</th>  </tr>
   <tr>    <td>${concatRollAndDescription}</td>  </tr>
+  
   ${dmgtypes}
 
   <tr>    <td><hr></td>  </tr>

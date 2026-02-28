@@ -310,10 +310,12 @@ export async function deductMana(actor, spell) {
     if (!type || !mode || !amt) continue;
 
     const statKey = type.toLowerCase();
-    const baseValue =
+    const rawBase =
       updates[`system.stats.${statKey}.value`] ??
       actor.system.stats[statKey]?.value ??
       0;
+
+    const baseValue = Number(rawBase);
 
     let newValue = baseValue;
 

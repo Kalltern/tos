@@ -144,10 +144,8 @@ export async function universalAttackLogic({
       if (actor.type === "npc") {
         attributeValue = actor.system.attributes[shortKey]?.value ?? 0;
       }
-
-      const attributeRoll = new Roll(
-        `(${attributeValue + testModifier}) - 1d100`,
-      );
+      const attributeTotalValue = attributeValue + testModifier;
+      const attributeRoll = new Roll(`(${attributeTotalValue}) - 1d100`);
 
       await attributeRoll.evaluate({ async: true });
 
@@ -156,7 +154,7 @@ export async function universalAttackLogic({
     <tr>
     <hr>
     <td>
-    <b>${mod.name} — ${testName} Test</b><br>
+    <b>${mod.name} — ${testName} Test ${attributeTotalValue}%</b><br>
     Margin of Success: ${attributeRoll.total}<br>
     </td>
     </tr>
@@ -320,10 +318,6 @@ export async function universalAttackLogic({
       effects;
 
     const expression = damageProfile?.expression || [];
-    console.log(
-      "Actor combat mods:",
-      game.tos.getActorCombatModifiers(actor, weapon),
-    );
     const dmgtypes =
       expression.length > 0
         ? `<hr>

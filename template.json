@@ -1328,15 +1328,7 @@
         "modes": ["add", "drain"],
         "types": []
       },
-      "testOptions": [
-        "Strength",
-        "Dexterity",
-        "Endurance",
-        "Inteligence",
-        "Will",
-        "Charisma",
-        "Perception"
-      ],
+      "testOptions": [],
       "attributeTest": "",
       "dmgTypes": [],
       "testModifier": 0,

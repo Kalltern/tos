@@ -73,10 +73,22 @@ export class ToSItem extends Item {
         "psychic",
       ];
 
+      this.system.testOptions = [
+        "strength",
+        "dexterity",
+        "endurance",
+        "inteligence",
+        "will",
+        "charisma",
+        "perception",
+        "leadership",
+        "channeling",
+      ];
+
       if (this.type === "spell" || this.type === "ability") {
         this.system.resourceOptions = {
           modes: ["add", "drain"],
-          types: ["Health", "Stamina", "Mana", "Toxicity"],
+          types: ["Health", "Stamina", "Mana", "Toxicity", "Corruption"],
         };
       }
     }

@@ -606,14 +606,23 @@ export async function combatAbilities() {
     const attackHTML = await attackRoll.render();
     const damageHTML = await damageRoll.render();
     const expression = damageProfile?.expression || [];
-
     const dmgtypes =
       expression.length > 0
         ? `
-<tr><td>Damage types:</td></tr>
-<tr><td>${expression
-            .map((t) => t.charAt(0).toUpperCase() + t.slice(1))
-            .join(" ")}</td></tr>
+<hr>
+<div style="
+  text-align:center;
+  font-size:14px;
+  margin-top:6px;
+">
+  <div style="font-weight:bold; margin-bottom:4px;">
+    Damage Types
+  </div>
+  <div>
+    ${expression.map((t) => t.charAt(0).toUpperCase() + t.slice(1)).join(" ")}
+  </div>
+</div>
+<hr>
 `
         : "";
     const hasBreakthrough =
@@ -683,20 +692,20 @@ export async function combatAbilities() {
   </strong>
 </span>
 <hr>
+<div style="text-align:center; font-size:16px;">
 <table style="width:100%; text-align:center; font-size:16px;">
 <tr><td>${concatRollAndDescription}</td></tr>
 </table>
+ </div>
+
 <hr>
-${dmgtypes}
 <p style="text-align:center; font-size:20px;">
   <b>${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}</b>
 </p>
-
-
 ${damageLine}
-
-<hr>
-
+<div style="text-align:center; font-size:14px;">
+${dmgtypes}
+ </div>
 <table style="width:100%; text-align:center; font-size:15px;">
   <tr><th>Effects</th></tr>
   <tr>
@@ -1004,35 +1013,53 @@ ${damageLine}
       }
     }
 
-    // Ability attribute test
+    // Ability test
     if (
       abilityAttributeTestName &&
       abilityAttributeTestName !== "-- Select a Type --"
     ) {
-      const shortKey =
-        attributeMap[abilityAttributeTestName.toLowerCase()] ??
-        abilityAttributeTestName;
+      const lowerTestName = abilityAttributeTestName.trim().toLowerCase();
+      let baseValue = 0;
 
-      let selectedAttributeModifier =
-        actor.system.attributes[shortKey]?.mod ?? 0;
-
-      if (actor.type === "npc") {
-        selectedAttributeModifier =
-          actor.system.attributes[shortKey]?.value ?? 0;
+      // 1️⃣ Leadership special case FIRST
+      if (lowerTestName === "leadership") {
+        baseValue =
+          actor.type === "npc"
+            ? (actor.system.attributes.cha?.value ?? 0)
+            : (actor.system.skills?.leadership?.rating ?? 0);
       }
 
-      const attributeRoll = new Roll(
-        `(${selectedAttributeModifier + abilityTestModifier}) - 1d100`,
-      );
+      // 2️⃣ Combat skills
+      else if (actor.system.combatSkills?.[lowerTestName]) {
+        baseValue = actor.system.combatSkills[lowerTestName]?.rating ?? 0;
+      }
+
+      // 3️⃣ Other skills
+      else if (actor.system.skills?.[lowerTestName]) {
+        baseValue = actor.system.skills[lowerTestName]?.rating ?? 0;
+      }
+
+      // 4️⃣ Attributes LAST (keep .mod for characters!)
+      else if (attributeMap[lowerTestName]) {
+        const shortKey = attributeMap[lowerTestName];
+
+        baseValue =
+          actor.type === "npc"
+            ? (actor.system.attributes[shortKey]?.value ?? 0)
+            : (actor.system.attributes[shortKey]?.mod ?? 0); // ✅ .mod preserved
+      }
+
+      const totalModifier = Number(baseValue) + Number(abilityTestModifier);
+
+      const attributeRoll = new Roll(`(${totalModifier}) - 1d100`);
+
       await attributeRoll.evaluate({ async: true });
 
       concatRollAndDescription += `
-    <hr>
-    <b>${abilityAttributeTestName} Test ${
-      selectedAttributeModifier + abilityTestModifier
-    }%</b><br>
-    Margin of Success: ${attributeRoll.total}
-  `;
+<hr>
+<b>${abilityAttributeTestName} Test ${totalModifier}%</b><br>
+Margin of Success: ${attributeRoll.total}
+`;
     }
     const modifierLabel = selectedModifiers.length
       ? ` + ${selectedModifiers.map((m) => m.name).join(", ")}`
