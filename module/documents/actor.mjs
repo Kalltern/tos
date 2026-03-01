@@ -125,6 +125,9 @@ export class ToSActor extends Actor {
       }
     }
 
+    const dodgeLimit = systemData.dodgeLimit;
+    dodgeLimit.total = dodgeLimit.value + dodgeLimit.bonus;
+
     this._prepareGlobalMod();
     // Make separate methods for each Actor type (character, npc, etc.) to keep
     // things organized.

@@ -807,6 +807,12 @@ prose-mirror {
 .tos .items-list .items-header .item-name {
   text-align: left;
 }
+.tos .items-list .items-header.gear .item-name {
+  max-width: 300px;
+}
+.tos .items-list .items-header.gear .item-durability {
+  margin-right: 100px;
+}
 .item-name.spellDifficulty {
   text-indent: 3rem;
 }

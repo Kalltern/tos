@@ -27,6 +27,8 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       viewDoc: this._viewDoc,
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
+      adjustNumericField: this._adjustNumericField,
+      adjustDurability: this._adjustDurability,
       addSupply: this._addSupply,
       subtractSupply: this._subtractSupply,
       toggleEffect: this._toggleEffect,
@@ -1008,21 +1010,40 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
    * @param {HTMLElement} target   The capturing HTML element which defined a [data-action]
    * @protected
    */
-  static async _addSupply(event, target) {
+  static async _adjustNumericField(event, target) {
     const doc = this._getEmbeddedDocument(target);
-    const currentQty = Number(doc.system.quantity ?? 0);
-    await doc.update({ "system.quantity": currentQty + 1 });
+    if (!doc) return;
+
+    const path = target.dataset.path;
+    const delta = Number(target.dataset.delta ?? 1);
+
+    if (!path) return;
+
+    const current = Number(foundry.utils.getProperty(doc, path) ?? 0);
+    const newValue = Math.max(0, current + delta);
+
+    await doc.update({ [path]: newValue });
+  }
+  static async _addSupply(event, target) {
+    return this._adjustNumericField(event, target, "system.quantity", {
+      deleteIfZero: false,
+    });
   }
 
   static async _subtractSupply(event, target) {
-    const doc = this._getEmbeddedDocument(target);
-    const currentQty = Number(doc.system.quantity ?? 0);
+    target.dataset.delta = -1;
 
-    if (currentQty <= 1) {
-      await doc.delete();
-    } else {
-      await doc.update({ "system.quantity": currentQty - 1 });
-    }
+    return this._adjustNumericField(event, target, "system.quantity", {
+      deleteIfZero: true,
+    });
+  }
+  static async _adjustDurability(event, target) {
+    return this._adjustNumericField(
+      event,
+      target,
+      "system.armor.durability",
+      { deleteIfZero: false }, // armor shouldn't delete itself
+    );
   }
 
   /**

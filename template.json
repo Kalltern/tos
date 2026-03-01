@@ -109,6 +109,11 @@
 
     "character": {
       "skillvisibility": true,
+      "dodgeLimit": {
+        "value": 50,
+        "bonus": 0,
+        "total": 0
+      },
       "finesse": false,
       "steelGrip": false,
       "predatorySenses": false,

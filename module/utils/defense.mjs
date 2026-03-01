@@ -356,6 +356,12 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
       );
 
       await roll.evaluate();
+      const d100Term = roll.terms.find((t) => t.faces === 100);
+      const d100Result = d100Term?.results?.[0]?.result;
+      console.log("d100Term", d100Term);
+      console.log("d100Result", d100Result);
+      const dodgeFailed = d100Result > actor.system.dodgeLimit.total;
+      console.log("dodgeFailed", dodgeFailed);
 
       await createDefenseChatMessage(
         roll,
@@ -363,6 +369,7 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
         rollName,
         criticalSuccessThreshold,
         criticalFailureThreshold,
+        { dodgeFailed },
       );
     };
 
@@ -402,6 +409,7 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
     rollName,
     criticalSuccessThreshold,
     criticalFailureThreshold,
+    { dodgeFailed = false } = {},
   ) {
     const rollResult = roll.dice[0].results[0].result;
 
@@ -448,7 +456,9 @@ export async function defenseRoll({ actor, weapon, ability = null } = {}) {
               ? "Critical Success!"
               : critFailure
                 ? "Critical Failure!"
-                : ""
+                : dodgeFailed
+                  ? "Dodge Failed"
+                  : ""
           }
         </b></p>
         ${armorTable}        
