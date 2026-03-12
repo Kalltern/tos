@@ -850,7 +850,7 @@ ${damageLine}
     let doctrineBonus = 0;
     let doctrineCritBonus = 0;
     let doctrineCritRangeBonus = 0;
-    let doctrineStunBonus = 0;
+    let doctrineStaggerBonus = 0;
     let doctrineSkillCritPen = 0;
     let doctrineCritDmg = 0;
     let doctrineBleedBonus = 0;
@@ -874,7 +874,7 @@ ${damageLine}
         doctrineBonus,
         doctrineCritBonus,
         doctrineCritRangeBonus,
-        doctrineStunBonus,
+        doctrineStaggerBonus,
         doctrineSkillCritPen,
         doctrineCritDmg,
         doctrineBleedBonus,
@@ -961,7 +961,7 @@ ${damageLine}
         weapon,
         weaponContext,
         doctrineBleedBonus,
-        doctrineStunBonus,
+        doctrineStaggerBonus,
         weaponSkillEffect,
         critScore,
         critSuccess,

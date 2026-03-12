@@ -213,7 +213,7 @@
           "finesse": { "label": "Finesse" },
           "sharp": { "label": "Sharp" },
           "thrown": { "label": "Thrown" },
-          "stun": { "label": "Stun" },
+          "stagger": { "label": "Stagger" },
           "bleed": { "label": "Bleed" },
           "attack": { "label": "Attack" },
           "defense": { "label": "Defense" },

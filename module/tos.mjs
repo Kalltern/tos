@@ -1555,3 +1555,42 @@ Hooks.once("ready", async () => {
     }
   }
 });
+Hooks.once("ready", async () => {
+  async function migrateItem(item) {
+    const updates = {};
+
+    const stunEffect = item.system.effects?.stun;
+    const stunOffhand = item.system.offhandProperties?.stun;
+
+    // effects.stun → effects.stagger
+    if (stunEffect !== undefined) {
+      updates["system.effects.stagger"] = stunEffect;
+      updates["system.effects.-=stun"] = null;
+    }
+
+    // offhandProperties.stun → offhandProperties.stagger
+    if (stunOffhand !== undefined) {
+      updates["system.offhandProperties.effects.stagger"] = stunOffhand;
+      updates["system.offhandProperties.effects.-=stun"] = null;
+    }
+
+    if (Object.keys(updates).length) {
+      console.log(`Migrating stun → stagger on item: ${item.name}`);
+      await item.update(updates);
+    }
+  }
+
+  /* Actor items */
+  for (const actor of game.actors) {
+    for (const item of actor.items) {
+      await migrateItem(item);
+    }
+  }
+
+  /* Independent world items */
+  for (const item of game.items) {
+    await migrateItem(item);
+  }
+
+  console.log("Stun → Stagger migration complete");
+});

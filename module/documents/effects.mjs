@@ -3,7 +3,7 @@ export class ToSActiveEffect extends ActiveEffect {
   /*  CHANGE STRUCTURE                            */
   /* -------------------------------------------- */
   static EFFECT_OVERRIDES = {
-    heavy_stun: ["stun"],
+    stun: ["stagger"],
   };
   static registerStatusCounterIntegration() {
     if (!game.user.isGM) {

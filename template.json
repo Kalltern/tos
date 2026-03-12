@@ -98,7 +98,7 @@
           }
         },
         "effectMods": {
-          "stun": {
+          "stagger": {
             "applyChance": 0,
             "stackMod": 0,
             "immune": false
@@ -226,7 +226,7 @@
         }
       },
       "effects": {
-        "stun": 0,
+        "stagger": 0,
         "bleed": 0,
         "extra1": 0,
         "extra2": 0,
@@ -1021,7 +1021,7 @@
         }
       },
       "effects": {
-        "stun": 0,
+        "stagger": 0,
         "bleed": 0,
         "extra1": 0,
         "extra2": 0,
@@ -1202,7 +1202,7 @@
         "breakthrough": "",
         "sneakDamage": "",
         "effects": {
-          "stun": 0,
+          "stagger": 0,
           "bleed": 0,
           "extra1": 0,
           "extra2": 0,
@@ -1228,7 +1228,7 @@
         "swordsman": false
       },
       "effects": {
-        "stun": 0,
+        "stagger": 0,
         "bleed": 0,
         "extra1": 0,
         "extra2": 0,
@@ -1356,7 +1356,7 @@
       "cost": 0,
       "perRound": 0,
       "effects": {
-        "stun": 0,
+        "stagger": 0,
         "bleed": 0,
         "extra1": 0,
         "extra2": 0,

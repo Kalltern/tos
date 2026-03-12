@@ -62,10 +62,10 @@ TOS.statusEffects = [
     statuses: ["bleed"],
   },
   {
-    id: "stun",
-    name: "EFFECT.StatusStunned",
+    id: "stagger",
+    name: "EFFECT.StatusStaggered",
     img: "icons/svg/daze.svg",
-    statuses: ["stun"],
+    statuses: ["stagger"],
   },
   {
     id: "burn",
@@ -76,10 +76,10 @@ TOS.statusEffects = [
 ];
 
 TOS.effectDefinitions = {
-  stun: {
-    name: "Stunned",
+  stagger: {
+    name: "Staggered",
     img: "icons/svg/daze.svg",
-    statuses: ["stun"],
+    statuses: ["stagger"],
     defaultTurns: 1,
     changes: [
       {
@@ -378,10 +378,10 @@ TOS.effectDefinitions = {
       },
     ],
   },
-  heavy_stun: {
-    name: "Heavy stun",
+  stun: {
+    name: "Stun",
     img: "icons/magic/movement/abstract-ribbons-red-orange.webp",
-    statuses: ["heavy_stun"],
+    statuses: ["stun"],
     defaultTurns: 2,
     changes: [
       {

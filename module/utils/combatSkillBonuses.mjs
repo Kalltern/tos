@@ -112,7 +112,7 @@ export async function getNonWeaponAbility(actor, ability) {
       null, // no weapon
       null, // no weaponContext
       0, // doctrineBleedBonus
-      0, // doctrineStunBonus
+      0, // doctrineStaggerBonus
       0, // weaponSkillEffect
       0, // critScore
       false, // critSuccess
@@ -195,7 +195,7 @@ export async function getDoctrineBonuses(actor, weapon) {
   let doctrineBonus = 0;
   let doctrineCritBonus = 0;
   let doctrineCritRangeBonus = 0;
-  let doctrineStunBonus = 0;
+  let doctrineStaggerBonus = 0;
   let doctrineBleedBonus = 0;
   let doctrineCritDefenseBonus = 0;
   let doctrineDefenseBonus = 0;
@@ -207,7 +207,7 @@ export async function getDoctrineBonuses(actor, weapon) {
       doctrineBonus: 0,
       doctrineCritBonus: 0,
       doctrineCritRangeBonus: 0,
-      doctrineStunBonus: 0,
+      doctrineStaggerBonus: 0,
       doctrineBleedBonus: 0,
       doctrineCritDefenseBonus: 0,
       doctrineDefenseBonus: 0,
@@ -239,7 +239,7 @@ export async function getDoctrineBonuses(actor, weapon) {
         }
         if (doctrine.reaver.value >= 7) {
           doctrineBleedBonus = 15;
-          doctrineStunBonus = 10;
+          doctrineStaggerBonus = 10;
         }
         if (doctrine.reaver.value >= 8) {
           doctrineBonus = 15;
@@ -257,7 +257,7 @@ export async function getDoctrineBonuses(actor, weapon) {
         doctrineRangedDefenseBonus = 5;
         if (doctrine.dimakerus.value >= 4) {
           doctrineBleedBonus = 10;
-          doctrineStunBonus = 5;
+          doctrineStaggerBonus = 5;
         }
         if (doctrine.dimakerus.value >= 7) {
           doctrineDefenseBonus = 10;
@@ -320,7 +320,7 @@ export async function getDoctrineBonuses(actor, weapon) {
       }
       if (doctrineName === "peltast" && doctrine.peltast.value >= 1) {
         doctrineBleedBonus = 20;
-        doctrineStunBonus = 10;
+        doctrineStaggerBonus = 10;
         if (doctrine.peltast.value >= 4) {
           doctrineSkillCritPen = 5;
           doctrineCritDmg = 5;
@@ -355,14 +355,14 @@ export async function getDoctrineBonuses(actor, weapon) {
     }
   }
   /* console.log(
-    `Doctrine Bonus: ${doctrineBonus}, ${doctrineCritBonus}, ${doctrineCritRangeBonus}, ${doctrineStunBonus}, ${doctrineBleedBonus}`,
+    `Doctrine Bonus: ${doctrineBonus}, ${doctrineCritBonus}, ${doctrineCritRangeBonus}, ${doctrineStaggerBonus}, ${doctrineBleedBonus}`,
   );*/
 
   return {
     doctrineBonus,
     doctrineCritBonus,
     doctrineCritRangeBonus,
-    doctrineStunBonus,
+    doctrineStaggerBonus,
     doctrineBleedBonus,
     doctrineRangedDefenseBonus,
     doctrineDefenseBonus,
@@ -672,7 +672,7 @@ function getEffectName(systemMap, effectMap, index) {
   const primaryNameKey = `effectType${index}`;
   const customNameKey = `effectName${index}`;
 
-  // 1. Get the primary system name (e.g., "Bleed", "Stun", or "Custom")
+  // 1. Get the primary system name (e.g., "Bleed", "Stagger", or "Custom")
   const primaryName = systemMap[primaryNameKey] || "";
 
   if (primaryName.toLowerCase() === "custom") {
@@ -689,7 +689,7 @@ export async function getEffectRolls(
   weapon,
   weaponContext = null,
   doctrineBleedBonus,
-  doctrineStunBonus,
+  doctrineStaggerBonus,
   weaponSkillEffect,
   critScore,
   critSuccess,
@@ -730,9 +730,9 @@ export async function getEffectRolls(
 
   if (critScore > 1) {
     critBleeds += 1;
-  } // --- 1. Process Fixed Effects (STUN) ---
+  } // --- 1. Process Fixed Effects (Stagger) ---
 
-  const fixedEffectNames = ["stun"];
+  const fixedEffectNames = ["stagger"];
 
   for (const effectName of fixedEffectNames) {
     const baseValue = weaponEffects[effectName] || 0;
@@ -748,18 +748,18 @@ export async function getEffectRolls(
     if (shouldProcess) {
       let modifiedEffectValue = offValue + baseValue + modifier + abilityBonus;
 
-      if (effectName === "stun") {
+      if (effectName === "stagger") {
         modifiedEffectValue =
           modifiedEffectValue +
-          doctrineStunBonus +
-          (offProps?.effects?.stun || 0) +
+          doctrineStaggerBonus +
+          (offProps?.effects?.stagger || 0) +
           sneakEffect +
           weaponSkillEffect +
           (critScore > 1 && critSuccess ? 100 : 0);
         if (isAuto) {
-          effectsRollResults += `<p><b>|Stun| </b></p>`;
+          effectsRollResults += `<p><b>|Stagger| </b></p>`;
 
-          mechanicalEffects["stun"] = {
+          mechanicalEffects["stagger"] = {
             chance: null,
             roll: null,
             auto: true,
@@ -775,8 +775,8 @@ export async function getEffectRolls(
           d100Roll.total <= roundedModifiedValue
             ? `<i class="fa-sharp-duotone fa-solid fa-star-christmas" style="--fa-primary-color: #c4c700; --fa-secondary-color: #5c5400;"></i> SUCCESS`
             : ``;
-        effectsRollResults += `<p><b>| Stun: </b>${d100Roll.total} | < ${roundedModifiedValue}% ${successText}</p>`;
-        mechanicalEffects["stun"] = {
+        effectsRollResults += `<p><b>| Stagger: </b>${d100Roll.total} | < ${roundedModifiedValue}% ${successText}</p>`;
+        mechanicalEffects["stagger"] = {
           chance: roundedModifiedValue,
           roll: d100Roll.total,
         };

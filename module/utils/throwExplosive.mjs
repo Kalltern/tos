@@ -26,7 +26,7 @@ export async function throwExplosive() {
     const effects = {
       burn: { color: "darkorange", label: "Burn" },
       freeze: { color: "teal", label: "Freeze" },
-      stun: { color: "yellow", label: "Stun" },
+      stagger: { color: "yellow", label: "Stagger" },
     };
 
     for (const [effect, { color, label }] of Object.entries(effects)) {

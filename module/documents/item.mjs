@@ -41,7 +41,6 @@ export class ToSItem extends Item {
         "fear",
         "flammable",
         "freeze",
-        "heavy_stun",
         "paralyze",
         "poison",
         "precision",
@@ -51,6 +50,7 @@ export class ToSItem extends Item {
         "shield_break",
         "slow",
         "soul_mark",
+        "stagger",
         "stun",
         "terror",
         "vulnerable",
@@ -351,7 +351,7 @@ export class ToSItem extends Item {
   _getAbilityTooltipData(data) {
     const effectLines = [
       data.effects.bleed && `Bleed ${data.effects.bleed}%`,
-      data.effects.stun && `Stun ${data.effects.stun}%`,
+      data.effects.stagger && `Stagger ${data.effects.stagger}%`,
       data.effectType1 &&
         `${data.effectType1} ${data.effects?.extra1 ? data.effects.extra1 + "%" : ""}`,
       data.effectType2 &&
@@ -378,7 +378,7 @@ export class ToSItem extends Item {
   _getWeaponTooltipData(data) {
     const effectLines = [
       data.effects.bleed && `Bleed ${data.effects.bleed}%`,
-      data.effects.stun && `Stun ${data.effects.stun}%`,
+      data.effects.stagger && `Stagger ${data.effects.stagger}%`,
       data.effectType1 &&
         `${data.effectType1} ${data.effects?.extra1 ? data.effects.extra1 + "%" : ""}`,
       data.effectType2 &&

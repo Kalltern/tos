@@ -384,8 +384,8 @@ export function calculateAttackBonuses(actor, spell) {
   // if (actor.items.find(i => i.name === "Focus")) {
   //     // Add +10 to all damage rolls (flat number)
   //     damageBonus += 10;
-  //     // Add +10 to the 'stun' effect check
-  //     effectModifiers['stun'] = (effectModifiers['stun'] || 0) + 10;
+  //     // Add +10 to the 'stagger' effect check
+  //     effectModifiers['stagger'] = (effectModifiers['stagger'] || 0) + 10;
   // }
 
   // --- Future Addon Example: "Bonus Damage" Field ---
@@ -562,7 +562,7 @@ export async function finalizeRollsAndPostChat(
     let finalEffectName = "";
 
     // 1. Handle Built-in Effects
-    if (key === "stun" || key === "bleed") {
+    if (key === "stagger" || key === "bleed") {
       finalEffectName = key.charAt(0).toUpperCase() + key.slice(1);
     }
 

@@ -306,7 +306,7 @@ export async function universalAttackLogic({
       weapon,
       resolvedContext,
       doctrine.doctrineBleedBonus,
-      doctrine.doctrineStunBonus,
+      doctrine.doctrineStaggerBonus,
       weaponSkillEffect,
       critScore,
       critSuccess,
