@@ -280,7 +280,6 @@ export class ToSActiveEffect extends ActiveEffect {
 
     const actor = this.parent;
     if (!actor) return;
-
     const resolve = actor.system.secondaryAttributes.res?.total ?? 0;
 
     const roll = await new Roll(`${resolve * 10} - 1d100`).roll();

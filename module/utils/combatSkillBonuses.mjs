@@ -3,7 +3,8 @@ async function getSneakDamageFormula(actor, weapon, weaponContext = null) {
   const offProps = weaponContext ? getOffhandProps(weaponContext) : null;
   const offhandSneakDamage = offProps?.sneakDamage ?? 0;
   const useSneak = (await actor.getFlag("tos", "useSneakAttack")) || false;
-  if (!useSneak) return { sneakDamage: "", sneakEffect: 0, sneakCritRange: 0 };
+  if (!useSneak)
+    return { sneakDamage: "", sneakEffect: 0, sneakCritPenetration: 0 };
 
   let counter = (await actor.getFlag("tos", "sneakAccessCounter")) || 0;
   counter++;
@@ -18,11 +19,12 @@ async function getSneakDamageFormula(actor, weapon, weaponContext = null) {
   }
 
   let sneakEffect = 0;
-  let sneakCritRange = 0;
+  let sneakCritPenetration = 0;
   if (actor.type !== "npc") {
     const doctrineRogueLevel = actor.system.doctrines.rogue.value;
     if (doctrineRogueLevel >= 3) sneakEffect = 50;
-    if (doctrineRogueLevel >= 4) sneakCritRange = 2;
+    if (doctrineRogueLevel >= 4) sneakCritPenetration = 5;
+    if (doctrineRogueLevel >= 10) sneakCritPenetration = 10;
   }
   let sneakDamage = `${actor.system.sneakDamage ?? 1}d6 + ${offhandSneakDamage}`;
   if (ws.sneakDamage) {
@@ -32,7 +34,7 @@ async function getSneakDamageFormula(actor, weapon, weaponContext = null) {
   return {
     sneakDamage: ` + ${sneakDamage}`,
     sneakEffect,
-    sneakCritRange,
+    sneakCritPenetration,
   };
 }
 
@@ -609,7 +611,7 @@ export async function getCriticalRolls(
   const offProps = getOffhandProps(weaponContext);
   const failedAttack = attackRoll.total < 0 ? -5 : 0;
   const ws = weapon?.system ?? {};
-  const { sneakCritRange } = await getSneakDamageFormula(
+  const { sneakCritPenetration } = await getSneakDamageFormula(
     actor,
     weapon,
     weaponContext ?? null,
@@ -618,7 +620,6 @@ export async function getCriticalRolls(
     (ws.critRange ?? 0) +
       actor.system.critRangeMelee +
       doctrineCritRangeBonus +
-      sneakCritRange +
       (offProps?.critRange || 0) +
       failedAttack || 0;
   const critScoreRollFormula = `${critRange} + 1d20`;
@@ -645,11 +646,19 @@ export async function getCriticalRolls(
     critPenetrationMapping[critScore] +
       perBonus +
       actorCritBonus +
+      sneakCritPenetration +
       penetration +
+      (weapon.system.critPenetration || 0) +
       weaponSkillCritPen +
       doctrineSkillCritPen || 0;
+
   let critDamageTotal =
-    critBonusDamage + perBonus + actorCritBonus + damageTotal + doctrineCritDmg;
+    critBonusDamage +
+    perBonus +
+    actorCritBonus +
+    (weapon.system.critDamage || 0) +
+    damageTotal +
+    doctrineCritDmg;
 
   return {
     critScore,

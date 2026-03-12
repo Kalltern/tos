@@ -53,11 +53,6 @@ export class ToSActor extends Actor {
   prepareDerivedData() {
     const actorData = this;
     const systemData = actorData.system;
-    const tempHp = systemData.stats.temporaryHealth;
-    // Reset global penalties
-
-    tempHp.value = Number(tempHp.value) || 0;
-    tempHp.max = Number(tempHp.max) || 0;
 
     const flags = actorData.flags.tos || {};
 
@@ -153,7 +148,7 @@ export class ToSActor extends Actor {
     }
     for (let [key, stat] of Object.entries(systemData.stats)) {
       // Calculate the attribute rating using ToS rules.
-      stat.max = stat.base + (stat.bonus ?? 0);
+      stat.max = (stat.base ?? 0) + (stat.bonus ?? 0);
     }
 
     //Loop through skill groups and add their ratings depending on their level and attribute score
@@ -164,6 +159,7 @@ export class ToSActor extends Actor {
     const skillset5 = [0, 10, 20, 30, 40, 50]; //drinking
     const skillset6 = [0, 5, 10, 15, 20, 25]; //social
     const skillset7 = [0, 20, 30, 40, 50, 60]; //survival, meditation
+    const skillsetLeadership = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]; //survival, meditation
     const combatset1 = [0, 15, 20, 30, 35, 45, 50, 60, 65, 75, 80]; // combat + archery
     const channeling1 = [0, 20, 25, 30, 35, 45, 50, 55, 65, 70, 80];
     const channeling2 = [0, 16, 22, 28, 34, 40, 46, 52, 58, 64, 70];
@@ -209,7 +205,6 @@ export class ToSActor extends Actor {
 
           // Dodge penalty
           combatSkills.dodge.bonus += shield.system.dodgePenalty ?? 0;
-
           const dodgeLimit = systemData.dodgeLimit;
           dodgeLimit.total = dodgeLimit.value + dodgeLimit.bonus;
           // Initiative / speed penalties
@@ -293,7 +288,7 @@ export class ToSActor extends Actor {
             skill.bonus +
             globalMod;
         }
-        if (key === "seduction") {
+        if (key === "temptation") {
           skill.rating =
             skillset6[skill.value] +
             attributeScore[skill.id].total * 5 +
@@ -588,7 +583,7 @@ export class ToSActor extends Actor {
     stat.corruption.max = stat.corruption.base + stat.corruption.bonus;
     stat.fatigue.max = stat.fatigue.base + stat.fatigue.bonus;
 
-    // persuasion seduction deception intimidation insight ; shepherds will
+    // persuasion temptation deception intimidation insight ; shepherds will
     if (systemData.priest) {
       stat.holyEnergy.max =
         stat.holyEnergy.base +
@@ -633,6 +628,9 @@ export class ToSActor extends Actor {
       stat.stamina.base +
       2 * systemData.skills.athletics.value -
       5 * stat.fatigue.value;
+    // Calculate temporaryHealth
+    systemData.stats.temporaryHealth.max =
+      10 + systemData.stats.temporaryHealth.bonus;
 
     // Calculate mana
     if (systemData.magicPotential) {
@@ -884,7 +882,9 @@ export class ToSActor extends Actor {
     const stamina = systemData.stats.stamina;
     const holyEnergy = systemData.stats.holyEnergy;
     const mana = systemData.stats.mana;
-
+    const res = systemData.attributes.wil.value;
+    systemData.secondaryAttributes.res.total =
+      (+res + +systemData.secondaryAttributes.res.bonus) / 10;
     mana.value = Number(mana.value) || 0;
     mana.max = Number(mana.max) || 0;
 

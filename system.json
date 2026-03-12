@@ -14,6 +14,24 @@
       "paths": ["css", "lang", "templates"]
     }
   },
+  "relationships": {
+    "requires": [
+      {
+        "id": "barbrawl",
+        "type": "module",
+        "compatibility": {
+          "minimum": "1.8.13"
+        }
+      },
+      {
+        "id": "statuscounter",
+        "type": "module",
+        "compatibility": {
+          "minimum": "3.0.4"
+        }
+      }
+    ]
+  },
   "url": "Replace this with a link to your public repository",
   "license": "LICENSE.txt",
   "readme": "README.md",

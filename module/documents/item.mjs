@@ -88,7 +88,14 @@ export class ToSItem extends Item {
       if (this.type === "spell" || this.type === "ability") {
         this.system.resourceOptions = {
           modes: ["add", "drain"],
-          types: ["Health", "Stamina", "Mana", "Toxicity", "Corruption"],
+          types: [
+            "Health",
+            "Stamina",
+            "Mana",
+            "Toxicity",
+            "Corruption",
+            "TemporaryHealth",
+          ],
         };
       }
     }

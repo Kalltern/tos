@@ -1372,3 +1372,186 @@ Hooks.once("ready", () => {
     }
   });
 });
+
+// Bar brawl integration, first three bars 0-2 are reserved for ingame customisation
+Hooks.on("preCreateToken", function (document, data) {
+  const actor = document.actor;
+  if (!actor) return;
+  document.updateSource({
+    "flags.barbrawl.resourceBars": {
+      bar4: {
+        order: 3,
+        id: "bar4",
+        attribute: "stats.health",
+        mincolor: "#3e1e1e",
+        maxcolor: "#a80000",
+        position: "bottom-outer",
+        otherVisibility: 0,
+        ownerVisibility: 50,
+        gmVisibility: -1,
+        hideFull: false,
+        hideEmpty: false,
+        hideCombat: false,
+        hideNoCombat: false,
+        hideHud: false,
+        indentLeft: null,
+        indentRight: null,
+        shareHeight: false,
+        style: "user",
+        label: "",
+        invert: false,
+        invertDirection: false,
+        subdivisions: null,
+        subdivisionsOwner: false,
+        fgImage: "",
+        bgImage: "",
+        opacity: null,
+      },
+      bar5: {
+        order: 4,
+        id: "bar5",
+        attribute: "stats.stamina",
+        mincolor: "#a3a3a3",
+        maxcolor: "#e6d200",
+        position: "bottom-inner",
+        otherVisibility: 0,
+        ownerVisibility: 50,
+        gmVisibility: -1,
+        hideFull: true,
+        hideEmpty: false,
+        hideCombat: false,
+        hideNoCombat: false,
+        hideHud: false,
+        indentLeft: null,
+        indentRight: 50,
+        shareHeight: true,
+        style: "user",
+        label: "",
+        invert: false,
+        invertDirection: false,
+        subdivisions: null,
+        subdivisionsOwner: false,
+        fgImage: "",
+        bgImage: "",
+        opacity: null,
+      },
+      bar6: {
+        order: 5,
+        id: "bar6",
+        attribute: "stats.toxicity",
+        mincolor: "#83ff7a",
+        maxcolor: "#2e9900",
+        position: "bottom-inner",
+        otherVisibility: 0,
+        ownerVisibility: 50,
+        gmVisibility: -1,
+        hideFull: false,
+        hideEmpty: true,
+        hideCombat: false,
+        hideNoCombat: false,
+        hideHud: false,
+        indentLeft: 50,
+        indentRight: null,
+        shareHeight: true,
+        style: "user",
+        label: "",
+        invert: false,
+        invertDirection: false,
+        subdivisions: null,
+        subdivisionsOwner: false,
+        fgImage: "",
+        bgImage: "",
+        opacity: null,
+      },
+      bar7: {
+        order: 6,
+        id: "bar7",
+        attribute: "stats.temporaryHealth",
+        mincolor: "#C8C8C8",
+        maxcolor: "#C8C8C8",
+        position: "top-inner",
+        otherVisibility: 0,
+        ownerVisibility: 50,
+        gmVisibility: -1,
+        hideFull: false,
+        hideEmpty: true,
+        hideCombat: false,
+        hideNoCombat: false,
+        hideHud: false,
+        indentLeft: 25,
+        indentRight: 25,
+        shareHeight: true,
+        style: "user",
+        label: "",
+        invert: false,
+        invertDirection: false,
+        subdivisions: null,
+        subdivisionsOwner: false,
+        fgImage: "",
+        bgImage: "",
+        opacity: null,
+      },
+    },
+  });
+
+  if (actor.system.magicPotential) {
+    document.updateSource({
+      "flags.barbrawl.resourceBars": {
+        bar8: {
+          order: 7,
+          id: "bar8",
+          attribute: "stats.mana",
+          mincolor: "#001547",
+          maxcolor: "#004ddd",
+          position: "bottom-outer",
+          otherVisibility: 0,
+          ownerVisibility: 50,
+          gmVisibility: -1,
+          hideFull: false,
+          hideEmpty: false,
+          hideCombat: false,
+          hideNoCombat: false,
+          hideHud: false,
+          indentLeft: null,
+          indentRight: null,
+          shareHeight: false,
+          style: "user",
+          label: "",
+          invert: false,
+          invertDirection: false,
+          subdivisions: null,
+          subdivisionsOwner: false,
+          fgImage: "",
+          bgImage: "",
+          opacity: null,
+        },
+      },
+    });
+  }
+});
+// seduction to temptation conversion and removal of seduction
+Hooks.once("ready", async () => {
+  for (let actor of game.actors) {
+    const seduction = actor.system.skills?.seduction;
+    const temptation = actor.system.skills?.temptation;
+
+    if (seduction && !temptation) {
+      await actor.update({
+        "system.skills.temptation": seduction,
+        "system.skills.-=seduction": null,
+      });
+    }
+  }
+});
+Hooks.once("ready", async () => {
+  for (const actor of game.actors) {
+    const seduction = actor.system.skills?.seduction;
+
+    if (seduction) {
+      await actor.update({
+        "system.skills.temptation": seduction,
+        "system.skills.-=seduction": null,
+      });
+    }
+  }
+});

@@ -130,16 +130,16 @@
         "shepherdOptions": [
           "persuasion",
           "deception",
-          "seduction",
+          "temptation",
           "intimidation",
           "insight"
         ]
       },
 
-      "day": false,
       "healthBonus": 0,
       "sneakDamageBonus": 0,
       "critDamage": 0,
+      "critPenetration": 0,
       "critRangeMelee": 0,
       "critRangeRanged": 0,
       "critRangeCast": 0,
@@ -683,7 +683,7 @@
           "visible": true,
           "bonus": 0
         },
-        "seduction": {
+        "temptation": {
           "value": 0,
           "rating": 0,
           "critbonus": 0,
@@ -1014,6 +1014,10 @@
           "value": 0,
           "bonus": 0,
           "total": 0
+        },
+        "res": {
+          "bonus": 0,
+          "total": 0
         }
       },
       "effects": {
@@ -1181,6 +1185,8 @@
       "critFail": 0,
       "critDefense": 0,
       "critDodge": 0,
+      "critDamage": 0,
+      "critPenetration": 0,
       "dodge": 0,
       "offhandProperties": {
         "diceBonus": "",
