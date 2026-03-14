@@ -473,6 +473,30 @@ export async function getAttackRolls(
     if (abilityAttack) {
       attackRollFormula = `@combatSkills.archery.rating + ${totalWeaponAttack} + ${abilityAttack} - 1d100`;
     }
+  } else if (ws.thrown) {
+    const knifeMasterCrit = knifeMasterCheck(actor, weapon) ? 2 : 0;
+    criticalSuccessThreshold =
+      actor.system.combatSkills.combat.criticalSuccessThreshold +
+      (ws.critChance ?? 0) +
+      knifeMasterCrit +
+      doctrineCritBonus +
+      (weaponSkillCrit ?? 0);
+    criticalFailureThreshold =
+      actor.system.combatSkills.combat.criticalFailureThreshold -
+      (ws.critFail ?? 0) -
+      customCritFail;
+    // ATTACK ROLL
+    console.log("Aim value", aimValue);
+    attackRollFormula =
+      finesse > normalCombat && ws.finesse
+        ? `@combatSkills.throwing.finesseRating + ${totalWeaponAttack} - 1d100`
+        : `@combatSkills.throwing.rating + ${totalWeaponAttack} - 1d100`;
+    if (abilityAttack) {
+      attackRollFormula =
+        finesse > normalCombat && ws.finesse
+          ? `@combatSkills.throwing.finesseRating + ${totalWeaponAttack} + ${abilityAttack} - 1d100`
+          : `@combatSkills.throwing.rating + ${totalWeaponAttack} + ${abilityAttack} - 1d100`;
+    }
   } else {
     criticalSuccessThreshold =
       actor.system.combatSkills.combat.criticalSuccessThreshold +
@@ -556,6 +580,19 @@ export async function getDamageRolls(
   if (sneakDamage) damageFormula += `+ ${sneakDamage}`;
   if (abilityDamage) damageFormula += `+ ${abilityDamage}`;
   if (actorMods) damageFormula += `+ ${actorMods.damageBonus}`;
+  if (qualifiesForFreehand(actor, weapon)) {
+    const freehandDice = getFreehandDice(actor);
+
+    if (freehandDice > 0) {
+      damageFormula += ` + ${freehandDice}d6`;
+    }
+  }
+  if (knifeMasterCheck(actor, weapon)) {
+    damageFormula += ` + (1d4 + 1)`;
+  }
+  for (const roll of actorMods.damageRolls) {
+    damageFormula += ` + ${roll}`;
+  }
   damageFormula += ")";
   damageFormula = damageFormula.replace(/\s*\+\s*$/, "");
   damageFormula = damageFormula.replace(/@([\w.]+)/g, (_, key) => {
@@ -617,7 +654,7 @@ export async function getCriticalRolls(
     weaponContext ?? null,
   );
   let actorCritRange;
-  if (ws.class === "crossbow" || ws === "bow" || ws.thrown) {
+  if (ws.class === "crossbow" || ws.class === "bow" || ws.thrown) {
     actorCritRange = actor.system.critRangeRanged;
   } else {
     actorCritRange = actor.system.critRangeMelee;
@@ -648,11 +685,25 @@ export async function getCriticalRolls(
   const critBonusDamage =
     critDamageMapping[critScore] + weaponSkillCritDmg || 0;
   const actorCritBonus = Number(actor.system.critDamage) || 0;
+  const weaponDamageTypes = [ws.dmgType1, ws.dmgType2, ws.dmgType3, ws.dmgType4]
+    .filter((e) => typeof e === "string")
+    .map((e) => e.toLowerCase());
+  let deadlyLungeBonus = 0;
+  if (actor.system.deadlyLunge) {
+    // Not allowed for thrown weapons
+    if (ws.thrown) return;
+    // Not allowed for bows/crossbows
+    if (["crossbow", "bow"].includes(ws.class)) return;
+    if (weaponDamageTypes.includes("piercing")) {
+      deadlyLungeBonus = 5;
+    }
+  }
   const critBonusPenetration =
     critPenetrationMapping[critScore] +
       perBonus +
       actorCritBonus +
       sneakCritPenetration +
+      deadlyLungeBonus +
       penetration +
       (weapon.system.critPenetration || 0) +
       weaponSkillCritPen +
@@ -660,6 +711,7 @@ export async function getCriticalRolls(
 
   let critDamageTotal =
     critBonusDamage +
+    deadlyLungeBonus +
     perBonus +
     actorCritBonus +
     (weapon.system.critDamage || 0) +
@@ -706,8 +758,17 @@ export async function getEffectRolls(
 
   const mechanicalEffects = {};
   let totalBleedChance = 0;
+
   let bleedRollResult = null;
   const ws = weapon?.system ?? {};
+  let deepSlash =
+    critSuccess &&
+    actor.system.deepSlash &&
+    ws.type === "light" &&
+    ws.dmgType2 === "slash" &&
+    (qualifiesForFreehand || shieldEquipped(actor))
+      ? 100
+      : 0;
   const { sneakEffect } = await getSneakDamageFormula(
     actor,
     weapon,
@@ -932,6 +993,7 @@ export async function getEffectRolls(
 
     totalBleedChance =
       (weaponEffects.bleed || 0) +
+      deepSlash +
       actorBleed +
       abilityBleed +
       weaponSkillEffect +
@@ -1136,11 +1198,15 @@ function buildDamageProfile(systemData) {
   return { expression: raw };
 }
 
-export function getActorCombatModifiers(actor) {
+export function getActorCombatModifiers(actor, weapon = null) {
   const effects = actor.system.activeCombatEffects ?? {};
+  const ws = weapon?.system ?? {};
+  const isArchery = ws.class === "bow" || ws.class === "crossbow";
+  const isMelee = !isArchery;
 
   let result = {
     damageBonus: 0,
+    damageRolls: [],
     penetrationBonus: 0,
     damageTypeMode: null,
     damageTypes: [],
@@ -1148,11 +1214,25 @@ export function getActorCombatModifiers(actor) {
   };
 
   for (const group of Object.values(effects)) {
-    // 🔥 CRITICAL FIX
     if (!group) continue;
 
     result.damageBonus += group.damageBonus ?? 0;
+    if (group.damageRoll) {
+      result.damageRolls.push(group.damageRoll);
+    }
+
+    // Universal penetration
     result.penetrationBonus += group.penetrationBonus ?? 0;
+
+    // Melee-only penetration
+    if (isMelee) {
+      result.penetrationBonus += group.meleePenetrationBonus ?? 0;
+    }
+
+    // Ranged-only penetration
+    if (isArchery) {
+      result.penetrationBonus += group.rangedPenetrationBonus ?? 0;
+    }
 
     if (group.damageTypes?.length) {
       result.damageTypes.push(...group.damageTypes);
@@ -1167,4 +1247,66 @@ export function getActorCombatModifiers(actor) {
   }
 
   return result;
+}
+
+function getFreehandDice(actor) {
+  const freehand = actor.system.freehand ?? {};
+
+  let dice = 0;
+
+  for (const value of Object.values(freehand)) {
+    if (value === true) dice++;
+  }
+
+  return dice;
+}
+
+function qualifiesForFreehand(actor, weapon) {
+  const combatData = actor.system.combat;
+  const activeSetId = combatData?.activeWeaponSet;
+
+  if (!activeSetId) return false;
+
+  const activeSet = combatData.weaponSets?.[activeSetId];
+  if (!activeSet) return false;
+
+  // Offhand must be empty
+  if (activeSet.off) return false;
+
+  const ws = weapon?.system ?? {};
+
+  // Two-handed weapons do NOT qualify
+  if (ws.type === "heavy") return false;
+
+  // Two-hand grip also blocks the bonus
+  if (ws.gripMode === "two") return false;
+
+  // No thrown weapons
+  if (ws.thrown) return false;
+  // bows and crossbows blocked too
+  if (["crossbow", "bow"].includes(weapon?.system.class)) return false;
+
+  return true;
+}
+
+function shieldEquipped(actor) {
+  const combatData = actor.system.combat;
+  const activeSetId = combatData?.activeWeaponSet;
+  if (!activeSetId) return false;
+
+  const activeSet = combatData.weaponSets?.[activeSetId];
+  const offHandId = activeSet?.off;
+  if (!offHandId) return false;
+
+  const offHand = actor.items.get(offHandId);
+  return !!offHand?.system?.shield;
+}
+function knifeMasterCheck(actor, weapon) {
+  const ws = weapon?.system ?? {};
+
+  return (
+    ws.thrown === true &&
+    ws.class === "sword" &&
+    actor.system.knifemaster === true
+  );
 }

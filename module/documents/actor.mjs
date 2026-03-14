@@ -647,8 +647,13 @@ export class ToSActor extends Actor {
     systemData.detection = per + systemData.skills.traps.value * 2;
 
     // Calculate Health, systemData.healthBonus comes from Armor
+    const ironMuscles = systemData.ironMuscles ? str : 0;
     systemData.stats.health.max =
-      end * attribute.end.rank + stat.health.base + stat.health.bonus + str;
+      end * attribute.end.rank +
+      stat.health.base +
+      stat.health.bonus +
+      str +
+      ironMuscles;
 
     // Calculate toxicity
     systemData.stats.toxicity.max =

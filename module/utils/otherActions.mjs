@@ -11,6 +11,12 @@ export async function delayTurn() {
     return;
   }
 
+  if (token.actor.system.hasty) {
+    ui.notifications.warn(
+      "Hasty people cannot delay their Turn Order under any circumstances.",
+    );
+    return;
+  }
   const combatant = combat.getCombatantByToken(token.id);
   if (!combatant) {
     ui.notifications.warn("Token not in combat.");
@@ -222,37 +228,40 @@ export async function firstAid() {
 
   let actor = selectedToken.actor.system;
   let firstAidData = actor.skills.firstAid;
+  let healbonus = "";
+
+  if (actor.feldsher2) healbonus = "+2d6";
+  else if (actor.feldsher1) healbonus = "+1d6";
 
   const firstAidRoll = new Roll(`@skills.firstAid.rating - 1d100`, actor);
   await firstAidRoll.evaluate({ async: true });
 
   const d100 = firstAidRoll.dice[0]?.total;
-  const critFail = firstAidData.criticalFailureThreshold;
-  const critSuccess = firstAidData.criticalSuccessThreshold;
+  const criticalFailureThreshold = firstAidData.criticalFailureThreshold;
+  const criticalSuccessThreshold = firstAidData.criticalSuccessThreshold;
+  console.log("feldsher", healbonus);
+  const bonus = healbonus ? `${healbonus}` : "";
 
   let critStatus = "";
+  let rollName = "firstAid";
   let healRoll = null;
 
-  if (d100 >= critFail) {
+  if (d100 >= criticalFailureThreshold) {
     critStatus =
       "<strong style='color: red;'>Critical Failure! Injury caused!</strong>";
-    healRoll = new Roll("2d4");
-    Math.floor(healRoll);
-    await healRoll.evaluate({ async: true });
-  } else if (d100 <= critSuccess || firstAidRoll.total >= 60) {
+
+    healRoll = new Roll(`2d4${bonus}`);
+  } else if (d100 <= criticalSuccessThreshold || firstAidRoll.total >= 60) {
     critStatus = "<strong style='color: green;'>Critical Success!</strong>";
-    healRoll = new Roll("(3d6+3)*2");
-    Math.floor(healRoll);
-    await healRoll.evaluate({ async: true });
+
+    healRoll = new Roll(`(3d6+3${bonus})*2`);
   } else if (firstAidRoll.total >= 25) {
-    healRoll = new Roll("(3d6+3)*1.5");
-    Math.floor(healRoll);
-    await healRoll.evaluate({ async: true });
+    healRoll = new Roll(`(3d6+3${bonus})*1.5`);
   } else {
-    healRoll = new Roll("3d6+3");
-    Math.floor(healRoll);
-    await healRoll.evaluate({ async: true });
+    healRoll = new Roll(`3d6+3${bonus}`);
   }
+
+  await healRoll.evaluate({ async: true });
 
   const iconUrl = "icons/magic/life/cross-yellow-green.webp";
 
@@ -269,6 +278,13 @@ export async function firstAid() {
   </div>
 </div>
   `,
+    flags: {
+      tos: {
+        rollName,
+        criticalSuccessThreshold,
+        criticalFailureThreshold,
+      },
+    },
     rolls: healRoll ? [firstAidRoll, healRoll] : [firstAidRoll],
     type: CONST.CHAT_MESSAGE_TYPES.ROLL,
   });

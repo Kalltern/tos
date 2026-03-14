@@ -492,6 +492,24 @@ TOS.effectDefinitions = {
     name: "Defensive stance",
     img: "icons/skills/melee/shield-block-gray-yellow.webp",
     statuses: ["defensive_stance"],
+    triggers: {
+      onRoundStart: {
+        formula: "1",
+        target: "system.stats.stamina.value",
+      },
+    },
+    changes: [
+      {
+        key: "system.combatSkills.meleeDefense.bonus",
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: 20,
+      },
+      {
+        key: "system.combatSkills.rangedDefense.bonus",
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: 10,
+      },
+    ],
   },
 
   guard: {
