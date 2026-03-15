@@ -629,7 +629,7 @@ export async function finalizeRollsAndPostChat(
   const damageRoll = new Roll(damageFormula, actor.system);
   await damageRoll.evaluate();
   // Add the flat damage bonus from Function 3
-  const damageTotal = damageRoll.total + damageBonus;
+  const damageTotal = Math.floor(damageRoll.total + damageBonus);
 
   // --- EFFECT ROLLS ---
   const spellEffects = foundry.utils.deepClone(spell.system.effects || {});
@@ -936,4 +936,25 @@ export async function finalizeRollsAndPostChat(
       ...(effectsFlag && { effects: effectsFlag }),
     },
   });
+
+  if (critFailure && spell.system.type) {
+    const table = game.tables.find(
+      (t) => t.getFlag("tos", "critTable") === spell.system.type,
+    );
+
+    if (table) {
+      const rankModifier = {
+        wild: -10,
+        apprentice: -2,
+        expert: 2,
+        master: 4,
+        grandmaster: 5,
+      };
+      const modifier = rankModifier[spell.system.rank] ?? 0;
+      const formula = `1d23 + ${modifier}`;
+      const roll = await new Roll(formula).evaluate();
+      await table.draw({ roll });
+    }
+  }
+  //tables -> Flag: "tos.critTable: fire"
 }

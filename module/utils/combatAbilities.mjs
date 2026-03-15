@@ -692,6 +692,7 @@ export async function combatAbilities() {
   </div>
 
 ${critHTML}
+</div>
 `;
 
     await ChatMessage.create({
@@ -727,14 +728,14 @@ ${critHTML}
 <p style="text-align:center; font-size:20px;">
   <b>${critSuccess ? "Critical Success!" : critFailure ? "Critical Failure!" : ""}</b>
 </p>
-${damageLine}
-<hr>
 <table style="width:100%; text-align:center; font-size:15px;">
   <tr><th>Effects</th></tr>
   <tr>
     <td><b>${allBleedRollResults}</b> ${effectsRollResults}</td>
   </tr>
 </table>
+<hr>
+${damageLine}
 <hr>
 `,
       flags: {

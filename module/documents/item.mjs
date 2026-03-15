@@ -106,7 +106,8 @@ export class ToSItem extends Item {
     }
 
     if (this.system.roll) {
-      const { diceNum, diceSize, diceBonus } = this.system.roll;
+      const { diceNum, diceSize } = this.system.roll;
+      const diceBonus = Math.floor(this.system.roll.diceBonus ?? 0);
 
       let formula = "";
 
