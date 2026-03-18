@@ -1,9 +1,8 @@
 export async function attackActions() {
-  const actor = canvas.tokens.controlled[0]?.actor;
-  if (!actor) {
-    ui.notifications.warn("No actor selected.");
-    return;
-  }
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
+
+  const { actor, token } = context;
 
   const hasThrownWeapon = actor.items.some(
     (i) => i.type === "weapon" && i.system.thrown === true,
@@ -123,6 +122,8 @@ export async function attackActions() {
 
         // ─── Execute Attack ───
         await game.tos[fnName]({
+          actor,
+          token,
           selectedModifiers,
         });
       },
@@ -243,8 +244,10 @@ function resolveActiveWeaponForAttack(actor, attackType) {
 }
 
 export async function autoAttack(options = {}) {
-  const actor = canvas.tokens.controlled[0]?.actor;
+  const actor = options.actor ?? canvas.tokens.controlled[0]?.actor;
   if (!actor) return;
+
+  const token = options.token ?? canvas.tokens.controlled[0] ?? null;
 
   //
   //  Pre-resolved context branch

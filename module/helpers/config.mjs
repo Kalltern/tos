@@ -85,7 +85,8 @@ TOS.effectDefinitions = {
     name: "Staggered",
     img: "icons/svg/daze.svg",
     statuses: ["stagger"],
-    defaultTurns: 1,
+    defaultTurns: 2,
+    useDuration: true,
     changes: [
       {
         key: "system.globalBonus",
@@ -212,6 +213,7 @@ TOS.effectDefinitions = {
     img: "icons/magic/movement/chevrons-down-yellow.webp",
     statuses: ["slow"],
     defaultTurns: 3,
+    useDuration: true,
     changes: [
       {
         key: "system.secondaryAttributes.spd.total",
@@ -254,7 +256,6 @@ TOS.effectDefinitions = {
     name: "Root",
     img: "icons/magic/nature/root-vine-entwined-thorns.webp",
     statuses: ["root"],
-    defaultTurns: 3,
     changes: [
       {
         key: "system.secondaryAttributes.spd.total",
@@ -324,7 +325,9 @@ TOS.effectDefinitions = {
     name: "Poison",
     img: "icons/magic/acid/dissolve-drip-droplet-smoke.webp",
     statuses: ["poison"],
-    defaultTurns: 3,
+    defaultRounds: 3,
+    useDuration: true,
+    maxStacks: 3,
     triggers: {
       onApply: {
         formula: "2d6",
@@ -367,6 +370,7 @@ TOS.effectDefinitions = {
     statuses: ["fear"],
     defaultRounds: 3,
     maxStacks: 99,
+    useDuration: false,
     triggers: {
       onApply: {
         custom: "fearTest",
@@ -388,6 +392,7 @@ TOS.effectDefinitions = {
     img: "icons/magic/movement/abstract-ribbons-red-orange.webp",
     statuses: ["stun"],
     defaultTurns: 2,
+    useDuration: true,
     changes: [
       {
         key: "system.globalBonus",
@@ -596,6 +601,7 @@ TOS.effectDefinitions = {
       onRoundStart: {
         formula: "1",
         target: "system.stats.stamina.value",
+        custom: "staminaDrain",
       },
     },
     changes: [
@@ -617,6 +623,28 @@ TOS.effectDefinitions = {
     img: "icons/skills/melee/shield-block-gray-yellow.webp",
     statuses: ["guard"],
     defaultTurns: 1,
+    useDuration: true,
+  },
+
+  stone_skin: {
+    name: "Stone Skin",
+    img: "icons/magic/defensive/armor-stone-skin.webp",
+    statuses: ["stone_skin"],
+    changes: [
+      {
+        key: "system.armor.natural.bonus",
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: 0,
+      },
+      {
+        key: "system.dodge.limit.bonus",
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: 0, // dynamic negative penalty
+      },
+    ],
+    triggers: {
+      onApply: { custom: "stoneSkinUpdate" },
+    },
   },
 
   channeling: {
@@ -627,6 +655,25 @@ TOS.effectDefinitions = {
     triggers: {
       onRoundStart: {
         custom: "channelingDrain",
+      },
+    },
+  },
+
+  // Wild magic spells DoTs
+
+  iceStrike: {
+    name: "Ice Strike",
+    img: "icons/magic/lightning/orb-ball-spiral-blue.webp",
+    statuses: ["iceStrike"],
+
+    triggers: {
+      onApply: {
+        formula: "icestrikeDamage",
+        target: "system.stats.health.value",
+      },
+      onRoundStart: {
+        formula: "icestrikeDamage",
+        target: "system.stats.health.value",
       },
     },
   },

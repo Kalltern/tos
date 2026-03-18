@@ -1,12 +1,9 @@
 export async function defenseRoll({ actor, weapon, ability = null } = {}) {
-  const selectedToken = canvas.tokens.controlled[0];
-
   if (!actor) {
-    if (!selectedToken) {
-      ui.notifications.warn("Please select a token.");
-      return;
-    }
-    actor = selectedToken.actor;
+    const context = game.tos.selectToken();
+    if (!context) return;
+
+    actor = context.actor;
   }
 
   const hasGuard = actor.effects.some(

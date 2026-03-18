@@ -330,7 +330,8 @@ prose-mirror {
   position: relative;
   background:
     linear-gradient(to bottom, rgba(30, 25, 20, 0.6), rgba(10, 10, 10, 0.6)),
-    url(headertextureTest7.JPG);
+    url(../ui/headertexture.jpg);
+
   padding: 10px;
   border-right: 1px solid rgba(200, 170, 90, 0.35);
   box-shadow: inset -10px 0 20px rgba(0, 0, 0, 0.6);
@@ -392,7 +393,7 @@ prose-mirror {
       rgba(60, 60, 60, 0.2) 10%,
       rgb(12 12 11 / 71%) 80%
     ),
-    url("headertextureTest7.JPG");
+    url(../ui/headertexture.jpg);
 }
 
 .tos .sheet-header-item .header-fields {
@@ -422,7 +423,7 @@ prose-mirror {
       rgba(60, 60, 60, 0.2) 10%,
       rgb(12 12 11 / 71%) 80%
     ),
-    url("headertextureTest7.JPG");
+    url(../ui/headertexture.jpg);
 }
 .tos .sheet-npc-header {
   min-height: 460px;

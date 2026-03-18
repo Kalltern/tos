@@ -4,9 +4,10 @@ export async function combatAbilities() {
   // ====================================================================
   let lockedMultiAttackAbility = null;
   let multiAttackCount = 1;
-  const selectedToken = canvas.tokens.controlled[0];
-  if (!selectedToken) return ui.notifications.warn("Please select a token.");
-  const actor = selectedToken.actor;
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
+
+  const { actor, token } = context;
 
   // Collect all relevant abilities: (type: ability) AND (type: melee OR class: defense)
   const allAbilities = actor.items.filter((i) => i.type === "ability");

@@ -34,6 +34,11 @@
           data-dtype="String"
         />
          </div>
+                   <div class="grid-span-1">
+            <label class="resource-label">{{localize "TOS.Item.Spells.FIELDS.sustained.label"}}</label>
+            <input type="checkbox" name="system.sustained" {{#if system.sustained}}checked{{/if}} />
+          </div>
+
 {{#if (eq item.system.option "magic")}}
         <div class="grid-span-1">
           <label for="spell-class">Class:</label>

@@ -5,11 +5,10 @@ export async function delayTurn() {
     return;
   }
 
-  const token = canvas.tokens.controlled[0];
-  if (!token) {
-    ui.notifications.warn("Select your token.");
-    return;
-  }
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
+
+  const { actor, token } = context;
 
   if (token.actor.system.hasty) {
     ui.notifications.warn(
@@ -112,13 +111,10 @@ export async function delayTurn() {
 
 export async function restAndRecover() {
   // Ensure a token is selected
-  const token = canvas.tokens.controlled[0];
-  if (!token || !token.actor) {
-    ui.notifications.error("Please select a token first.");
-    return;
-  }
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
 
-  const actor = token.actor;
+  const { actor, token } = context;
 
   // Increase stamina
   const stamina = actor.system.stats.stamina.value ?? 0;
@@ -152,13 +148,10 @@ export async function restAndRecover() {
 
 export async function longRest() {
   // Ensure a token is selected
-  const token = canvas.tokens.controlled[0];
-  if (!token || !token.actor) {
-    ui.notifications.error("Please select a token first.");
-    return;
-  }
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
 
-  const actor = token.actor;
+  const { actor, token } = context;
   const system = actor.system;
 
   // ─── Stamina ───
@@ -220,25 +213,24 @@ export async function longRest() {
 }
 
 export async function firstAid() {
-  const selectedToken = canvas.tokens.controlled[0];
-  if (!selectedToken) {
-    ui.notifications.warn("Please select a token.");
-    return;
-  }
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
 
-  let actor = selectedToken.actor.system;
-  let firstAidData = actor.skills.firstAid;
+  const { actor, token } = context;
+  let firstAidData = actor.system.skills.firstAid;
   let healbonus = "";
 
-  if (actor.feldsher2) healbonus = "+2d6";
-  else if (actor.feldsher1) healbonus = "+1d6";
+  if (actor.system.feldsher2) healbonus = "+2d6";
+  else if (actor.system.feldsher1) healbonus = "+1d6";
 
-  const firstAidRoll = new Roll(`@skills.firstAid.rating - 1d100`, actor);
+  const firstAidRoll = new Roll(
+    `@skills.firstAid.rating - 1d100`,
+    actor.getRollData(),
+  );
   await firstAidRoll.evaluate({ async: true });
 
   const d100 = firstAidRoll.dice[0]?.total;
-  const criticalFailureThreshold = firstAidData.criticalFailureThreshold;
-  const criticalSuccessThreshold = firstAidData.criticalSuccessThreshold;
+  const { criticalFailureThreshold, criticalSuccessThreshold } = firstAidData;
   console.log("feldsher", healbonus);
   const bonus = healbonus ? `${healbonus}` : "";
 
@@ -266,7 +258,10 @@ export async function firstAid() {
   const iconUrl = "icons/magic/life/cross-yellow-green.webp";
 
   ChatMessage.create({
-    speaker: ChatMessage.getSpeaker({ actor: selectedToken.actor }),
+    speaker: ChatMessage.getSpeaker({
+      actor,
+      token: token?.document,
+    }),
     flavor: `
 <div style="display:flex; align-items:center; gap:10px;">
   <img src="${iconUrl}" width="36" height="36" style="border-radius:50%;" />

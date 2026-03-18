@@ -464,19 +464,6 @@ export function calculateAttackBonuses(actor, spell) {
         if (bonus) applyEffect(effectModifiers, schoolEffects.air, bonus);
       }
     }
-
-    console.log("Fire perk debug:", {
-      improvedBurn: actor.system.effects?.fire?.improvedBurn,
-      school: spell.system.type,
-      damageTypes: [
-        spell.system.damageType1,
-        spell.system.damageType2,
-        spell.system.damageType3,
-        spell.system.damageType4,
-      ],
-      rank: spell.system.rank,
-      isOffensive: spell.system.isOffensive,
-    });
   }
 
   // --- Future Addon Example: "Focus" Trait ---
@@ -585,7 +572,12 @@ export async function finalizeRollsAndPostChat(
   attackResults,
   options = {},
 ) {
-  const { ignoreChanneling = false, maintainChanneling = false } = options;
+  const {
+    ignoreChanneling = false,
+    maintainChanneling = false,
+    fromChanneling = false,
+    focusSpent = 0,
+  } = options;
   const {
     attackRoll,
     critSuccess,
@@ -673,7 +665,9 @@ export async function finalizeRollsAndPostChat(
   const damageRoll = new Roll(damageFormula, actor.system);
   await damageRoll.evaluate();
   // Add the flat damage bonus from Function 3
+
   const damageTotal = Math.floor(damageRoll.total + damageBonus);
+  damageRoll._total = damageTotal;
 
   // --- EFFECT ROLLS ---
   const spellEffects = foundry.utils.deepClone(spell.system.effects || {});
@@ -695,64 +689,59 @@ export async function finalizeRollsAndPostChat(
     Object.entries(actorEffects).map(([k, v]) => [k.toLowerCase(), v]),
   );
 
-  for (const [key, effectValue] of Object.entries(spellEffects)) {
-    // 0 = ignore completely
-    if (effectValue === 0 && !(key in perkEffects)) continue;
+  const aggregatedEffects = {};
 
+  for (const [key, effectValue] of Object.entries(spellEffects)) {
     let finalEffectName = "";
 
-    // 1. Handle Built-in Effects
     const builtinEffects = ["burn", "slow", "stagger", "bleed"];
-    if (builtinEffects.includes(key)) {
-      finalEffectName = key.charAt(0).toUpperCase() + key.slice(1);
-    }
 
-    // 2. Handle Customizable Slots
-    else if (key.startsWith("extra")) {
+    if (builtinEffects.includes(key)) {
+      finalEffectName = key.toLowerCase();
+    } else if (key.startsWith("extra")) {
       const index = key.replace("extra", "");
       const typeValue = spell.system[`effectType${index}`] || "";
 
       if (typeValue.toLowerCase() === "custom") {
         finalEffectName =
-          spell.system.effects[`effectName${index}`] || `Custom ${index}`;
+          spell.system.effects[`effectName${index}`] || `custom${index}`;
       } else {
-        finalEffectName = typeValue;
+        finalEffectName = typeValue.toLowerCase();
       }
     }
 
-    if (!finalEffectName || key.startsWith("effectName")) continue;
+    if (!finalEffectName) continue;
 
-    const actorBonus =
-      normalizedActorEffects[finalEffectName.toLowerCase()] || 0;
+    // ONLY base values here
+    aggregatedEffects[finalEffectName] =
+      (aggregatedEffects[finalEffectName] || 0) + effectValue;
+  }
 
-    const bonusModifier = effectModifiers?.[finalEffectName.toLowerCase()] || 0;
-    console.log("Effect bonuses:", effectModifiers);
-    const totalEffectValue = effectValue + actorBonus + bonusModifier;
+  for (const [effectName, baseValue] of Object.entries(aggregatedEffects)) {
+    const actorBonus = normalizedActorEffects[effectName] || 0;
+    const bonusModifier = effectModifiers?.[effectName] || 0;
 
-    // ----------------------------------
-    // AUTO SUCCESS (-1 sentinel)
-    // ----------------------------------
-    if (effectValue === -1) {
+    const totalEffectValue = baseValue + actorBonus + bonusModifier;
+
+    // --- AUTO SUCCESS CASE ---
+    if (totalEffectValue === -1) {
       effectsRollResults += `
-      <p><b>${finalEffectName}:</b></p>
-    `;
+    <p><b>|${effectName}|</b></p>
+  `;
 
-      mechanicalEffects[finalEffectName.toLowerCase()] = {
-        chance: null,
+      mechanicalEffects[effectName] = {
+        chance: -1,
         roll: null,
+        auto: true,
       };
 
       continue;
     }
 
-    // ----------------------------------
-    // Skip if final chance <= 0
-    // ----------------------------------
+    // --- NORMAL SKIP ---
     if (totalEffectValue <= 0) continue;
 
-    // ----------------------------------
-    // Normal roll resolution
-    // ----------------------------------
+    // --- NORMAL ROLL ---
     const d100Roll = new Roll("1d100");
     await d100Roll.evaluate();
 
@@ -760,11 +749,11 @@ export async function finalizeRollsAndPostChat(
     const successText = rollValue <= totalEffectValue ? " SUCCESS" : "";
 
     effectsRollResults += `
-    <p><b>|${finalEffectName}|</b>
+    <p><b>|${effectName}|</b>
     ${rollValue} < ${totalEffectValue}% ${successText}</p>
   `;
 
-    mechanicalEffects[finalEffectName.toLowerCase()] = {
+    mechanicalEffects[effectName] = {
       chance: totalEffectValue,
       roll: rollValue,
     };
@@ -772,19 +761,34 @@ export async function finalizeRollsAndPostChat(
 
   // 1.a Handle Mana deduction effect
   const costPerRound = Number(spell.system.perRound) || 0;
+  if (maintainChanneling && costPerRound > 0 && !fromChanneling) {
+    const existing = actor.effects.find(
+      (e) => e.getFlag("core", "statusId") === "channeling",
+    );
 
-  if (maintainChanneling && costPerRound > 0) {
+    if (existing) {
+      await existing.delete();
+    }
+
     const effect = await game.tos.applyEffect(actor, "channeling");
 
     if (effect) {
+      await effect.setFlag("tos", "channelingData", {
+        spellId: spell.id,
+        rollContext: {
+          focusSpent,
+        },
+        isSustained: spell.system.sustained, // ✅ ADD THIS
+      });
+
       await effect.setFlag("tos", "costPerRound", costPerRound);
     }
   }
 
   if (maintainChanneling && costPerRound <= 0) {
     ui.notifications.warn(`${spell.name} does not allow prolonged channeling.`);
+    return;
   }
-
   // --- CRITICAL SCORE ROLL ---
   const critScoreRoll = new Roll(`1d20`);
   await critScoreRoll.evaluate();
@@ -1025,4 +1029,42 @@ export async function finalizeRollsAndPostChat(
     });
   }
   //tables -> Flag: "tos.critTable: fire"
+}
+
+export async function resolveChannelingTick(actor, effect) {
+  const data = effect.getFlag("tos", "channelingData");
+  if (!data) return;
+
+  // ✅ behavior decision lives here
+  if (!data.isSustained) return;
+
+  const spell = actor.items.get(data.spellId);
+  if (!spell) {
+    await effect.delete();
+    return;
+  }
+
+  const focusSpent = data.rollContext?.focusSpent ?? 0;
+
+  const options = {
+    freeCast: true,
+    ignoreChanneling: true,
+    maintainChanneling: true,
+    fromChanneling: true,
+  };
+
+  const bonuses = calculateAttackBonuses(actor, spell);
+
+  const attackResults = await performAttackRoll(
+    actor,
+    spell,
+    bonuses.attackBonus,
+    focusSpent,
+    options,
+  );
+
+  await finalizeRollsAndPostChat(actor, spell, bonuses, attackResults, {
+    ...options,
+    focusSpent,
+  });
 }

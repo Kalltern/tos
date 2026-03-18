@@ -1418,6 +1418,7 @@
         "types": [""]
       },
       "isOffensive": true,
+      "sustained": false,
       "difficulty": 0,
       "cost": 0,
       "perRound": 0

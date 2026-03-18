@@ -7,14 +7,11 @@ export async function universalAttackLogic({
   context: preResolvedContext = null,
   selectedModifiers = [],
 }) {
-  const selectedToken = canvas.tokens.controlled[0];
-  if (!selectedToken) {
-    ui.notifications.warn("Please select a token.");
-    return;
-  }
-  console.log("MODIFIERS RECEIVED:", selectedModifiers);
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
 
-  const actor = selectedToken.actor;
+  const { actor, token } = context;
+
   const weapons = actor.items.filter(weaponFilter);
 
   if (!weapons.length) {

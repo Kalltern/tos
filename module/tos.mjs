@@ -56,6 +56,7 @@ import {
   calculateAttackBonuses,
   performAttackRoll,
   finalizeRollsAndPostChat,
+  resolveChannelingTick,
 } from "./utils/magicSkillBonuses.mjs";
 
 /* -------------------------------------------- */
@@ -86,6 +87,7 @@ Hooks.once("init", function () {
 
   game.tos = game.tos || {};
   game.tos.helpOverlay = HelpOverlay;
+  game.tos.selectToken = selectToken;
   game.tos.statusEffectManager = statusEffectManager;
   game.tos.getActorCombatModifiers = getActorCombatModifiers;
   game.tos.applyEffect = ToSActiveEffect.applyEffect.bind(ToSActiveEffect);
@@ -121,6 +123,7 @@ Hooks.once("init", function () {
   game.tos.finalizeRollsAndPostChat = finalizeRollsAndPostChat;
   game.tos.defenseRoll = defenseRoll;
   game.tos.autoAttack = autoAttack;
+  game.tos.resolveChannelingTick = resolveChannelingTick;
   registerDynamicInitiative();
   registerEffectSheetExtensions();
 
@@ -1653,3 +1656,31 @@ Hooks.on("renderChatMessage", (message, html) => {
     button.innerText = "Resolved";
   });
 });
+
+export function selectToken({ warn = true, notifyFallback = false } = {}) {
+  let actor = null;
+  let token = null;
+
+  const controlled = canvas.tokens.controlled[0];
+
+  if (controlled) {
+    actor = controlled.actor;
+    token = controlled;
+  } else if (game.user.character) {
+    actor = game.user.character;
+    token = actor.getActiveTokens()[0] ?? null;
+
+    if (notifyFallback) {
+      ui.notifications.info("No token selected — using assigned character.");
+    }
+  }
+
+  if (!actor) {
+    if (warn) {
+      ui.notifications.warn("Select a token or assign a character.");
+    }
+    return null;
+  }
+
+  return { actor, token };
+}

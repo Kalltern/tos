@@ -29,9 +29,6 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
       createDoc: this._createDoc,
       deleteDoc: this._deleteDoc,
       adjustNumericField: this._adjustNumericField,
-      adjustDurability: this._adjustDurability,
-      addSupply: this._addSupply,
-      subtractSupply: this._subtractSupply,
       toggleEffect: this._toggleEffect,
       roll: this._onRoll,
       toggleEquipped: this._toggleEquipped,
@@ -1036,28 +1033,14 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const current = Number(foundry.utils.getProperty(doc, path) ?? 0);
     const newValue = Math.max(0, current + delta);
 
+    // 🧠 SPECIAL CASE: Supplies (quantity)
+    if (path === "system.quantity" && newValue === 0) {
+      await doc.delete();
+      return;
+    }
+
+    // ✅ Default behavior (durability, etc.)
     await doc.update({ [path]: newValue });
-  }
-  static async _addSupply(event, target) {
-    return this._adjustNumericField(event, target, "system.quantity", {
-      deleteIfZero: false,
-    });
-  }
-
-  static async _subtractSupply(event, target) {
-    target.dataset.delta = -1;
-
-    return this._adjustNumericField(event, target, "system.quantity", {
-      deleteIfZero: true,
-    });
-  }
-  static async _adjustDurability(event, target) {
-    return this._adjustNumericField(
-      event,
-      target,
-      "system.armor.durability",
-      { deleteIfZero: false }, // armor shouldn't delete itself
-    );
   }
 
   /**

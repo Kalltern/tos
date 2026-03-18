@@ -21,11 +21,34 @@ export class ToSActiveEffect extends ActiveEffect {
     Hooks.on("preCreateActiveEffect", (effect) => {
       const statusId = effect.getFlag("core", "statusId");
       const def = CONFIG.TOS.effectDefinitions[statusId];
-      if (!def?.maxStacks) return;
+      if (!def) return;
+
+      const hasStacks = !!def.maxStacks;
+      const hasRounds = !!def.defaultRounds;
+      const hasTurns = !!def.defaultTurns;
+
+      // Only show counter if something actually changes over time
+      const shouldShowCounter = hasStacks || hasRounds || hasTurns;
+
+      if (!shouldShowCounter) {
+        effect.updateSource({
+          "flags.statuscounter.visible": false,
+        });
+        return;
+      }
+
+      // 🔑 Decide what the counter represents
+      const useStacks = !!def.maxStacks && !def.useDuration;
+
+      // Default: duration unless explicitly stack-based
+      const dataSource = useStacks
+        ? "flags.tos.stacks"
+        : def.defaultRounds
+          ? "flags.tos.rounds"
+          : "flags.tos.actorTurns";
 
       effect.updateSource({
-        "flags.statuscounter.config.dataSource": "flags.tos.stacks",
-        "flags.tos.stacks": effect.getFlag("tos", "stacks") ?? 1,
+        "flags.statuscounter.config.dataSource": dataSource,
         "flags.statuscounter.visible": true,
       });
     });
@@ -90,6 +113,7 @@ export class ToSActiveEffect extends ActiveEffect {
 
       for (const effect of actor.effects) {
         await effect.executeTrigger?.("onRoundStart");
+        await effect.decrementRound?.();
       }
     }
   }
@@ -153,8 +177,12 @@ export class ToSActiveEffect extends ActiveEffect {
       return;
     }
 
-    const duration = turns ?? def.defaultTurns ?? 0;
     const maxStacks = def.maxStacks ?? 99;
+
+    const turnsDuration = turns ?? def.defaultTurns ?? 0;
+    const roundsDuration = def.defaultRounds ?? 0;
+
+    const initialStacks = effectId === "fear" ? 3 : Math.min(stacks, maxStacks);
 
     const existing = actor.effects.find((e) => e.statuses?.has(effectId));
     // ============================================
@@ -192,8 +220,12 @@ export class ToSActiveEffect extends ActiveEffect {
       await existing.setFlag("tos", "stacks", newStacks);
       await existing.updateCorrosionChange();
 
-      if (duration > 0) {
-        await existing.setFlag("tos", "actorTurns", duration);
+      if (turnsDuration > 0) {
+        await existing.setFlag("tos", "actorTurns", turnsDuration);
+      }
+
+      if (roundsDuration > 0) {
+        await existing.setFlag("tos", "rounds", roundsDuration);
       }
 
       await existing.executeTrigger("onApply", { appliedStacks });
@@ -203,16 +235,17 @@ export class ToSActiveEffect extends ActiveEffect {
     // ============================================
     // NEW EFFECT
     // ============================================
-
-    const initialStacks = effectId === "fear" ? 3 : Math.min(stacks, maxStacks);
-
     const tosFlags = {
       triggers: def.triggers ?? {},
       stacks: initialStacks,
     };
 
-    if (duration > 0) {
-      tosFlags.actorTurns = duration;
+    if (turnsDuration > 0) {
+      tosFlags.actorTurns = turnsDuration;
+    }
+
+    if (roundsDuration > 0) {
+      tosFlags.rounds = roundsDuration;
     }
 
     const [created] = await actor.createEmbeddedDocuments("ActiveEffect", [
@@ -224,7 +257,6 @@ export class ToSActiveEffect extends ActiveEffect {
         changes: def.changes ?? [],
       },
     ]);
-
     await created.executeTrigger("onApply", { appliedStacks: initialStacks });
     // Corrosion armor update
     await created.updateCorrosionChange();
@@ -267,6 +299,19 @@ export class ToSActiveEffect extends ActiveEffect {
     await this.setFlag("tos", "actorTurns", remaining);
   }
 
+  async decrementRound() {
+    const rounds = this.getFlag("tos", "rounds");
+    if (rounds == null) return;
+
+    const remaining = rounds - 1;
+
+    if (remaining <= 0) {
+      await this.delete();
+      return;
+    }
+
+    await this.setFlag("tos", "rounds", remaining);
+  }
   /* -------------------------------------------- */
   /*  TRIGGER STRUCTURE                           */
   /* -------------------------------------------- */
@@ -357,6 +402,51 @@ export class ToSActiveEffect extends ActiveEffect {
     await game.tos.applyEffect(actor, "panic");
   }
 
+  async _handleStoneSkin() {
+    const actor = this.parent;
+    if (!actor) return;
+
+    // ----------------------------------
+    // Check armor
+    // ----------------------------------
+    const hasArmor = actor.items.some(
+      (item) =>
+        item.type === "gear" &&
+        item.system?.equipped === true &&
+        ["Bottom", "Middle", "Top"].includes(item.system?.layer),
+    );
+
+    const armorBonus = hasArmor ? 2 : 15;
+
+    // ----------------------------------
+    // Dodge bonus clamp logic
+    // ----------------------------------
+    const currentBonus = actor.system.dodge.limit.bonus ?? 0;
+
+    let penalty = 0;
+
+    if (currentBonus > 20) {
+      penalty = 20 - currentBonus; // negative value
+    }
+
+    // ----------------------------------
+    // Clone changes
+    // ----------------------------------
+    const changes = foundry.utils.deepClone(this._source.changes);
+
+    for (let c of changes) {
+      if (c.key === "system.armor.natural.bonus") {
+        c.value = armorBonus;
+      }
+
+      if (c.key === "system.dodge.limit.bonus") {
+        c.value = penalty;
+      }
+    }
+
+    await this.update({ changes });
+  }
+
   async _handleFearRound() {
     const actor = this.parent;
     if (!actor) return;
@@ -394,8 +484,16 @@ export class ToSActiveEffect extends ActiveEffect {
       return this._handleFearTest();
     }
 
+    if (trigger.custom === "staminaDrain") {
+      return this._handleStaminaDrain(trigger);
+    }
+
     if (trigger.custom === "channelingDrain") {
       return this._handleChannelingDrain();
+    }
+
+    if (trigger.custom === "stoneSkinUpdate") {
+      return this._handleStoneSkin();
     }
 
     if (trigger.custom === "fearRound") {
@@ -412,7 +510,15 @@ export class ToSActiveEffect extends ActiveEffect {
       .replace("{stacks}", stacks)
       .replace("{appliedStacks}", appliedStacks);
 
-    const roll = await new Roll(formula).roll();
+    const roll = await new Roll(formula).evaluate({ async: true });
+
+    if (trigger.target) {
+      const current = foundry.utils.getProperty(actor, trigger.target) ?? 0;
+
+      await actor.update({
+        [trigger.target]: current - roll.total,
+      });
+    }
 
     await roll.toMessage({
       speaker: ChatMessage.getSpeaker({ actor }),
@@ -441,32 +547,93 @@ export class ToSActiveEffect extends ActiveEffect {
     await ToSActiveEffect._removeCombatModifiers(actor, effectId);
   }
 
+  async _handleStaminaDrain(trigger) {
+    const actor = this.parent;
+    if (!actor) return;
+
+    let formula = trigger.formula;
+
+    const stacks = this.getFlag("tos", "stacks") ?? 1;
+    formula = formula.replace("{stacks}", stacks);
+
+    const roll = await new Roll(formula).evaluate({ async: true });
+    const cost = roll.total;
+
+    const path = trigger.target;
+    const current = foundry.utils.getProperty(actor, path) ?? 0;
+
+    // ❌ Not enough stamina → remove effect
+    if (current < cost) {
+      await this.delete();
+
+      ui.notifications.info(
+        `${actor.name} drops Defensive Stance (no stamina)`,
+      );
+
+      return;
+    }
+
+    // ✅ Safe update
+    const latest = foundry.utils.getProperty(actor, path) ?? 0;
+
+    await actor.update({
+      [path]: Math.max(0, latest - cost),
+    });
+
+    ui.notifications.info(`${this.name} – Stamina Drain`);
+  }
+
   async _handleChannelingDrain() {
     const actor = this.parent;
     if (!actor) return;
 
+    const data = this.getFlag("tos", "channelingData");
+    if (!data) return;
+
     const costPerRound = this.getFlag("tos", "costPerRound") ?? 0;
-    if (!costPerRound) return;
 
-    const currentMana = actor.system.stats.mana?.value ?? 0;
-    const newMana = Math.max(currentMana - costPerRound, 0);
+    if (costPerRound > 0) {
+      const currentMana = actor.system.stats.mana?.value ?? 0;
 
-    await actor.update({
-      "system.stats.mana.value": newMana,
-    });
+      // 🔴 CHECK FIRST
+      if (currentMana < costPerRound) {
+        await this.delete();
 
-    ui.notifications.info(
-      `<p><b>Maintaining Channeling:</b> -${costPerRound} Mana</p>`,
-    );
+        ui.notifications.info(
+          `<p><b>Channeling Broken (Not Enough Mana)</b></p>`,
+        );
 
-    // Break if no mana
-    if (newMana <= 0) {
-      await this.delete();
+        return;
+      }
 
-      ChatMessage.create({
-        speaker: ChatMessage.getSpeaker({ actor }),
-        content: `<p><b>Channeling Broken (No Mana)</b></p>`,
+      // 🔋 THEN PAY
+      const newMana = currentMana - costPerRound;
+
+      await actor.update({
+        "system.stats.mana.value": newMana,
       });
+
+      ui.notifications.info(
+        `<p><b>Maintaining Channeling:</b> -${costPerRound} Mana</p>`,
+      );
     }
+
+    // ✅ Now resolve (even if mana is now 0)
+    await game.tos.resolveChannelingTick(actor, this);
   }
 }
+
+Hooks.on("updateItem", async (item) => {
+  if (item.type !== "gear") return;
+
+  const actor = item.parent;
+  if (!actor) return;
+
+  const effect = actor.effects.find(
+    (e) => e.getFlag("core", "statusId") === "stone_skin",
+  );
+
+  if (!effect) return;
+
+  await effect._handleStoneSkin();
+});

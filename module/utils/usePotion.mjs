@@ -1,24 +1,8 @@
 export async function usePotion() {
-  const selectedToken = canvas.tokens.controlled[0];
+  const context = game.tos.selectToken({ notifyFallback: true });
+  if (!context) return;
 
-  if (!selectedToken) {
-    ui.notifications.warn("Please select a token.");
-    return;
-  }
-
-  const actor = selectedToken.actor;
-  const consumables = actor.items.filter(
-    (i) => i.type === "consumable" && i.system.option === "potion"
-  );
-  if (!consumables.length) {
-    ui.notifications.warn("This actor has no potions.");
-    return;
-  }
-
-  const potionChoices = consumables.map((c, i) => ({
-    label: c.name,
-    value: i,
-  }));
+  const { actor, token } = context;
 
   const applyConsumableEffects = async (consumable, roll, drinkingRoll) => {
     let effectResults = "";
@@ -65,19 +49,18 @@ export async function usePotion() {
     return effectResults;
   };
 
-  const handlePotionSelection = async (index) => {
-    const consumable = consumables[index];
+  const handlePotionSelection = async (consumable) => {
     const rollData = actor.getRollData();
     const roll = await new Roll(consumable.system.formula, rollData).evaluate();
     const drinkingRoll = await new Roll(
       "@skills.drinking.rating - 1d100",
-      rollData
+      rollData,
     ).evaluate();
 
     const effectResults = await applyConsumableEffects(
       consumable,
       roll,
-      drinkingRoll
+      drinkingRoll,
     );
 
     await ChatMessage.create({
@@ -115,33 +98,56 @@ export async function usePotion() {
   style.innerText = css;
   document.head.appendChild(style);
 
-  new Dialog({
-    title: "Select Potion",
-    content: `
+  const renderPotionDialog = () => {
+    const consumables = actor.items.filter(
+      (i) => i.type === "consumable" && i.system.option === "potion",
+    );
+
+    if (!consumables.length) {
+      ui.notifications.warn("No potions left.");
+      return;
+    }
+
+    const potionChoices = consumables.map((c, i) => ({
+      label: `${c.name} (${c.system.quantity ?? 1})`,
+      value: i,
+    }));
+
+    let dialog;
+
+    dialog = new Dialog({
+      title: "Select Potion",
+      content: `
       <form>
-        <fieldset>
-          <ul id="potion-list" style="list-style: none; padding: 0;">
-            ${potionChoices
-              .map(
-                (choice) =>
-                  `<li class="potion-choice" data-value="${choice.value}" style="cursor: pointer; padding: 5px; border-bottom: 1px solid #444;">
+        <ul id="potion-list" style="list-style: none; padding: 0;">
+          ${potionChoices
+            .map(
+              (choice) => `
+              <li class="potion-choice" data-value="${choice.value}" style="cursor: pointer; padding: 5px; border-bottom: 1px solid #444;">
                 ${choice.label}
-              </li>`
-              )
-              .join("")}
-          </ul>
-        </fieldset>
+              </li>`,
+            )
+            .join("")}
+        </ul>
       </form>
     `,
-    buttons: {},
-    resizable: true,
-    width: 200,
-    height: 100,
-    render: (html) => {
-      html.find("#potion-list li").click(async (event) => {
-        const selectedValue = parseInt(event.currentTarget.dataset.value);
-        await handlePotionSelection(selectedValue);
-      });
-    },
-  }).render(true);
+      buttons: {},
+      render: function (html) {
+        html.find("#potion-list li").click(async (event) => {
+          const index = parseInt(event.currentTarget.dataset.value);
+          const consumable = consumables[index];
+
+          dialog.close(); // ✅ fixed
+
+          await handlePotionSelection(consumable);
+
+          renderPotionDialog();
+        });
+      },
+    });
+
+    dialog.render(true);
+  };
+
+  renderPotionDialog();
 }
