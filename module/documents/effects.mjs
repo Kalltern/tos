@@ -91,7 +91,8 @@ export class ToSActiveEffect extends ActiveEffect {
     if (!actor) return;
 
     for (const effect of actor.effects) {
-      await effect._onActorTurnStart?.();
+      await effect.executeTrigger?.("onTurnStart");
+      await effect.decrementActorTurn?.();
     }
   }
 
@@ -111,9 +112,29 @@ export class ToSActiveEffect extends ActiveEffect {
       const actor = combatant.actor;
       if (!actor) continue;
 
+      // -------------------------
+      // 1. Run ROUND effects
+      // -------------------------
       for (const effect of actor.effects) {
         await effect.executeTrigger?.("onRoundStart");
         await effect.decrementRound?.();
+      }
+
+      // -------------------------
+      // 2. Regeneration bleed rule
+      // -------------------------
+      const hasRegen = actor.effects.some(
+        (e) => e.getFlag("core", "statusId") === "regeneration",
+      );
+
+      if (hasRegen) {
+        const bleed = actor.effects.find(
+          (e) => e.getFlag("core", "statusId") === "bleed",
+        );
+
+        if (bleed) {
+          await bleed.delete();
+        }
       }
     }
   }
@@ -500,6 +521,10 @@ export class ToSActiveEffect extends ActiveEffect {
       return this._handleFearRound();
     }
 
+    if (trigger.custom === "regenerationHeal") {
+      return this._handleRegenerationHeal(trigger);
+    }
+
     let formula = trigger.formula;
     if (!formula) return;
 
@@ -547,6 +572,24 @@ export class ToSActiveEffect extends ActiveEffect {
     await ToSActiveEffect._removeCombatModifiers(actor, effectId);
   }
 
+  async _handleRegenerationHeal(trigger) {
+    const actor = this.parent;
+    if (!actor) return;
+
+    const roll = await new Roll(trigger.formula).evaluate({ async: true });
+
+    const path = "system.stats.health.value";
+    const current = foundry.utils.getProperty(actor, path) ?? 0;
+
+    await actor.update({
+      [path]: current + roll.total,
+    });
+
+    await roll.toMessage({
+      speaker: ChatMessage.getSpeaker({ actor }),
+      flavor: `${this.name} – Healing`,
+    });
+  }
   async _handleStaminaDrain(trigger) {
     const actor = this.parent;
     if (!actor) return;

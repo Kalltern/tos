@@ -5,6 +5,20 @@ export class HelpOverlay {
     else this.render();
   }
 
+  static getCombatRoundContent() {
+    return `
+    <div class="help-category">
+      <h2 class="category-title">
+        ${game.i18n.localize("TOS.Help.CombatRound.Title")}
+      </h2>
+
+      <div class="card-body">
+        ${game.i18n.localize("TOS.Help.CombatRound.Description")}
+      </div>
+    </div>
+  `;
+  }
+
   static render() {
     const overlay = document.createElement("div");
     overlay.id = "tos-help-overlay";
@@ -36,6 +50,7 @@ export class HelpOverlay {
             const labelDescription = game.i18n.localize(
               `TOS.Help.Description.${action.description}`,
             );
+            const cost = game.i18n.localize(`TOS.Help.Category.cost`);
 
             return `
               <div class="help-card">
@@ -45,7 +60,7 @@ export class HelpOverlay {
                 </div>
 
                 <div class="card-meta">
-                  <span><b>Cena:</b> ${labelCost}</span>
+                  <span><b>${cost}:</b> ${labelCost}</span>
                 </div>
 
                 <div class="card-body">
@@ -72,12 +87,47 @@ export class HelpOverlay {
       .join("");
 
     overlay.innerHTML = `
-      <div class="help-board">
-        ${rows}
-      </div>
-    `;
+  <div class="help-board">
+
+    <div class="help-tabs">
+      <button class="tab-button active" data-tab="general">
+        ${game.i18n.localize("TOS.Help.Tab.GeneralActions")}
+      </button>
+      <button class="tab-button" data-tab="round">
+        ${game.i18n.localize("TOS.Help.Tab.CombatRound")}
+      </button>
+    </div>
+
+    <div class="tab-content active" data-content="general">
+      ${rows}
+    </div>
+
+    <div class="tab-content" data-content="round">
+      ${this.getCombatRoundContent()}
+    </div>
+
+  </div>
+`;
 
     document.body.appendChild(overlay);
+
+    const buttons = overlay.querySelectorAll(".tab-button");
+    const contents = overlay.querySelectorAll(".tab-content");
+
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.tab;
+
+        // Update buttons
+        buttons.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+
+        // Update content
+        contents.forEach((c) => {
+          c.classList.toggle("active", c.dataset.content === target);
+        });
+      });
+    });
 
     overlay.addEventListener("click", (event) => {
       if (event.target === overlay) overlay.remove();
@@ -91,6 +141,95 @@ export class HelpOverlay {
     };
 
     document.addEventListener("keydown", escHandler);
+  }
+
+  static getCombatRoundContent() {
+    const t = (key) => game.i18n.localize(`TOS.Help.Round.${key}`);
+
+    return `
+    <div class="help-category">
+
+      <h2 class="category-title">
+        ${game.i18n.localize("TOS.Help.CombatRound.Title")}
+      </h2>
+
+      <div class="category-row">
+
+        <div class="help-card">
+          <div class="card-header">
+            <h3>${t("Step1.Title")}</h3>
+          </div>
+          <div class="card-body">
+            <ul>
+              <li>${t("Step1.Effects")}</li>
+              <li>${t("Step1.Initiative")}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="card-header">
+            <h3>${t("Step2.Title")}</h3>
+          </div>
+          <div class="card-body">
+            ${t("Step2.Intro")}<br><br>
+            ${t("Step2.YouHave")}
+            <ul>
+              <li>${t("Step2.Actions")}</li>
+              <li>${t("Step2.FreeActions")}</li>
+              <li>${t("Step2.Limit")}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="card-header">
+            <h3>${t("Step3.Title")}</h3>
+          </div>
+          <div class="card-body">
+            ${t("Step3.Intro")}
+            <ul>
+              <li>${t("Step3.Opportunity")}</li>
+              <li>${t("Step3.Counter")}</li>
+              <li>${t("Step3.Spell")}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="help-card">
+          <div class="card-header">
+            <h3>${t("Step4.Title")}</h3>
+          </div>
+          <div class="card-body">
+            ${t("Step4.End")}<br>
+            ${t("Step4.NoEnemies")}<br>
+            ${t("Step4.EarlyEnd")}
+          </div>
+        </div>
+
+      </div>
+
+      <h2 class="category-title" style="margin-top: 30px;">
+        ${t("Rules.Title")}
+      </h2>
+
+      <div class="category-row">
+
+        <div class="help-card">
+          <div class="card-header">
+            <h3>${t("Rules.DelayTitle")}</h3>
+          </div>
+          <div class="card-body">
+            ${t("Rules.DelayText1")}<br><br>
+            ${t("Rules.DelayText2")}<br>
+            ${t("Rules.DelayText3")}
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  `;
   }
 }
 

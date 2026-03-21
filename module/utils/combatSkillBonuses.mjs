@@ -590,6 +590,9 @@ export async function getDamageRolls(
   if (knifeMasterCheck(actor, weapon)) {
     damageFormula += ` + (1d4 + 1)`;
   }
+  if (ws.gripMode === "two") {
+    damageFormula += ` + ${ws.twoHandDice ?? "1d6"}`;
+  }
   for (const roll of actorMods.damageRolls) {
     damageFormula += ` + ${roll}`;
   }

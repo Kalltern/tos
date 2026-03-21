@@ -677,4 +677,21 @@ TOS.effectDefinitions = {
       },
     },
   },
+
+  regeneration: {
+    name: "Regeneration",
+    img: "icons/magic/life/heart-cross-green.webp",
+    statuses: ["regeneration"],
+
+    triggers: {
+      onApply: {
+        formula: "2d4 + 2",
+        custom: "regenerationHeal",
+      },
+      onRoundStart: {
+        formula: "2d4 + 2",
+        custom: "regenerationHeal",
+      },
+    },
+  },
 };

@@ -13,7 +13,7 @@
 
   <div class="header-fields">
     <div class="document-name">
-      <input name="name" type="text" value="{{item.name}}" placeholder="Name" />
+      <input name="name" type="text" value="{{item.name}}" placeholder="{{localize 'TOS.UI.name'}}" />
     </div>
     {{!-- =====================
          AMMUNITION
@@ -22,7 +22,7 @@
       <div class="grid-span-1">
         <label for="ammunition-option">Option:</label>
         <select name="system.option" id="ammunition-option">
-          <option value="">-- Select a type --</option>
+          <option value="">{{localize "TOS.UI.selectType"}}</option>
           {{#each system.options as |option|}}
             <option value="{{option}}" {{#if (eq ../system.option option)}}selected{{/if}}>
               {{option}}
@@ -71,7 +71,7 @@
       <div class="grid-span-1">
         <label for="feature-option">Option:</label>
         <select name="system.option" id="feature-option">
-          <option value="">-- Select a type --</option>
+          <option value="">{{localize "TOS.UI.selectType"}}</option>
           {{#each system.options as |option|}}
             <option value="{{option}}" {{#if (eq ../system.option option)}}selected{{/if}}>
               {{option}}
@@ -135,9 +135,9 @@
         {{!-- Weapon-only fields --}}
         {{#if (eq item.type "weapon")}}
           <div class="grid-span-1">
-            <label for="weapon-class">Weapon Class:</label>
+            <label for="weapon-class">{{localize "TOS.UI.weaponClass"}}:</label>
             <select name="system.class" id="weapon-class">
-              <option value="">-- Select a Class --</option>
+              <option value="">{{localize "TOS.UI.selectClass"}}</option>
               {{#each system.classOptions as |classOption|}}
                 <option value="{{classOption}}" {{#if (eq ../system.class classOption)}}selected{{/if}}>
                   {{classOption}}
@@ -147,9 +147,9 @@
           </div>
 
           <div class="grid-span-1">
-            <label for="weapon-type">Weapon Type:</label>
+            <label for="weapon-type">{{localize "TOS.UI.weaponType"}}:</label>
             <select name="system.type" id="weapon-type">
-              <option value="">-- Select a Type --</option>
+              <option value="">{{localize "TOS.UI.selectType"}}</option>
               {{#each system.typeOptions as |typeOption|}}
                 <option value="{{typeOption}}" {{#if (eq ../system.type typeOption)}}selected{{/if}}>
                   {{typeOption}}
@@ -162,9 +162,9 @@
         {{!-- Ability-only fields --}}
         {{#if (eq item.type "ability")}}
           <div class="grid-span-1">
-            <label for="ability-class">Ability Class:</label>
+            <label for="ability-class">{{localize "TOS.UI.abilityClass"}}:</label>
             <select name="system.class" id="ability-class">
-              <option value="">-- Select a Class --</option>
+              <option value="">{{localize "TOS.UI.selectClass"}}</option>
               {{#each system.classOptions as |classOption|}}
                 <option value="{{classOption}}" {{#if (eq ../system.class classOption)}}selected{{/if}}>
                   {{classOption}}
@@ -174,9 +174,9 @@
           </div>
 
           <div class="grid-span-1">
-            <label for="ability-type">Ability Type:</label>
+            <label for="ability-type">{{localize "TOS.UI.abilityType"}}:</label>
             <select name="system.type" id="ability-type">
-              <option value="">-- Select a Type --</option>
+              <option value="">{{localize "TOS.UI.selectType"}}</option>
               {{#each system.typeOptions as |typeOption|}}
                 <option value="{{typeOption}}" {{#if (eq ../system.type typeOption)}}selected{{/if}}>
                   {{typeOption}}
@@ -186,9 +186,9 @@
           </div>
 
           <div class="grid-span-1">
-            <label for="cost-type">Cost Type:</label>
+            <label for="cost-type">{{localize "TOS.UI.costType"}}:</label>
             <select name="system.costType" id="cost-type">
-              <option value="">-- Select a Type --</option>
+              <option value="">{{localize "TOS.UI.selectType"}}</option>
               {{#each system.costOptions as |costOption|}}
                 <option value="{{costOption}}" {{#if (eq ../system.costType costOption)}}selected{{/if}}>
                   {{costOption}}
@@ -198,9 +198,9 @@
           </div>
 
           <div class="grid-span-1">
-            <label for="test-type">Test Type:</label>
+            <label for="test-type">{{localize "TOS.UI.testType"}}:</label>
             <select name="system.attributeTest" id="test-type">
-              <option value="">-- Select a Type --</option>
+              <option value="">{{localize "TOS.UI.selectType"}}</option>
               {{#each system.testOptions as |testOption|}}
                 <option value="{{testOption}}" {{#if (eq ../system.attributeTest testOption)}}selected{{/if}}>
                   {{testOption}}
@@ -215,7 +215,7 @@
           </div>
 
           <div class="grid-span-1">
-            <label class="resource-label">Test Modifier</label>
+            <label class="resource-label">{{localize "TOS.UI.testModifier"}}</label>
             <input type="text" name="system.testModifier" value="{{system.testModifier}}" data-dtype="Number"/>
           </div>
 
@@ -278,9 +278,9 @@
 
         {{#unless system.shield}}
           <div class="grid-span-1">
-            <label for="gear-layer">Gear layer:</label>
+            <label for="gear-layer">{{localize "TOS.UI.gearLayer"}}:</label>
             <select name="system.layer" id="gear-layer">
-              <option value="">-- Select a layer --</option>
+              <option value="">{{localize "TOS.UI.selectLayer"}}</option>
               {{#each system.layerOptions as |layerOption|}}
                 <option value="{{layerOption}}" {{#if (eq ../system.layer layerOption)}}selected{{/if}}>
                   {{layerOption}}
@@ -301,7 +301,7 @@
         <div class="grid-span-1">
           <label for="consumable-option">Type:</label>
           <select name="system.option" id="consumable-option">
-            <option value="">-- Select a type --</option>
+            <option value="">{{localize "TOS.UI.selectType"}}</option>
             {{#each system.options as |option|}}
               <option value="{{option}}" {{#if (eq ../system.option option)}}selected{{/if}}>{{option}}</option>
             {{/each}}
@@ -311,9 +311,9 @@
         {{!-- Potion --}}
         {{#if (eq item.system.option "potion")}}
           <div class="grid-span-1">
-            <label for="potion-type">Potion type:</label>
+            <label for="potion-type">{{localize "TOS.UI.potionType"}}:</label>
             <select name="system.type" id="potion-type">
-              <option value="">-- Select a type --</option>
+              <option value="">{{localize "TOS.UI.selectType"}}</option>
               {{#each system.types as |type|}}
                 <option value="{{type}}" {{#if (eq ../system.type type)}}selected{{/if}}>{{type}}</option>
               {{/each}}
@@ -386,7 +386,7 @@
         <div class="grid-span-1">
           <label for="spell-option">Type:</label>
           <select name="system.option" id="spell-option">
-            <option value="">-- Select a type --</option>
+            <option value="">{{localize "TOS.UI.selectType"}}</option>
             {{#each system.options as |option|}}
               <option value="{{option}}" {{#if (eq ../system.option option)}}selected{{/if}}>{{option}}</option>
             {{/each}}
@@ -396,9 +396,9 @@
         {{!-- Magic option --}}
         {{#if (eq item.system.option "magic")}}
           <div class="grid-span-1">
-            <label for="school-type">School:</label>
+            <label for="school-type">{{localize "TOS.UI.school"}}:</label>
             <select name="system.type" id="school-type">
-              <option value="">-- Select a school --</option>
+              <option value="">{{localize "TOS.UI.selectSchool"}}</option>
               {{#each system.spellTypes as |type|}}
                 <option value="{{type}}" {{#if (eq ../system.type type)}}selected{{/if}}>{{type}}</option>
               {{/each}}
@@ -406,9 +406,9 @@
           </div>
 
           <div class="grid-span-1">
-            <label for="spell-rank">Rank:</label>
+            <label for="spell-rank">{{localize "TOS.UI.rank"}}:</label>
             <select name="system.rank">
-              <option value="">-- Select a rank --</option>
+              <option value="">{{localize "TOS.UI.selectRank"}}</option>
               {{#each system.spellRanks as |rank|}}
                 <option value="{{rank}}" {{#if (eq ../system.rank rank)}}selected{{/if}}>{{rank}}</option>
               {{/each}}
@@ -424,9 +424,9 @@
         {{!-- Divine option --}}
         {{#if (eq item.system.option "divine")}}
           <div class="grid-span-1">
-            <label for="spell-rank">Rank:</label>
+            <label for="spell-rank">{{localize "TOS.UI.rank"}}:</label>
             <select name="system.rank">
-              <option value="">-- Select a rank --</option>
+              <option value="">{{localize "TOS.UI.selectRank"}}</option>
               {{#each system.miracleRanks as |rank|}}
                 <option value="{{rank}}" {{#if (eq ../system.rank rank)}}selected{{/if}}>{{rank}}</option>
               {{/each}}
@@ -450,9 +450,9 @@
           <input type="text" name="system.roll.diceBonus" value="{{system.roll.diceBonus}}" data-dtype="String" placeholder="e.g. @spellPower"/>
         </div>
        <div class="grid-span-1">
-            <label for="test-type">Test Type:</label>
+            <label for="test-type">{{localize "TOS.UI.testType"}}:</label>
             <select name="system.attributeTest" id="test-type">
-              <option value="">-- Select a Type --</option>
+              <option value="">{{localize "TOS.UI.selectType"}}</option>
               {{#each system.testOptions as |testOption|}}
                 <option value="{{testOption}}" {{#if (eq ../system.attributeTest testOption)}}selected{{/if}}>
                   {{testOption}}
@@ -462,7 +462,7 @@
        </div>
          
           <div class="grid-span-1">
-            <label class="resource-label">Test Modifier</label>
+            <label class="resource-label">{{localize "TOS.UI.testModifier"}}</label>
             <input type="text" name="system.testModifier" value="{{system.testModifier}}" data-dtype="String" placeholder="e.g. @spellPower"/>
           </div>
          </div>

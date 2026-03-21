@@ -352,7 +352,7 @@ export class ToSActorSheet extends api.HandlebarsApplicationMixin(
     const itemId = button.dataset.itemId;
 
     const actor = this.actor;
-    if (!actor || actor.type !== "character") return;
+    if (!actor) return;
 
     const item = actor.items.get(itemId);
     if (!item) return;

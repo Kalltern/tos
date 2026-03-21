@@ -4,33 +4,6 @@
       "Actor": "ToS Actor Sheet",
       "Item": "ToS Item Sheet"
     },
-    "UI": {
-      "name": "Name",
-      "option": "Option",
-      "type": "Type",
-      "selectType": "-- Select a type --",
-      "selectClass": "-- Select a Class --",
-      "selectLayer": "-- Select a layer --",
-      "selectRank": "-- Select a rank --",
-      "selectSchool": "-- Select a school --",
-
-      "weaponClass": "Weapon Class",
-      "weaponType": "Weapon Type",
-
-      "abilityClass": "Ability Class",
-      "abilityType": "Ability Type",
-
-      "costType": "Cost Type",
-      "testType": "Test Type",
-      "testModifier": "Test Modifier",
-
-      "gearLayer": "Gear layer",
-
-      "potionType": "Potion type",
-
-      "school": "School",
-      "rank": "Rank"
-    },
     "Config": {
       "Initiative": {
         "name": "Dynamic Initiative",
@@ -329,8 +302,7 @@
         "Description": "Description",
         "Doctrines": "Doctrines",
         "Effects": "Effects",
-        "combatEffects": "Combat Effects",
-        "OffHand": "Offhand"
+        "combatEffects": "Combat Effects"
       },
       "Weapon": {
         "FIELDS": {
@@ -338,9 +310,9 @@
           "key": { "label": "Key" },
           "twoHandGrip": { "label": "Can Two hand grip" },
           "rollFormula": { "label": "Roll Formula" },
-          "diceNum": { "label": "Dice count" },
-          "dieSize": { "label": "Die size" },
-          "rollMod": { "label": "Roll modifier" },
+          "diceNum": { "label": "Number of dices" },
+          "dieSize": { "label": "Die Size" },
+          "rollMod": { "label": "Roll Modifier" },
           "finesse": { "label": "Finesse" },
           "sharp": { "label": "Sharp" },
           "thrown": { "label": "Thrown" },
@@ -380,7 +352,7 @@
           "magic": { "label": "Magic" },
           "equipped": { "label": "Equipped" },
           "layer": { "label": "Armor layer" },
-          "helmet": { "label": "Has helmet" },
+          "helmet": { "label": "Has head" },
           "shield": { "label": "Is a shield" },
           "durability": { "label": "Durability" },
           "swimPenalty": { "label": "Swim penalty" },
@@ -428,7 +400,6 @@
       "Spell": {
         "FIELDS": {
           "isOffensive": { "label": "Offensive" },
-          "sustained": { "label": "Sustained" },
           "difficulty": { "label": "Difficulty" },
           "cost": { "label": "Cost" },
           "perRound": { "label": "Cost per round" },
