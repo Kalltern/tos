@@ -1056,14 +1056,11 @@ export async function getEffectRolls(
   }
   totalBleeds = critBleeds + normalBleeds;
   let allBleedRollResults = "";
-  if (
-    mechanicalEffects["bleed"] &&
-    (totalBleeds > 0 || bleedChanceDisplay === "AUTO")
-  ) {
-    allBleedRollResults = `|Bleed| ${[
+  if (mechanicalEffects["bleed"] || bleedChanceDisplay === "AUTO") {
+    allBleedRollResults = `|Bleed: ${[
       ...regularBleedRolls,
       ...sharpBleedRolls,
-    ].join("  Sharp: ")} | < ${bleedChanceDisplay}% 
+    ].join("| |Sharp: ")}| < ${bleedChanceDisplay}% 
     <span title="Normal Bleed Applied: ${normalBleeds}
 In total :(${totalBleeds}) due to Crit score: ${critScore} 
 ">

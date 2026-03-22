@@ -388,7 +388,6 @@ ${
   <img src="${weapon.img}" width="36" height="36" style="margin-right:8px;">
   <strong style="font-size:20px;">${resolvedFlavor}${modifierLabel}</strong>
 </span>
-<hr>
 <div style="text-align:center; font-size:16px;">
   ${concatDescription}
   ${attributeTestHTML}
