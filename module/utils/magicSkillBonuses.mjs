@@ -602,6 +602,13 @@ export async function finalizeRollsAndPostChat(
   const spellAttributeTestName = spell.system.attributeTest || 0;
   const spellTestModifier = spell.system.testModifier || 0;
   const effectiveCritSuccess = ignoreChanneling ? false : critSuccess;
+  const isInvalid =
+    !spellAttributeTestName || spellAttributeTestName === "--select a type--";
+
+  const capitalizedName = isInvalid
+    ? null // or "" depending on your UI needs
+    : spellAttributeTestName.charAt(0).toUpperCase() +
+      spellAttributeTestName.slice(1);
 
   const attributeMap = {
     strength: "str",
@@ -642,14 +649,14 @@ export async function finalizeRollsAndPostChat(
     await modifierRoll.evaluate({ async: true });
 
     const attributeString = `
+    <hr>
   <span
     title="Test chance ${modifierRoll.total}%&#10;Rolled: ${attributeRoll.result}"
     style="display:inline-block;"
   >
-    ${spellAttributeTestName} Test Margin of Success: [${attributeRoll.total}]
+    ${capitalizedName} Test Margin of Success: [${attributeRoll.total}]
   </span>
 
-  <br><br>
 `;
 
     concatRollAndDescription += attributeString;

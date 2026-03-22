@@ -634,6 +634,7 @@ export async function combatAbilities() {
     concatRollAndDescription,
     mechanicalEffects,
     damageProfile = [],
+    attributeTestHTML = "",
   }) {
     let attackHTML = "";
     let damageHTML = "";
@@ -721,7 +722,12 @@ ${critHTML}
 <hr>
 <div style="text-align:center; font-size:16px;">
 <table style="width:100%; text-align:center; font-size:16px;">
-<tr><td>${concatRollAndDescription}</td></tr>
+<tr>
+  <td>
+    ${concatRollAndDescription}
+    ${attributeTestHTML}
+  </td>
+</tr>
 </table>
  </div>
  <hr>
@@ -1032,15 +1038,48 @@ ${damageLine}
 
     let concatRollAndDescription = ability.system.description || "";
 
+    let attributeTestHTML = "";
+
     // Append modifier descriptions
     for (const mod of selectedModifiers) {
-      if (mod.system.description) {
-        concatRollAndDescription += `
-      <hr>
-      <b>${mod.name}</b><br>
-      ${mod.system.description}
-    `;
+      const testName = mod.system.attributeTest;
+      const testModifier = Number(mod.system.testModifier) || 0;
+
+      if (!testName || testName === "-- Select a Type --") continue;
+
+      const attributeMap = {
+        strength: "str",
+        endurance: "end",
+        dexterity: "dex",
+        intelligence: "int",
+        wisdom: "wis",
+        charisma: "cha",
+      };
+
+      const shortKey = attributeMap[testName.toLowerCase()] ?? testName;
+
+      let attributeValue = actor.system.attributes[shortKey]?.mod ?? 0;
+
+      if (actor.type === "npc") {
+        attributeValue = actor.system.attributes[shortKey]?.value ?? 0;
       }
+
+      const attributeTotalValue = attributeValue + testModifier;
+
+      const attributeRoll = new Roll(`(${attributeTotalValue}) - 1d100`);
+      await attributeRoll.evaluate({ async: true });
+
+      attributeTestHTML += `
+<tr>
+<td>
+<span
+title="Test chance ${attributeTotalValue}%&#10;Rolled: ${attributeRoll.result}">
+<b>${mod.name} — ${testName} Test ${attributeTotalValue}%</b><br>
+Margin of Success: [${attributeRoll.total}]
+</span>
+</td>
+</tr>
+`;
     }
 
     // Ability test
@@ -1125,6 +1164,7 @@ Margin of Success: ${attributeRoll.total}
       mechanicalEffects,
       damageProfile,
       halfDamage: totalHalfDamage,
+      attributeTestHTML,
     });
     // ─── AMMO DEDUCTION ───
     if (ammo) {

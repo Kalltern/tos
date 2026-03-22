@@ -219,6 +219,28 @@ export class ToSActiveEffect extends ActiveEffect {
       }
     }
 
+    let changes = def.changes ? foundry.utils.deepClone(def.changes) : [];
+
+    // ============================================
+    // DYNAMIC EFFECTS
+    // ============================================
+    if (effectId === "sleep") {
+      const caster = canvas.tokens.controlled[0]?.actor ?? game.user.character; // character or controlled token
+      if (!caster) {
+        ui.notifications.warn("No valid caster found.");
+        return;
+      }
+      const spellPower = caster?.system?.schools?.water?.spellPower ?? 0;
+
+      const penalty = Math.floor(spellPower / 2);
+
+      changes.push({
+        key: "system.secondaryAttributes.ini.bonus",
+        mode: CONST.ACTIVE_EFFECT_MODES.ADD,
+        value: -penalty,
+      });
+    }
+
     // ============================================
     // EXISTING EFFECT
     // ============================================
@@ -275,7 +297,7 @@ export class ToSActiveEffect extends ActiveEffect {
         img: def.img,
         statuses: def.statuses ?? [],
         flags: { tos: tosFlags, core: { statusId: effectId } },
-        changes: def.changes ?? [],
+        changes: changes,
       },
     ]);
     await created.executeTrigger("onApply", { appliedStacks: initialStacks });

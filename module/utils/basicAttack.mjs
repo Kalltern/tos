@@ -157,11 +157,14 @@ export async function universalAttackLogic({
     <tr>
     <hr>
     <td>
+    <span
+    title="Test chance ${attributeTotalValue}%&#10;Rolled: ${attributeRoll.result}"
+    style="display:inline-block;">
     <b>${mod.name} — ${testName} Test ${attributeTotalValue}%</b><br>
-    Margin of Success: ${attributeRoll.total}<br>
+    Margin of Success: [${attributeRoll.total}]<br>
+      </span>
     </td>
     </tr>
-    <hr>
     
  
   `;

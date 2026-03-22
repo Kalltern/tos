@@ -694,4 +694,18 @@ TOS.effectDefinitions = {
       },
     },
   },
+  cyclone: {
+    name: "Cyclone",
+    img: "icons/magic/air/wind-tornado-cyclone-white.webp",
+    statuses: ["cyclone"],
+    defaultTurns: 3,
+    useDuration: true,
+  },
+  sleep: {
+    name: "Sleep",
+    img: "icons/magic/control/sleep-bubble-purple.webp",
+    statuses: ["sleep"],
+    defaultTurns: 3,
+    useDuration: true,
+  },
 };

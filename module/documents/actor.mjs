@@ -905,7 +905,7 @@ export class ToSActor extends Actor {
         Number(combatSkill.bonus ?? 0) +
         Number(systemData.globalMod ?? 0);
 
-      console.log("After:", key, combatSkill.rating);
+      //console.log("After:", key, combatSkill.rating);
     }
 
     for (let [key, attribute] of Object.entries(systemData.attributes)) {
