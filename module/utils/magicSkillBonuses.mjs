@@ -23,6 +23,7 @@ function _injectDialogCSS() {
         /* General Dialog styling */
         .spell-dialog .window-content {
             max-width: 400px; /* Increased max width for tabs */
+            min-height: 530px;
             width: 100%;
         }
         .spell-dialog .window{
@@ -201,6 +202,9 @@ export function showSpellSelectionDialogs(actor) {
         content: dialogContent,
         buttons: {},
         render: (html) => {
+          const app = spellDialog.element[0];
+          app.style.height = "auto";
+          app.style.minHeight = "360px";
           // 1. Activate initial tab
           const firstTab = html.find(".tab-item").first();
           firstTab.addClass("active");

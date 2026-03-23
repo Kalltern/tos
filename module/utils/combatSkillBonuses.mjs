@@ -13,7 +13,7 @@ async function getSneakDamageFormula(actor, weapon, weaponContext = null) {
   if (counter >= 3) {
     await actor.unsetFlag("tos", "useSneakAttack");
     await actor.unsetFlag("tos", "sneakAccessCounter");
-    console.log("Sneak attack fully consumed, flags cleared.");
+    //console.log("Sneak attack fully consumed, flags cleared.");
   } else {
     console.log(`Sneak used by ${counter}/3 systems`);
   }
@@ -486,7 +486,7 @@ export async function getAttackRolls(
       (ws.critFail ?? 0) -
       customCritFail;
     // ATTACK ROLL
-    console.log("Aim value", aimValue);
+    //  console.log("Aim value", aimValue);
     attackRollFormula =
       finesse > normalCombat && ws.finesse
         ? `@combatSkills.throwing.finesseRating + ${totalWeaponAttack} - 1d100`
@@ -506,7 +506,7 @@ export async function getAttackRolls(
       (ws.critFail ?? 0) -
       customCritFail;
     // ATTACK ROLL
-    console.log("Aim value", aimValue);
+    //  console.log("Aim value", aimValue);
     attackRollFormula =
       finesse > normalCombat && ws.finesse
         ? `@combatSkills.combat.finesseRating + ${totalWeaponAttack} - 1d100`
@@ -605,7 +605,7 @@ export async function getDamageRolls(
   const damageRoll = new Roll(damageFormula, actor.system);
   await damageRoll.evaluate();
 
-  console.log("enchant damage", actorMods.damageBonus);
+  //console.log("enchant damage", actorMods.damageBonus);
   const damageTotal = Math.floor(damageRoll.total ?? 0);
 
   // If the weapon has breakthrough, roll it
@@ -777,7 +777,7 @@ export async function getEffectRolls(
     weapon,
     weaponContext ?? null,
   );
-  console.log("sneakEffect", sneakEffect);
+  // console.log("sneakEffect", sneakEffect);
   let effectsRollResults = "";
 
   const offProps = getOffhandProps(weaponContext);

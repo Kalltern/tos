@@ -99,8 +99,8 @@ export async function combatAbilities() {
 
   if (!document.getElementById("tos-ability-dialog-styles")) {
     const css = `
-        .ability-dialog .window-content { max-width: 300px; width: 100%; }
-        .ability-dialog .window { width: auto; }
+        .ability-dialog .window-content { max-width: 300px; width: 100%; height: auto; }
+        .ability-dialog .window { width: auto; height: auto; }
         #keep-open-container { margin-bottom: 8px; font-size: 14px; }
         #keep-open { margin-right: 5px; }
     `;
@@ -337,6 +337,9 @@ export async function combatAbilities() {
     classes: ["ability-dialog"],
     buttons: {},
     render: (html) => {
+      const app = abilityDialog.element[0];
+      app.style.height = "auto";
+      app.style.minHeight = "530px";
       // Activate first tab
       const firstTab = html.find(".tab-item").first();
       firstTab.addClass("active");
