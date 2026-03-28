@@ -14,7 +14,7 @@ The system contains Lite version of the ToS ruleset and a Quickplay scenario for
 
 ### Legal
 
-This system is a project of ToS team, all rights reserved. 
+All original game content (rules, text, setting) is © ToS Team, all rights reserved.
 
 Authors of the ToS ruleset (ToS team): 
 Karkan, 
